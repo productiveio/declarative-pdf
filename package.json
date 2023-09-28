@@ -1,9 +1,9 @@
 {
-  "name": "pdfgen",
+  "name": "declarativepdf",
   "version": "0.0.1",
-  "description": "Generate PDF from HTML",
+  "description": "A tool for generating PDF documents from declarative HTML templates",
   "main": "./dist/index.js",
-  "author": "Productive.io",
+  "author": "productiveio",
   "license": "MIT",
   "type": "module",
   "scripts": {
