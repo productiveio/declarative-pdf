@@ -1,0 +1,4738 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+      name="viewport"
+    />
+    <style>
+      * {
+        -webkit-print-color-adjust: exact;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      body:not(.pdf) document-page {
+        margin: 20px auto;
+        box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.4);
+        min-height: 842px;
+        page-break-before: always;
+        background-color: #ffffff;
+        position: relative;
+        width: 595px;
+      }
+
+      document-page,
+      page-background,
+      page-header,
+      page-body,
+      page-footer {
+        display: block;
+      }
+
+      document-page {
+        position: relative;
+        z-index: 1;
+      }
+
+      page-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 595px;
+        height: 842px;
+        z-index: -1;
+      }
+
+      table {
+        border-spacing: 0;
+      }
+
+      @font-face {
+        font-family: '_helvetica';
+        src: url('./helvetica-neue.woff2')
+          format('woff2');
+      }
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        font-family: '_helvetica';
+      }
+
+      page-header,
+      page-body,
+      page-footer {
+        line-height: 10px;
+        font-size: 8px;
+        padding: 0 44px;
+        color: #111111;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        margin-top: 0;
+      }
+
+      section {
+        margin-bottom: 0;
+        padding-bottom: 14px;
+      }
+
+      table {
+        border-collapse: collapse;
+        border-spacing: 0;
+      }
+      table th {
+        font-weight: normal;
+        text-transform: none;
+        color: #4a4a4a;
+        vertical-align: top;
+      }
+
+      th {
+        text-transform: uppercase;
+        color: #888888;
+        text-align: left;
+        padding: 4px 0;
+      }
+
+      td {
+        padding: 4px 0;
+        vertical-align: top;
+      }
+
+      .clearfix::after {
+        content: '';
+        clear: both;
+        display: table;
+      }
+
+      .header {
+        padding-top: 45px;
+        padding-bottom: 26px;
+      }
+
+      .header-left {
+        width: 45%;
+        float: left;
+      }
+
+      .header-right {
+        width: 45%;
+        float: right;
+      }
+      .header-right .company-info {
+        margin-bottom: 40px;
+      }
+      .header-right .company-info:last-child {
+        margin-bottom: 0;
+      }
+
+      .header-logo {
+        margin-bottom: 20px;
+      }
+      .header-logo .header-logo__image {
+        max-width: 180px;
+        max-height: 90px;
+      }
+
+      .company-info {
+        display: block;
+      }
+      .company-info table {
+        width: 100%;
+      }
+      .company-info table th,
+      .company-info table td {
+        padding: 4px 8px;
+        line-height: 10px;
+      }
+      .company-info table th {
+        text-align: right;
+      }
+      .company-info table td {
+        width: 160px;
+        border-left: 1px solid #cccccc;
+      }
+      .company-info .company-info__name {
+        font-weight: bold;
+        font-size: 9px;
+        padding-bottom: 4px;
+      }
+
+      .details table {
+        width: 100%;
+      }
+      .details table th {
+        width: 80px;
+        text-align: left;
+        padding: 4px 8px;
+        padding-left: 0;
+      }
+      .details table td {
+        border-left: 1px solid #cccccc;
+        padding: 4px 8px;
+      }
+
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .data-table tr {
+        page-break-inside: avoid;
+      }
+      .data-table tr:nth-child(odd):not(:first-child) {
+        background-color: rgba(200, 200, 200, 0.3);
+      }
+      .data-table th,
+      .data-table td {
+        padding-left: 8px;
+        padding-right: 8px;
+        border: 1px solid #cccccc;
+      }
+      .data-table th:first-child,
+      .data-table td:first-child {
+        border-left: 0;
+      }
+      .data-table th:last-child,
+      .data-table td:last-child {
+        border-right: 0;
+      }
+      .data-table th {
+        font-size: 7px;
+        font-weight: bold;
+        padding-top: 8px;
+        padding-bottom: 2px;
+        border-top: 0;
+      }
+      .data-table td {
+        padding-top: 8px;
+        padding-bottom: 8px;
+      }
+      .data-table [col='price'],
+      .data-table [col='hourly-rate'],
+      .data-table [col='revenue'],
+      .data-table [col='amount'],
+      .data-table [col='rate'],
+      .data-table [col='quantity'],
+      .data-table [col='discount'],
+      .data-table [col='tax'],
+      .data-table [col='section-price'],
+      .data-table [col='section-revenue'],
+      .data-table [col='section-quantity'],
+      .data-table [col='section-discount'] {
+        text-align: right;
+        white-space: nowrap;
+      }
+      .data-table [col='amount'],
+      .data-table [col='section-amount'] {
+        font-weight: bold;
+      }
+      .data-table [col='discount'] {
+        width: 60px;
+      }
+
+      .totals {
+        width: 200px;
+        margin-left: auto;
+        margin-top: 8px;
+        page-break-inside: avoid;
+      }
+      .totals table {
+        width: 100%;
+      }
+      .totals table th,
+      .totals table td {
+        text-align: right;
+        padding: 4px 0;
+      }
+      .totals table [field='discount-with-services'] th,
+      .totals table [field='discount-with-services'] td {
+        text-transform: none;
+        font-size: 7px;
+        color: #888888;
+      }
+
+      .totals__total td,
+      .totals__total th {
+        font-weight: bold;
+        font-size: 10px;
+      }
+      .totals__total td .second-currency-value,
+      .totals__total th .second-currency-value {
+        margin-top: 4px;
+      }
+
+      .note {
+        margin-top: 20px;
+        border-top: 1px solid #cccccc;
+      }
+      .note table {
+        width: 100%;
+      }
+      .note table th {
+        font-weight: bold;
+        font-size: 7px;
+      }
+
+      .footer {
+        padding: 14px 0;
+        text-align: center;
+        line-height: 9px;
+        white-space: pre-line;
+      }
+
+      .white-space-pre-line {
+        white-space: pre-line;
+      }
+
+      .grand-total-section {
+        page-break-inside: avoid;
+        padding-top: 14px;
+      }
+      .grand-total-section table {
+        width: 100%;
+      }
+      .grand-total-section th {
+        font-weight: bold;
+        font-size: 12px;
+        text-transform: none;
+        color: #4a4a4a;
+      }
+      .grand-total-section td {
+        font-weight: bold;
+        text-align: right;
+        font-size: 13px;
+        color: #111111;
+      }
+      .grand-total-section .second-currency-value {
+        margin-top: 4px;
+      }
+
+      .grand-total-section2 {
+        page-break-inside: avoid;
+        margin-top: 12px;
+        margin-bottom: 16px;
+        padding-bottom: 0;
+        position: relative;
+        z-index: 1;
+      }
+      .grand-total-section2 .totals__total-table th {
+        font-weight: bold;
+        font-size: 12px;
+        text-transform: none;
+      }
+      .grand-total-section2 .totals__total-table td {
+        font-weight: bold;
+      }
+
+      .grand-total-section2:before {
+        content: '';
+        background-color: #f3f3f3;
+        position: absolute;
+        left: -8px;
+        top: -4px;
+        height: calc(100% + 10px);
+        width: calc(100% + 16px);
+        z-index: -1;
+      }
+
+      .header-tax-invoice-label {
+        font-weight: bold;
+        text-align: right;
+        font-size: 14px;
+        margin-right: 60px;
+        margin-bottom: 20px;
+      }
+
+      .data-table-service-name.has-description {
+        font-weight: bold;
+        margin-bottom: 2px;
+      }
+
+      .second-currency-value {
+        color: #888888;
+      }
+
+      .second-currency-exchange-rate-info {
+        font-size: 7px;
+      }
+
+      .draft-stamp {
+        position: absolute;
+        z-index: -1;
+        font-size: 70px;
+        font-weight: 600;
+        transform: rotate(45deg);
+        top: 100px;
+        left: 140px;
+        opacity: 0.1;
+        letter-spacing: 8px;
+        user-select: none;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      window.data = {
+        bill_from: {
+          name: 'Development d.o.o',
+          address: 'Strojarska 3',
+          email: null,
+          city: 'Zagreb',
+          zipcode: '10000',
+          country: 'Croatia',
+          state: 'Zagrebacka',
+          phone: null,
+          website: null,
+          vat: 'PDV',
+        },
+        bill_to: {
+          name: 'This is A FULL CLIENT',
+          address: 'work',
+          city: 'zgbbb',
+          zipcode: '123345',
+          country: 'Croatia',
+          state: 'hr',
+          vat: '12345',
+        },
+        company_custom_fields: null,
+        company: {
+          name: 'A FULL CLIENT',
+          avatar_url: './avatar.jpg',
+          description: 'here is some background info',
+          due_days: 30,
+          company_code: 'CODE!@#',
+          emails: [
+            { name: 'Work', email: 'neki@email.com', contact_datum_id: 146 },
+            {
+              name: 'Home',
+              email: 'neki-drugi@mail.com',
+              contact_datum_id: 154,
+            },
+          ],
+          phones: [
+            { name: 'Mobile', phone: '123', contact_datum_id: 143 },
+            { name: 'Work', phone: '123', contact_datum_id: 144 },
+            { name: 'Home', phone: '123', contact_datum_id: 145 },
+          ],
+          websites: [
+            { name: 'Website', website: 'neki.website', contact_datum_id: 147 },
+            { name: 'Blog', website: 'neki.blog', contact_datum_id: 148 },
+            {
+              name: 'LinkedIn',
+              website: 'neki.linkedin',
+              contact_datum_id: 149,
+            },
+            { name: 'Twitter', website: 'neki.twitter', contact_datum_id: 150 },
+            {
+              name: 'Facebook',
+              website: 'neki.facebook',
+              contact_datum_id: 151,
+            },
+          ],
+          addresses: [
+            {
+              city: 'zgb',
+              name: 'Home',
+              state: 'hr',
+              address: 'home',
+              country: 'Croatia',
+              zipcode: '123',
+              billing_address: false,
+              contact_datum_id: 152,
+            },
+            {
+              city: 'zgbbb',
+              name: 'Billing',
+              state: 'hr',
+              address: 'work',
+              country: 'Croatia',
+              zipcode: '123345',
+              billing_address: true,
+              contact_datum_id: 153,
+            },
+          ],
+        },
+        contact: {
+          name: 'Client Manager',
+          first_name: 'Client',
+          last_name: 'Manager',
+          email: 'client.manager@productive.io',
+          phones: [
+            { name: 'Mobile', phone: '11111111111', contact_datum_id: 221 },
+            { name: 'Work', phone: '2222222222', contact_datum_id: 222 },
+          ],
+          title: 'Boss',
+        },
+        creator: {
+          name: 'Tibor Rogulja',
+          first_name: 'Tibor',
+          last_name: 'Rogulja',
+          email: 'admin@productive.io',
+          phones: [
+            { name: 'Mobile', phone: '555555', contact_datum_id: 217 },
+            { name: 'Mobile', phone: '444444', contact_datum_id: 220 },
+          ],
+          title: 'dr',
+        },
+        custom_fields: {
+          Customizable: {
+            id: '1',
+            name: 'Customizable',
+            description: 'asd',
+            value: null,
+          },
+          'Deal factor': {
+            id: '76',
+            name: 'Deal factor',
+            description: null,
+            value: null,
+          },
+          asdasd: {
+            id: '86',
+            name: 'asdasd',
+            description: 'asdasd',
+            value: null,
+          },
+          'Additional Information': {
+            id: '103',
+            name: 'Additional Information',
+            description: null,
+            value: '',
+          },
+          'Delivery Date': {
+            id: '101',
+            name: 'Delivery Date',
+            description: null,
+            value: '09/17/2022',
+          },
+          Google: {
+            id: '102',
+            name: 'Google',
+            description: 'google docs link',
+            value: '',
+          },
+          'Nakon ponude': {
+            id: '104',
+            name: 'Nakon ponude',
+            description: 'studio sonda',
+            value: null,
+          },
+          'Nakon idejnog': {
+            id: '105',
+            name: 'Nakon idejnog',
+            description: 'studio sonda',
+            value: '- ovo je nesto ovdje stajaznam',
+          },
+          'Nakon izvedbenog': {
+            id: '106',
+            name: 'Nakon izvedbenog',
+            description: 'studio sonda',
+            value: null,
+          },
+          Subject: {
+            id: '107',
+            name: 'Subject',
+            description: null,
+            value: 'Ovo je subject koji bi se trebao vidjet',
+          },
+          'Fulfilment period': {
+            id: '108',
+            name: 'Fulfilment period',
+            description: null,
+            value: 'neki period 1233',
+          },
+          'Payment Terms': {
+            id: '109',
+            name: 'Payment Terms',
+            description: null,
+            value: 'ovo su neki termsi',
+          },
+          'Project Duration': {
+            id: '110',
+            name: 'Project Duration',
+            description: null,
+            value: '30',
+          },
+          'Total (EUR)': {
+            id: '111',
+            name: 'Total (EUR)',
+            description: null,
+            value: null,
+          },
+          ProReq: {
+            id: '113',
+            name: 'ProReq',
+            description: 'production required field',
+            value: null,
+          },
+        },
+        date: '2022-02-09',
+        end_date: null,
+        footer: null,
+        logo_url: './logo.png',
+        name: 'A brand new deal',
+        note: null,
+        number: '1744',
+        owner: {
+          name: 'Tibor Rogulja',
+          first_name: 'Tibor',
+          last_name: 'Rogulja',
+          email: 'admin@productive.io',
+          phones: [
+            { name: 'Mobile', phone: '555555', contact_datum_id: 217 },
+            { name: 'Mobile', phone: '444444', contact_datum_id: 220 },
+          ],
+          title: 'dr',
+        },
+        purchase_order_number: 'yolo69',
+        has_dual_currency_displayed: false,
+        exchange_rate_dual: 1,
+        budget_revamp: true,
+        generated_at: '18. february 2023 10:57 AM +00:00',
+        show_budget_totals: null,
+        currency: 'CHF',
+        currency_dual: null,
+        tax1_name: 'PDV',
+        tax1_value: '10.0',
+        tax1_amount: 1913439.0,
+        tax1_amount_dual: null,
+        tax2_name: null,
+        tax2_value: null,
+        tax2_amount: 0.0,
+        tax2_amount_dual: null,
+        tax_value: 10.0,
+        tax_amount: 1913439,
+        subtotal: 19134390,
+        subtotal_dual: null,
+        discount_with_services: 56.09,
+        discount_amount_with_services: 24437610.0,
+        discount_amount_with_services_dual: null,
+        total: 21047829,
+        total_dual: null,
+        services: [
+          {
+            name: 'neki servis za recycle bin',
+            description: '\u003cdiv\u003eopis\u003c/div\u003e',
+            unit: 'day',
+            is_hourly_pricing_type: true,
+            is_fixed_pricing_type: false,
+            price: 11000,
+            price_dual: null,
+            pricing_type_name: 'Actual',
+            pricing_type: 'hourly',
+            budget_used: 0,
+            budget_used_dual: null,
+            budget_total: 0,
+            budget_total_dual: null,
+            quantity: '11.0',
+            discount: 100.0,
+            discount_amount: 121000.0,
+            total: 0,
+            total_dual: null,
+            service_type: 'Programming',
+            estimated_time: 5280,
+            estimated_hours: 88.0,
+            billable_time: 0,
+            billable_hours: 0.0,
+          },
+          {
+            name: 'Price management',
+            description: null,
+            unit: 'hour',
+            is_hourly_pricing_type: false,
+            is_fixed_pricing_type: true,
+            price: 100,
+            price_dual: null,
+            pricing_type_name: 'Fixed',
+            pricing_type: 'fixed_price',
+            budget_used: 0,
+            budget_used_dual: null,
+            budget_total: 0,
+            budget_total_dual: null,
+            quantity: '100.0',
+            discount: 100.0,
+            discount_amount: 10000.0,
+            total: 0,
+            total_dual: null,
+            service_type: 'Project Management',
+            estimated_time: 1200,
+            estimated_hours: 20.0,
+            billable_time: 0,
+            billable_hours: 0.0,
+          },
+          {
+            name: 'neki itemi',
+            description: null,
+            unit: 'piece',
+            is_hourly_pricing_type: false,
+            is_fixed_pricing_type: true,
+            price: 0,
+            price_dual: null,
+            pricing_type_name: 'Fixed',
+            pricing_type: 'fixed_price',
+            budget_used: 0,
+            budget_used_dual: null,
+            budget_total: 0,
+            budget_total_dual: null,
+            quantity: '0.0',
+            discount: 0.0,
+            discount_amount: 0.0,
+            total: 0,
+            total_dual: null,
+            service_type: 'Programming',
+            estimated_time: 600,
+            estimated_hours: 10.0,
+            billable_time: 480,
+            billable_hours: 8.0,
+          },
+          {
+            name: 'some new things that are super nice',
+            description:
+              '\u003cdiv\u003ehere is some description\u003c/div\u003e',
+            unit: 'day',
+            is_hourly_pricing_type: true,
+            is_fixed_pricing_type: false,
+            price: 500000,
+            price_dual: null,
+            pricing_type_name: 'Actual',
+            pricing_type: 'hourly',
+            budget_used: 0,
+            budget_used_dual: null,
+            budget_total: 13750000,
+            budget_total_dual: null,
+            quantity: '55.0',
+            discount: 50.0,
+            discount_amount: 13750000.0,
+            total: 13750000,
+            total_dual: null,
+            service_type: 'Business Development',
+            estimated_time: 26400,
+            estimated_hours: 440.0,
+            billable_time: 0,
+            billable_hours: 0.0,
+          },
+          {
+            name: 'Proba descriptiona',
+            description:
+              '\u003cdiv\u003esomething\u003c/div\u003e\u003cblockquote\u003enew\u003c/blockquote\u003e\u003cdiv\u003e\u003cstrong\u003enew\u003c/strong\u003e\u003cbr\u003e\u003cem\u003enew\u003c/em\u003e\u003cbr\u003enew\u003c/div\u003e',
+            unit: 'piece',
+            is_hourly_pricing_type: true,
+            is_fixed_pricing_type: false,
+            price: 2000,
+            price_dual: null,
+            pricing_type_name: 'Actual',
+            pricing_type: 'hourly',
+            budget_used: 0,
+            budget_used_dual: null,
+            budget_total: 0,
+            budget_total_dual: null,
+            quantity: '5000.0',
+            discount: 100.0,
+            discount_amount: 10000000.0,
+            total: 0,
+            total_dual: null,
+            service_type: 'govno tyupe 2',
+            estimated_time: 0,
+            estimated_hours: 0.0,
+            billable_time: 0,
+            billable_hours: 0.0,
+          },
+          {
+            name: 'test',
+            description: null,
+            unit: 'hour',
+            is_hourly_pricing_type: false,
+            is_fixed_pricing_type: true,
+            price: 0,
+            price_dual: null,
+            pricing_type_name: 'Fixed',
+            pricing_type: 'fixed_price',
+            budget_used: 0,
+            budget_used_dual: null,
+            budget_total: 0,
+            budget_total_dual: null,
+            quantity: '0.0',
+            discount: 100.0,
+            discount_amount: 0.0,
+            total: 0,
+            total_dual: null,
+            service_type: 'govno tyupe 2',
+            estimated_time: 600,
+            estimated_hours: 10.0,
+            billable_time: 0,
+            billable_hours: 0.0,
+          },
+          {
+            name: 'Tipkanje u prazno',
+            description:
+              '\u003cdiv\u003eOvo je neki opis ovog servisa\u003cbr\u003eOvo je neki opis ovog servisa\u003cbr\u003eOvo je neki opis ovog servisa\u003cbr\u003eOvo je neki opis ovog servisa\u003cbr\u003eOvo je neki opis ovog servisa\u003cbr\u003eOvo je neki opis ovog servisa\u003cbr\u003eOvo je neki opis ovog servisa\u003c/div\u003e',
+            unit: 'day',
+            is_hourly_pricing_type: true,
+            is_fixed_pricing_type: false,
+            price: 50000,
+            price_dual: null,
+            pricing_type_name: 'Actual',
+            pricing_type: 'hourly',
+            budget_used: 0,
+            budget_used_dual: null,
+            budget_total: 2000000,
+            budget_total_dual: null,
+            quantity: '50.0',
+            discount: 20.0,
+            discount_amount: 500000.0,
+            total: 2000000,
+            total_dual: null,
+            service_type: 'govno tyupe 2',
+            estimated_time: 24000,
+            estimated_hours: 400.0,
+            billable_time: 0,
+            billable_hours: 0.0,
+          },
+          {
+            name: 'magla',
+            description:
+              '\u003cdiv\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003c/div\u003e',
+            unit: 'hour',
+            is_hourly_pricing_type: false,
+            is_fixed_pricing_type: true,
+            price: 111000,
+            price_dual: null,
+            pricing_type_name: 'Fixed',
+            pricing_type: 'fixed_price',
+            budget_used: 879120,
+            budget_used_dual: null,
+            budget_total: 1208790,
+            budget_total_dual: null,
+            quantity: '11.0',
+            discount: 1.0,
+            discount_amount: 12210.0,
+            total: 1208790,
+            total_dual: null,
+            service_type: 'Food delivery',
+            estimated_time: 660,
+            estimated_hours: 11.0,
+            billable_time: 480,
+            billable_hours: 8.0,
+          },
+          {
+            name: 'magla 2',
+            description:
+              '\u003cdiv\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003c/div\u003e',
+            unit: 'hour',
+            is_hourly_pricing_type: false,
+            is_fixed_pricing_type: true,
+            price: 111000,
+            price_dual: null,
+            pricing_type_name: 'Fixed',
+            pricing_type: 'fixed_price',
+            budget_used: 0,
+            budget_used_dual: null,
+            budget_total: 2175600,
+            budget_total_dual: null,
+            quantity: '20.0',
+            discount: 2.0,
+            discount_amount: 44400.0,
+            total: 2175600,
+            total_dual: null,
+            service_type: 'Food delivery',
+            estimated_time: 1200,
+            estimated_hours: 20.0,
+            billable_time: 0,
+            billable_hours: 0.0,
+          },
+        ],
+        sections: [
+          {
+            id: '69',
+            name: 'section 1',
+            has_services_discount: true,
+            services: [
+              {
+                name: 'neki servis za recycle bin',
+                description: '\u003cdiv\u003eopis\u003c/div\u003e',
+                unit: 'day',
+                is_hourly_pricing_type: true,
+                is_fixed_pricing_type: false,
+                price: 11000,
+                price_dual: null,
+                pricing_type_name: 'Actual',
+                pricing_type: 'hourly',
+                budget_used: 0,
+                budget_used_dual: null,
+                budget_total: 0,
+                budget_total_dual: null,
+                quantity: '11.0',
+                discount: 100.0,
+                discount_amount: 121000.0,
+                total: 0,
+                total_dual: null,
+                service_type: 'Programming',
+                estimated_time: 5280,
+                estimated_hours: 88.0,
+                billable_time: 0,
+                billable_hours: 0.0,
+              },
+              {
+                name: 'Price management',
+                description: null,
+                unit: 'hour',
+                is_hourly_pricing_type: false,
+                is_fixed_pricing_type: true,
+                price: 100,
+                price_dual: null,
+                pricing_type_name: 'Fixed',
+                pricing_type: 'fixed_price',
+                budget_used: 0,
+                budget_used_dual: null,
+                budget_total: 0,
+                budget_total_dual: null,
+                quantity: '100.0',
+                discount: 100.0,
+                discount_amount: 10000.0,
+                total: 0,
+                total_dual: null,
+                service_type: 'Project Management',
+                estimated_time: 1200,
+                estimated_hours: 20.0,
+                billable_time: 0,
+                billable_hours: 0.0,
+              },
+              {
+                name: 'neki itemi',
+                description: null,
+                unit: 'piece',
+                is_hourly_pricing_type: false,
+                is_fixed_pricing_type: true,
+                price: 0,
+                price_dual: null,
+                pricing_type_name: 'Fixed',
+                pricing_type: 'fixed_price',
+                budget_used: 0,
+                budget_used_dual: null,
+                budget_total: 0,
+                budget_total_dual: null,
+                quantity: '0.0',
+                discount: 0.0,
+                discount_amount: 0.0,
+                total: 0,
+                total_dual: null,
+                service_type: 'Programming',
+                estimated_time: 600,
+                estimated_hours: 10.0,
+                billable_time: 480,
+                billable_hours: 8.0,
+              },
+              {
+                name: 'some new things that are super nice',
+                description:
+                  '\u003cdiv\u003ehere is some description\u003c/div\u003e',
+                unit: 'day',
+                is_hourly_pricing_type: true,
+                is_fixed_pricing_type: false,
+                price: 500000,
+                price_dual: null,
+                pricing_type_name: 'Actual',
+                pricing_type: 'hourly',
+                budget_used: 0,
+                budget_used_dual: null,
+                budget_total: 13750000,
+                budget_total_dual: null,
+                quantity: '55.0',
+                discount: 50.0,
+                discount_amount: 13750000.0,
+                total: 13750000,
+                total_dual: null,
+                service_type: 'Business Development',
+                estimated_time: 26400,
+                estimated_hours: 440.0,
+                billable_time: 0,
+                billable_hours: 0.0,
+              },
+            ],
+            subtotal: 13750000,
+            subtotal_default: 14882627,
+            subtotal_dual: null,
+            discount_percentage: 50.24,
+            discount_amount: 13881000.0,
+            discount_amount_default: 15024393.0,
+            discount_amount_dual: null,
+            discounted_amount: 13750000,
+            discounted_amount_default: 14882627,
+            discounted_amount_dual: null,
+            tax1_amount: 1375000.0,
+            tax1_amount_default: 1488262.7,
+            tax1_amount_dual: null,
+            tax2_amount: 0.0,
+            tax2_amount_default: 0.0,
+            tax2_amount_dual: null,
+            tax_amount: 1375000.0,
+            tax_amount_default: 1488262.7,
+            total: 15125000.0,
+            total_default: 16370889.7,
+            total_dual: null,
+          },
+          {
+            id: '114',
+            name: 'section 2',
+            has_services_discount: true,
+            services: [
+              {
+                name: 'Proba descriptiona',
+                description:
+                  '\u003cdiv\u003esomething\u003c/div\u003e\u003cblockquote\u003enew\u003c/blockquote\u003e\u003cdiv\u003e\u003cstrong\u003enew\u003c/strong\u003e\u003cbr\u003e\u003cem\u003enew\u003c/em\u003e\u003cbr\u003enew\u003c/div\u003e',
+                unit: 'piece',
+                is_hourly_pricing_type: true,
+                is_fixed_pricing_type: false,
+                price: 2000,
+                price_dual: null,
+                pricing_type_name: 'Actual',
+                pricing_type: 'hourly',
+                budget_used: 0,
+                budget_used_dual: null,
+                budget_total: 0,
+                budget_total_dual: null,
+                quantity: '5000.0',
+                discount: 100.0,
+                discount_amount: 10000000.0,
+                total: 0,
+                total_dual: null,
+                service_type: 'govno tyupe 2',
+                estimated_time: 0,
+                estimated_hours: 0.0,
+                billable_time: 0,
+                billable_hours: 0.0,
+              },
+              {
+                name: 'test',
+                description: null,
+                unit: 'hour',
+                is_hourly_pricing_type: false,
+                is_fixed_pricing_type: true,
+                price: 0,
+                price_dual: null,
+                pricing_type_name: 'Fixed',
+                pricing_type: 'fixed_price',
+                budget_used: 0,
+                budget_used_dual: null,
+                budget_total: 0,
+                budget_total_dual: null,
+                quantity: '0.0',
+                discount: 100.0,
+                discount_amount: 0.0,
+                total: 0,
+                total_dual: null,
+                service_type: 'govno tyupe 2',
+                estimated_time: 600,
+                estimated_hours: 10.0,
+                billable_time: 0,
+                billable_hours: 0.0,
+              },
+              {
+                name: 'Tipkanje u prazno',
+                description:
+                  '\u003cdiv\u003eOvo je neki opis ovog servisa\u003cbr\u003eOvo je neki opis ovog servisa\u003cbr\u003eOvo je neki opis ovog servisa\u003cbr\u003eOvo je neki opis ovog servisa\u003cbr\u003eOvo je neki opis ovog servisa\u003cbr\u003eOvo je neki opis ovog servisa\u003cbr\u003eOvo je neki opis ovog servisa\u003c/div\u003e',
+                unit: 'day',
+                is_hourly_pricing_type: true,
+                is_fixed_pricing_type: false,
+                price: 50000,
+                price_dual: null,
+                pricing_type_name: 'Actual',
+                pricing_type: 'hourly',
+                budget_used: 0,
+                budget_used_dual: null,
+                budget_total: 2000000,
+                budget_total_dual: null,
+                quantity: '50.0',
+                discount: 20.0,
+                discount_amount: 500000.0,
+                total: 2000000,
+                total_dual: null,
+                service_type: 'govno tyupe 2',
+                estimated_time: 24000,
+                estimated_hours: 400.0,
+                billable_time: 0,
+                billable_hours: 0.0,
+              },
+            ],
+            subtotal: 2000000,
+            subtotal_default: 2164746,
+            subtotal_dual: null,
+            discount_percentage: 84.0,
+            discount_amount: 10500000.0,
+            discount_amount_default: 11366186.5,
+            discount_amount_dual: null,
+            discounted_amount: 2000000,
+            discounted_amount_default: 2164746,
+            discounted_amount_dual: null,
+            tax1_amount: 200000.0,
+            tax1_amount_default: 216474.6,
+            tax1_amount_dual: null,
+            tax2_amount: 0.0,
+            tax2_amount_default: 0.0,
+            tax2_amount_dual: null,
+            tax_amount: 200000.0,
+            tax_amount_default: 216474.6,
+            total: 2200000.0,
+            total_default: 2381220.6,
+            total_dual: null,
+          },
+          {
+            id: '140',
+            name: 'section 3',
+            has_services_discount: true,
+            services: [
+              {
+                name: 'magla',
+                description:
+                  '\u003cdiv\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003c/div\u003e',
+                unit: 'hour',
+                is_hourly_pricing_type: false,
+                is_fixed_pricing_type: true,
+                price: 111000,
+                price_dual: null,
+                pricing_type_name: 'Fixed',
+                pricing_type: 'fixed_price',
+                budget_used: 879120,
+                budget_used_dual: null,
+                budget_total: 1208790,
+                budget_total_dual: null,
+                quantity: '11.0',
+                discount: 1.0,
+                discount_amount: 12210.0,
+                total: 1208790,
+                total_dual: null,
+                service_type: 'Food delivery',
+                estimated_time: 660,
+                estimated_hours: 11.0,
+                billable_time: 480,
+                billable_hours: 8.0,
+              },
+              {
+                name: 'magla 2',
+                description:
+                  '\u003cdiv\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003c/div\u003e',
+                unit: 'hour',
+                is_hourly_pricing_type: false,
+                is_fixed_pricing_type: true,
+                price: 111000,
+                price_dual: null,
+                pricing_type_name: 'Fixed',
+                pricing_type: 'fixed_price',
+                budget_used: 0,
+                budget_used_dual: null,
+                budget_total: 2175600,
+                budget_total_dual: null,
+                quantity: '20.0',
+                discount: 2.0,
+                discount_amount: 44400.0,
+                total: 2175600,
+                total_dual: null,
+                service_type: 'Food delivery',
+                estimated_time: 1200,
+                estimated_hours: 20.0,
+                billable_time: 0,
+                billable_hours: 0.0,
+              },
+            ],
+            subtotal: 3384390,
+            subtotal_default: 3663172,
+            subtotal_dual: null,
+            discount_percentage: 1.65,
+            discount_amount: 56610.0,
+            discount_amount_default: 61273.124716553284,
+            discount_amount_dual: null,
+            discounted_amount: 3384390,
+            discounted_amount_default: 3663172,
+            discounted_amount_dual: null,
+            tax1_amount: 338439.0,
+            tax1_amount_default: 366317.2,
+            tax1_amount_dual: null,
+            tax2_amount: 0.0,
+            tax2_amount_default: 0.0,
+            tax2_amount_dual: null,
+            tax_amount: 338439.0,
+            tax_amount_default: 366317.2,
+            total: 3722829.0,
+            total_default: 4029489.2,
+            total_dual: null,
+          },
+        ],
+        sections_length: 3,
+        discount: null,
+        discount_amount: 0.0,
+        discount_amount_dual: null,
+        non_discounted_total: 43572000.0,
+        discounted_amount: 19134390,
+        has_services_discount: true,
+        fp_services: [
+          {
+            name: 'Price management',
+            description: null,
+            unit: 'hour',
+            is_hourly_pricing_type: false,
+            is_fixed_pricing_type: true,
+            price: 100,
+            price_dual: null,
+            pricing_type_name: 'Fixed',
+            pricing_type: 'fixed_price',
+            budget_used: 0,
+            budget_used_dual: null,
+            budget_total: 0,
+            budget_total_dual: null,
+            quantity: '100.0',
+            discount: 100.0,
+            discount_amount: 10000.0,
+            total: 0,
+            total_dual: null,
+            service_type: 'Project Management',
+            estimated_time: 1200,
+            estimated_hours: 20.0,
+            billable_time: 0,
+            billable_hours: 0.0,
+          },
+          {
+            name: 'neki itemi',
+            description: null,
+            unit: 'piece',
+            is_hourly_pricing_type: false,
+            is_fixed_pricing_type: true,
+            price: 0,
+            price_dual: null,
+            pricing_type_name: 'Fixed',
+            pricing_type: 'fixed_price',
+            budget_used: 0,
+            budget_used_dual: null,
+            budget_total: 0,
+            budget_total_dual: null,
+            quantity: '0.0',
+            discount: 0.0,
+            discount_amount: 0.0,
+            total: 0,
+            total_dual: null,
+            service_type: 'Programming',
+            estimated_time: 600,
+            estimated_hours: 10.0,
+            billable_time: 480,
+            billable_hours: 8.0,
+          },
+          {
+            name: 'test',
+            description: null,
+            unit: 'hour',
+            is_hourly_pricing_type: false,
+            is_fixed_pricing_type: true,
+            price: 0,
+            price_dual: null,
+            pricing_type_name: 'Fixed',
+            pricing_type: 'fixed_price',
+            budget_used: 0,
+            budget_used_dual: null,
+            budget_total: 0,
+            budget_total_dual: null,
+            quantity: '0.0',
+            discount: 100.0,
+            discount_amount: 0.0,
+            total: 0,
+            total_dual: null,
+            service_type: 'govno tyupe 2',
+            estimated_time: 600,
+            estimated_hours: 10.0,
+            billable_time: 0,
+            billable_hours: 0.0,
+          },
+          {
+            name: 'magla',
+            description:
+              '\u003cdiv\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003c/div\u003e',
+            unit: 'hour',
+            is_hourly_pricing_type: false,
+            is_fixed_pricing_type: true,
+            price: 111000,
+            price_dual: null,
+            pricing_type_name: 'Fixed',
+            pricing_type: 'fixed_price',
+            budget_used: 879120,
+            budget_used_dual: null,
+            budget_total: 1208790,
+            budget_total_dual: null,
+            quantity: '11.0',
+            discount: 1.0,
+            discount_amount: 12210.0,
+            total: 1208790,
+            total_dual: null,
+            service_type: 'Food delivery',
+            estimated_time: 660,
+            estimated_hours: 11.0,
+            billable_time: 480,
+            billable_hours: 8.0,
+          },
+          {
+            name: 'magla 2',
+            description:
+              '\u003cdiv\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003cbr\u003eovdje ide neki opis\u003c/div\u003e',
+            unit: 'hour',
+            is_hourly_pricing_type: false,
+            is_fixed_pricing_type: true,
+            price: 111000,
+            price_dual: null,
+            pricing_type_name: 'Fixed',
+            pricing_type: 'fixed_price',
+            budget_used: 0,
+            budget_used_dual: null,
+            budget_total: 2175600,
+            budget_total_dual: null,
+            quantity: '20.0',
+            discount: 2.0,
+            discount_amount: 44400.0,
+            total: 2175600,
+            total_dual: null,
+            service_type: 'Food delivery',
+            estimated_time: 1200,
+            estimated_hours: 20.0,
+            billable_time: 0,
+            billable_hours: 0.0,
+          },
+        ],
+        fp_tax_amount: 338439,
+        fp_discount_amount: 0.0,
+        fp_discounted_amount: 3384390.0,
+        fp_services_discount_amount: 66610,
+        fp_subtotal: 3384390,
+        fp_subtotal_dual: null,
+        fp_total: 3722829.0,
+        fp_total_dual: null,
+        fp_tax1_amount: 338439,
+        fp_tax1_amount_dual: null,
+        fp_tax2_amount: 0,
+        fp_tax2_amount_dual: null,
+        hp_services: [
+          {
+            name: 'neki servis za recycle bin',
+            description: '\u003cdiv\u003eopis\u003c/div\u003e',
+            unit: 'day',
+            is_hourly_pricing_type: true,
+            is_fixed_pricing_type: false,
+            price: 11000,
+            price_dual: null,
+            pricing_type_name: 'Actual',
+            pricing_type: 'hourly',
+            budget_used: 0,
+            budget_used_dual: null,
+            budget_total: 0,
+            budget_total_dual: null,
+            quantity: '11.0',
+            discount: 100.0,
+            discount_amount: 121000.0,
+            total: 0,
+            total_dual: null,
+            service_type: 'Programming',
+            estimated_time: 5280,
+            estimated_hours: 88.0,
+            billable_time: 0,
+            billable_hours: 0.0,
+          },
+          {
+            name: 'some new things that are super nice',
+            description:
+              '\u003cdiv\u003ehere is some description\u003c/div\u003e',
+            unit: 'day',
+            is_hourly_pricing_type: true,
+            is_fixed_pricing_type: false,
+            price: 500000,
+            price_dual: null,
+            pricing_type_name: 'Actual',
+            pricing_type: 'hourly',
+            budget_used: 0,
+            budget_used_dual: null,
+            budget_total: 13750000,
+            budget_total_dual: null,
+            quantity: '55.0',
+            discount: 50.0,
+            discount_amount: 13750000.0,
+            total: 13750000,
+            total_dual: null,
+            service_type: 'Business Development',
+            estimated_time: 26400,
+            estimated_hours: 440.0,
+            billable_time: 0,
+            billable_hours: 0.0,
+          },
+          {
+            name: 'Proba descriptiona',
+            description:
+              '\u003cdiv\u003esomething\u003c/div\u003e\u003cblockquote\u003enew\u003c/blockquote\u003e\u003cdiv\u003e\u003cstrong\u003enew\u003c/strong\u003e\u003cbr\u003e\u003cem\u003enew\u003c/em\u003e\u003cbr\u003enew\u003c/div\u003e',
+            unit: 'piece',
+            is_hourly_pricing_type: true,
+            is_fixed_pricing_type: false,
+            price: 2000,
+            price_dual: null,
+            pricing_type_name: 'Actual',
+            pricing_type: 'hourly',
+            budget_used: 0,
+            budget_used_dual: null,
+            budget_total: 0,
+            budget_total_dual: null,
+            quantity: '5000.0',
+            discount: 100.0,
+            discount_amount: 10000000.0,
+            total: 0,
+            total_dual: null,
+            service_type: 'govno tyupe 2',
+            estimated_time: 0,
+            estimated_hours: 0.0,
+            billable_time: 0,
+            billable_hours: 0.0,
+          },
+          {
+            name: 'Tipkanje u prazno',
+            description:
+              '\u003cdiv\u003eOvo je neki opis ovog servisa\u003cbr\u003eOvo je neki opis ovog servisa\u003cbr\u003eOvo je neki opis ovog servisa\u003cbr\u003eOvo je neki opis ovog servisa\u003cbr\u003eOvo je neki opis ovog servisa\u003cbr\u003eOvo je neki opis ovog servisa\u003cbr\u003eOvo je neki opis ovog servisa\u003c/div\u003e',
+            unit: 'day',
+            is_hourly_pricing_type: true,
+            is_fixed_pricing_type: false,
+            price: 50000,
+            price_dual: null,
+            pricing_type_name: 'Actual',
+            pricing_type: 'hourly',
+            budget_used: 0,
+            budget_used_dual: null,
+            budget_total: 2000000,
+            budget_total_dual: null,
+            quantity: '50.0',
+            discount: 20.0,
+            discount_amount: 500000.0,
+            total: 2000000,
+            total_dual: null,
+            service_type: 'govno tyupe 2',
+            estimated_time: 24000,
+            estimated_hours: 400.0,
+            billable_time: 0,
+            billable_hours: 0.0,
+          },
+        ],
+        hp_tax_amount: 0,
+        hp_discount_amount: 0.0,
+        hp_discounted_amount: 0.0,
+        hp_services_discount_amount: 0,
+        hp_subtotal: 0,
+        hp_subtotal_dual: null,
+        hp_total: 0.0,
+        hp_total_dual: null,
+        hp_tax1_amount: 0,
+        hp_tax1_amount_dual: null,
+        hp_tax2_amount: 0,
+        hp_tax2_amount_dual: null,
+        expenses: [],
+        expenses_tax_amount: 0,
+        expenses_discount_amount: 0.0,
+        expenses_discounted_amount: 0.0,
+        expenses_subtotal: 0,
+        expenses_subtotal_dual: null,
+        expenses_total: 0.0,
+        expenses_total_dual: null,
+        expenses_tax1_amount: 0,
+        expenses_tax1_amount_dual: null,
+        expenses_tax2_amount: 0,
+        expenses_tax2_amount_dual: null,
+        service_type_groups: [
+          {
+            service_type: { name: 'Programming' },
+            items: [
+              {
+                description: 'neki servis za recycle bin',
+                unit: 'day',
+                quantity: 11.0,
+                unit_price: 11000.0,
+                amount: 0.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '100.0',
+                has_discount: true,
+                service_type: { name: 'Programming' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 11000.0,
+              },
+              {
+                description: 'neki itemi',
+                unit: 'piece',
+                quantity: 0.0,
+                unit_price: 0.0,
+                amount: 0.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: null,
+                has_discount: false,
+                service_type: { name: 'Programming' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 0.0,
+              },
+            ],
+            has_discounted_item: true,
+            has_item_with_markup: false,
+            has_services: true,
+            amount: 0.0,
+            currency: 'CHF',
+          },
+          {
+            service_type: { name: 'Project Management' },
+            items: [
+              {
+                description: 'Price management',
+                unit: 'hour',
+                quantity: 100.0,
+                unit_price: 100.0,
+                amount: 0.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '100.0',
+                has_discount: true,
+                service_type: { name: 'Project Management' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 100.0,
+              },
+            ],
+            has_discounted_item: true,
+            has_item_with_markup: false,
+            has_services: true,
+            amount: 0.0,
+            currency: 'CHF',
+          },
+          {
+            service_type: { name: 'Business Development' },
+            items: [
+              {
+                description: 'some new things that are super nice',
+                unit: 'day',
+                quantity: 55.0,
+                unit_price: 500000.0,
+                amount: 13750000.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '50.0',
+                has_discount: true,
+                service_type: { name: 'Business Development' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 500000.0,
+              },
+            ],
+            has_discounted_item: true,
+            has_item_with_markup: false,
+            has_services: true,
+            amount: 13750000.0,
+            currency: 'CHF',
+          },
+          {
+            service_type: { name: 'govno tyupe 2' },
+            items: [
+              {
+                description: 'Proba descriptiona',
+                unit: 'piece',
+                quantity: 5000.0,
+                unit_price: 2000.0,
+                amount: 0.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '100.0',
+                has_discount: true,
+                service_type: { name: 'govno tyupe 2' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 2000.0,
+              },
+              {
+                description: 'test',
+                unit: 'hour',
+                quantity: 0.0,
+                unit_price: 0.0,
+                amount: 0.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '100.0',
+                has_discount: true,
+                service_type: { name: 'govno tyupe 2' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 0.0,
+              },
+              {
+                description: 'Tipkanje u prazno',
+                unit: 'day',
+                quantity: 50.0,
+                unit_price: 50000.0,
+                amount: 2000000.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '20.0',
+                has_discount: true,
+                service_type: { name: 'govno tyupe 2' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 50000.0,
+              },
+            ],
+            has_discounted_item: true,
+            has_item_with_markup: false,
+            has_services: true,
+            amount: 2000000.0,
+            currency: 'CHF',
+          },
+          {
+            service_type: { name: 'Food delivery' },
+            items: [
+              {
+                description: 'magla',
+                unit: 'hour',
+                quantity: 11.0,
+                unit_price: 111000.0,
+                amount: 1208790.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '1.0',
+                has_discount: true,
+                service_type: { name: 'Food delivery' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 111000.0,
+              },
+              {
+                description: 'magla 2',
+                unit: 'hour',
+                quantity: 20.0,
+                unit_price: 111000.0,
+                amount: 2175600.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '2.0',
+                has_discount: true,
+                service_type: { name: 'Food delivery' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 111000.0,
+              },
+            ],
+            has_discounted_item: true,
+            has_item_with_markup: false,
+            has_services: true,
+            amount: 3384390.0,
+            currency: 'CHF',
+          },
+        ],
+        service_type_groups_by_name: [
+          {
+            service_type: { name: 'Business Development' },
+            items: [
+              {
+                description: 'some new things that are super nice',
+                unit: 'day',
+                quantity: 55.0,
+                unit_price: 500000.0,
+                amount: 13750000.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '50.0',
+                has_discount: true,
+                service_type: { name: 'Business Development' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 500000.0,
+              },
+            ],
+            has_discounted_item: true,
+            has_item_with_markup: false,
+            has_services: true,
+            amount: 13750000.0,
+            currency: 'CHF',
+          },
+          {
+            service_type: { name: 'Food delivery' },
+            items: [
+              {
+                description: 'magla',
+                unit: 'hour',
+                quantity: 11.0,
+                unit_price: 111000.0,
+                amount: 1208790.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '1.0',
+                has_discount: true,
+                service_type: { name: 'Food delivery' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 111000.0,
+              },
+              {
+                description: 'magla 2',
+                unit: 'hour',
+                quantity: 20.0,
+                unit_price: 111000.0,
+                amount: 2175600.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '2.0',
+                has_discount: true,
+                service_type: { name: 'Food delivery' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 111000.0,
+              },
+            ],
+            has_discounted_item: true,
+            has_item_with_markup: false,
+            has_services: true,
+            amount: 3384390.0,
+            currency: 'CHF',
+          },
+          {
+            service_type: { name: 'Programming' },
+            items: [
+              {
+                description: 'neki servis za recycle bin',
+                unit: 'day',
+                quantity: 11.0,
+                unit_price: 11000.0,
+                amount: 0.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '100.0',
+                has_discount: true,
+                service_type: { name: 'Programming' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 11000.0,
+              },
+              {
+                description: 'neki itemi',
+                unit: 'piece',
+                quantity: 0.0,
+                unit_price: 0.0,
+                amount: 0.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: null,
+                has_discount: false,
+                service_type: { name: 'Programming' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 0.0,
+              },
+            ],
+            has_discounted_item: true,
+            has_item_with_markup: false,
+            has_services: true,
+            amount: 0.0,
+            currency: 'CHF',
+          },
+          {
+            service_type: { name: 'Project Management' },
+            items: [
+              {
+                description: 'Price management',
+                unit: 'hour',
+                quantity: 100.0,
+                unit_price: 100.0,
+                amount: 0.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '100.0',
+                has_discount: true,
+                service_type: { name: 'Project Management' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 100.0,
+              },
+            ],
+            has_discounted_item: true,
+            has_item_with_markup: false,
+            has_services: true,
+            amount: 0.0,
+            currency: 'CHF',
+          },
+          {
+            service_type: { name: 'govno tyupe 2' },
+            items: [
+              {
+                description: 'Proba descriptiona',
+                unit: 'piece',
+                quantity: 5000.0,
+                unit_price: 2000.0,
+                amount: 0.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '100.0',
+                has_discount: true,
+                service_type: { name: 'govno tyupe 2' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 2000.0,
+              },
+              {
+                description: 'test',
+                unit: 'hour',
+                quantity: 0.0,
+                unit_price: 0.0,
+                amount: 0.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '100.0',
+                has_discount: true,
+                service_type: { name: 'govno tyupe 2' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 0.0,
+              },
+              {
+                description: 'Tipkanje u prazno',
+                unit: 'day',
+                quantity: 50.0,
+                unit_price: 50000.0,
+                amount: 2000000.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '20.0',
+                has_discount: true,
+                service_type: { name: 'govno tyupe 2' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 50000.0,
+              },
+            ],
+            has_discounted_item: true,
+            has_item_with_markup: false,
+            has_services: true,
+            amount: 2000000.0,
+            currency: 'CHF',
+          },
+        ],
+        services_grouped_by_service_type: [
+          {
+            service_type: { name: 'Programming' },
+            items: [
+              {
+                description: 'neki servis za recycle bin',
+                unit: 'day',
+                quantity: 11.0,
+                unit_price: 11000.0,
+                amount: 0.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '100.0',
+                has_discount: true,
+                service_type: { name: 'Programming' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 11000.0,
+              },
+              {
+                description: 'neki itemi',
+                unit: 'piece',
+                quantity: 0.0,
+                unit_price: 0.0,
+                amount: 0.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: null,
+                has_discount: false,
+                service_type: { name: 'Programming' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 0.0,
+              },
+            ],
+            has_discounted_item: true,
+            has_item_with_markup: false,
+            has_services: true,
+            amount: 0.0,
+            currency: 'CHF',
+          },
+          {
+            service_type: { name: 'Project Management' },
+            items: [
+              {
+                description: 'Price management',
+                unit: 'hour',
+                quantity: 100.0,
+                unit_price: 100.0,
+                amount: 0.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '100.0',
+                has_discount: true,
+                service_type: { name: 'Project Management' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 100.0,
+              },
+            ],
+            has_discounted_item: true,
+            has_item_with_markup: false,
+            has_services: true,
+            amount: 0.0,
+            currency: 'CHF',
+          },
+          {
+            service_type: { name: 'Business Development' },
+            items: [
+              {
+                description: 'some new things that are super nice',
+                unit: 'day',
+                quantity: 55.0,
+                unit_price: 500000.0,
+                amount: 13750000.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '50.0',
+                has_discount: true,
+                service_type: { name: 'Business Development' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 500000.0,
+              },
+            ],
+            has_discounted_item: true,
+            has_item_with_markup: false,
+            has_services: true,
+            amount: 13750000.0,
+            currency: 'CHF',
+          },
+          {
+            service_type: { name: 'govno tyupe 2' },
+            items: [
+              {
+                description: 'Proba descriptiona',
+                unit: 'piece',
+                quantity: 5000.0,
+                unit_price: 2000.0,
+                amount: 0.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '100.0',
+                has_discount: true,
+                service_type: { name: 'govno tyupe 2' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 2000.0,
+              },
+              {
+                description: 'test',
+                unit: 'hour',
+                quantity: 0.0,
+                unit_price: 0.0,
+                amount: 0.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '100.0',
+                has_discount: true,
+                service_type: { name: 'govno tyupe 2' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 0.0,
+              },
+              {
+                description: 'Tipkanje u prazno',
+                unit: 'day',
+                quantity: 50.0,
+                unit_price: 50000.0,
+                amount: 2000000.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '20.0',
+                has_discount: true,
+                service_type: { name: 'govno tyupe 2' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 50000.0,
+              },
+            ],
+            has_discounted_item: true,
+            has_item_with_markup: false,
+            has_services: true,
+            amount: 2000000.0,
+            currency: 'CHF',
+          },
+          {
+            service_type: { name: 'Food delivery' },
+            items: [
+              {
+                description: 'magla',
+                unit: 'hour',
+                quantity: 11.0,
+                unit_price: 111000.0,
+                amount: 1208790.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '1.0',
+                has_discount: true,
+                service_type: { name: 'Food delivery' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 111000.0,
+              },
+              {
+                description: 'magla 2',
+                unit: 'hour',
+                quantity: 20.0,
+                unit_price: 111000.0,
+                amount: 2175600.0,
+                currency: 'CHF',
+                deal_currency: 'CHF',
+                markup_currency: 'CHF',
+                discount: '2.0',
+                has_discount: true,
+                service_type: { name: 'Food delivery' },
+                markup: null,
+                markup_amount: 0,
+                unit_price_without_markup: 111000.0,
+              },
+            ],
+            has_discounted_item: true,
+            has_item_with_markup: false,
+            has_services: true,
+            amount: 3384390.0,
+            currency: 'CHF',
+          },
+        ],
+        expenses_grouped_by_service_type: [],
+        locale: 'en_US',
+        template_name: 'harvest',
+        exportable_type: 'deal',
+        i18n: {
+          en: {
+            date: {
+              formats: {
+                default: '%Y-%m-%d',
+                short: '%b %d',
+                long: '%B %d, %Y',
+              },
+              day_names: [
+                'Sunday',
+                'Monday',
+                'Tuesday',
+                'Wednesday',
+                'Thursday',
+                'Friday',
+                'Saturday',
+              ],
+              abbr_day_names: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+              month_names: [
+                null,
+                'January',
+                'February',
+                'March',
+                'April',
+                'May',
+                'June',
+                'July',
+                'August',
+                'September',
+                'October',
+                'November',
+                'December',
+              ],
+              abbr_month_names: [
+                null,
+                'Jan',
+                'Feb',
+                'Mar',
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec',
+              ],
+              order: ['year', 'month', 'day'],
+            },
+            time: {
+              formats: {
+                default: '%a, %d %b %Y %H:%M:%S %z',
+                short: '%d %b %H:%M',
+                long: '%B %d, %Y %H:%M',
+              },
+              am: 'am',
+              pm: 'pm',
+            },
+            support: {
+              array: {
+                words_connector: ', ',
+                two_words_connector: ' and ',
+                last_word_connector: ', and ',
+              },
+            },
+            number: {
+              format: {
+                separator: '.',
+                delimiter: ',',
+                precision: 3,
+                significant: false,
+                strip_insignificant_zeros: false,
+              },
+              currency: {
+                format: {
+                  format: '%u%n',
+                  unit: '$',
+                  separator: '.',
+                  delimiter: ',',
+                  precision: 2,
+                  significant: false,
+                  strip_insignificant_zeros: false,
+                },
+              },
+              percentage: { format: { delimiter: '', format: '%n%' } },
+              precision: { format: { delimiter: '' } },
+              human: {
+                format: {
+                  delimiter: '',
+                  precision: 3,
+                  significant: true,
+                  strip_insignificant_zeros: true,
+                },
+                storage_units: {
+                  format: '%n %u',
+                  units: {
+                    byte: { one: 'Byte', other: 'Bytes' },
+                    kb: 'KB',
+                    mb: 'MB',
+                    gb: 'GB',
+                    tb: 'TB',
+                    pb: 'PB',
+                    eb: 'EB',
+                  },
+                },
+                decimal_units: {
+                  format: '%n %u',
+                  units: {
+                    unit: '',
+                    thousand: 'Thousand',
+                    million: 'Million',
+                    billion: 'Billion',
+                    trillion: 'Trillion',
+                    quadrillion: 'Quadrillion',
+                  },
+                },
+              },
+            },
+            errors: {
+              format: '%{attribute} %{message}',
+              messages: {
+                model_invalid: 'Validation failed: %{errors}',
+                inclusion: 'is not included in the list',
+                exclusion: 'is reserved',
+                invalid: 'is invalid',
+                confirmation: "doesn't match %{attribute}",
+                accepted: 'must be accepted',
+                empty: "can't be empty",
+                blank: "can't be blank",
+                present: 'must be blank',
+                too_long: {
+                  one: 'is too long (maximum is 1 character)',
+                  other: 'is too long (maximum is %{count} characters)',
+                },
+                too_short: {
+                  one: 'is too short (minimum is 1 character)',
+                  other: 'is too short (minimum is %{count} characters)',
+                },
+                wrong_length: {
+                  one: 'is the wrong length (should be 1 character)',
+                  other: 'is the wrong length (should be %{count} characters)',
+                },
+                not_a_number: 'is not a number',
+                not_an_integer: 'must be an integer',
+                greater_than: 'must be greater than %{count}',
+                greater_than_or_equal_to:
+                  'must be greater than or equal to %{count}',
+                equal_to: 'must be equal to %{count}',
+                less_than: 'must be less than %{count}',
+                less_than_or_equal_to: 'must be less than or equal to %{count}',
+                other_than: 'must be other than %{count}',
+                odd: 'must be odd',
+                even: 'must be even',
+              },
+              unavailable_session:
+                "Session %{id} is is no longer available in memory.\n\nIf you happen to run on a multi-process server (like Unicorn or Puma) the process\nthis request hit doesn't store %{id} in memory. Consider turning the number of\nprocesses/workers to one (1) or using a different server in development.\n",
+              unacceptable_request:
+                'A supported version is expected in the Accept header.\n',
+              connection_refused:
+                'Oops! Failed to connect to the Web Console middleware.\nPlease make sure a rails development server is running.\n',
+            },
+            datetime: {
+              distance_in_words: {
+                half_a_minute: 'half a minute',
+                less_than_x_seconds: {
+                  one: 'less than 1 second',
+                  other: 'less than %{count} seconds',
+                },
+                x_seconds: { one: '1 second', other: '%{count} seconds' },
+                less_than_x_minutes: {
+                  one: 'less than a minute',
+                  other: 'less than %{count} minutes',
+                },
+                x_minutes: { one: '1 minute', other: '%{count} minutes' },
+                about_x_hours: {
+                  one: 'about 1 hour',
+                  other: 'about %{count} hours',
+                },
+                x_days: { one: '1 day', other: '%{count} days' },
+                about_x_months: {
+                  one: 'about 1 month',
+                  other: 'about %{count} months',
+                },
+                x_months: { one: '1 month', other: '%{count} months' },
+                about_x_years: {
+                  one: 'about 1 year',
+                  other: 'about %{count} years',
+                },
+                over_x_years: {
+                  one: 'over 1 year',
+                  other: 'over %{count} years',
+                },
+                almost_x_years: {
+                  one: 'almost 1 year',
+                  other: 'almost %{count} years',
+                },
+              },
+              prompts: {
+                year: 'Year',
+                month: 'Month',
+                day: 'Day',
+                hour: 'Hour',
+                minute: 'Minute',
+                second: 'Seconds',
+              },
+            },
+            helpers: {
+              select: { prompt: 'Please select' },
+              submit: {
+                create: 'Create %{model}',
+                update: 'Update %{model}',
+                submit: 'Save %{model}',
+              },
+            },
+          },
+          ca_ES: {
+            amount: 'Import',
+            budget: 'Pressupost',
+            budget_for: 'Pressupost per a',
+            budget_number: 'Número del pressupost',
+            client: 'Client',
+            company_vat: 'Identificació fiscal / CIF',
+            company_vat_domestic: 'Identificació fiscal / CIF',
+            created_by: 'Creat per',
+            date: 'Data',
+            delivery_date: 'Data de lliurament',
+            description: 'Descripció',
+            discount: 'Descompte',
+            due_date: 'Data de venciment',
+            estimated: 'Estimació',
+            expenses: 'Despeses',
+            fixed_price: 'Preu fix',
+            formats: { date: { default: '%d.%m.%Y' } },
+            from: 'de',
+            hourly_price: 'Preu per hora',
+            hours: 'Hores',
+            invoice: 'Factura',
+            invoice_for: 'Factura de',
+            issue_date: "Data d'emissió",
+            note: 'Notes',
+            owner: 'Propietari',
+            page: 'Pàgina',
+            price: 'Preu',
+            proposal: 'Proposta',
+            proposal_for: 'Proposta de',
+            proposal_number: 'Número de la proposta',
+            purchase_order_number: 'Número de PO /Comanda',
+            quantity: 'Quantitat',
+            rate: 'Taxa',
+            service: 'Servei',
+            subject: 'Assumpte',
+            subtotal: 'Subtotal',
+            total: 'Total',
+            unit: 'Unitats',
+            unit_enum: { day: 'Dia', hour: 'Hora', piece: 'Peça' },
+          },
+          cs_CZ: {
+            amount: 'Cena celkem',
+            budget: 'Rozpočet',
+            budget_for: 'Rozpočet pro',
+            budget_number: 'Číslo rozpočtu',
+            client: 'Klient',
+            company_vat: 'IČ',
+            company_vat_domestic: 'IČ',
+            created_by: 'Vytvořil',
+            date: 'Datum',
+            delivery_date: 'Datum dodání',
+            description: 'Popis',
+            discount: 'Sleva',
+            due_date: 'Datum splatnosti',
+            estimated: 'Odhadnuto',
+            expenses: 'Výdaje',
+            fixed_price: 'Fixní cena',
+            formats: { date: { default: '%d.%m.%Y' } },
+            from: 'Od',
+            hourly_price: 'Hodinová cena',
+            hours: 'Hodiny',
+            invoice: 'Faktura',
+            invoice_for: 'Faktura pro',
+            issue_date: 'Datum vytvoření',
+            locale_country_english: 'Czech Republic',
+            note: 'Poznámky',
+            owner: 'Vlastník',
+            page: 'Stránka',
+            price: 'Jednotková cena',
+            proposal: 'Nabídka',
+            proposal_for: 'Nabídka pro',
+            proposal_number: 'Číslo nabídky',
+            purchase_order_number: 'Číslo objednávky',
+            quantity: 'Množství',
+            rate: 'Sazba',
+            service: 'Služba',
+            subject: 'Předmět',
+            subtotal: 'Mezisoučet',
+            total: 'Celkem',
+            unit: 'Jednotka',
+            unit_enum: { day: 'den', hour: 'hodina', piece: 'kus' },
+            tax: 'Daň',
+            credit_note: 'Dobropis',
+            discount_amount: 'Výše slevy',
+            billing_type: 'Typ fakturace',
+            budget_total: 'Celkový rozpočet',
+            budget_used: 'Použitý rozpočet',
+            grand_total: 'Celkový součet',
+            invoice_number: 'Číslo faktury',
+            phone: 'Telefon',
+            budget_date: 'Datum rozpočtu',
+            export_date: 'Datum exportu',
+            billable_amount: 'Účtovatelná částka',
+          },
+          da_DK: {
+            amount: 'Beløb',
+            budget: 'Budget',
+            budget_for: 'Budget til',
+            budget_number: 'Budgetnummer',
+            client: 'Kunde',
+            company_vat: 'CVR',
+            company_vat_domestic: 'CVR',
+            created_by: 'Udskrevet af',
+            date: 'Dato',
+            delivery_date: 'Leveringsdato',
+            description: 'Beskrivelse',
+            discount: 'Rabat',
+            due_date: 'Forfaldsdato',
+            estimated: 'Estimeret',
+            expenses: 'Udgifter',
+            fixed_price: 'Fastpris',
+            formats: { date: { default: '%d.%m %Y' } },
+            from: 'Fra',
+            hourly_price: 'Timepris',
+            hours: 'Timer',
+            invoice: 'Faktura',
+            invoice_for: 'Faktura til',
+            issue_date: 'Udstedelsesdato',
+            locale_country_english: 'Denmark',
+            note: 'Noter',
+            page: 'Side',
+            price: 'Pris',
+            proposal: 'Tilbud',
+            proposal_for: 'Tilbud til',
+            proposal_number: 'Tilbudsnummer',
+            purchase_order_number: 'Indkøbsordrenummer',
+            quantity: 'Antal',
+            rate: 'Sats',
+            service: 'Ydelse',
+            subtotal: 'Subtotal',
+            total: 'I alt',
+            unit_enum: { day: 'Dag', hour: 'Time', piece: 'Styk' },
+            unit: 'Enhed',
+            subject: 'Emne',
+            owner: 'Operatør',
+            tax: 'Skat',
+            credit_note: 'Kreditnota',
+            discount_amount: 'Rabatbeløb',
+            billing_type: 'Faktureringstype',
+            budget_total: 'Samlet budget',
+            budget_used: 'Brugt budget',
+            grand_total: 'Totalt',
+            invoice_number: 'Faktura nummer',
+            phone: 'Telefon',
+            budget_date: 'Budget dato',
+            export_date: 'Eksportdato',
+            billable_amount: 'Fakturerbart beløb',
+          },
+          de_DE: {
+            invoice: 'Rechnung',
+            client: 'Kunde',
+            date: 'Datum',
+            due_date: 'Fällig am',
+            delivery_date: 'Lieferdatum',
+            created_by: 'erstellt von',
+            description: 'Beschreibung',
+            unit: 'Einheit',
+            quantity: 'Menge',
+            rate: 'Einzelpreis',
+            amount: 'Betrag',
+            subtotal: 'Summe',
+            discount: 'Rabatt',
+            total: 'Betrag',
+            note: 'Anmerkungen',
+            unit_enum: { day: 'Tag', hour: 'Stunde', piece: 'Stück' },
+            company_vat: 'Steuer ID',
+            purchase_order_number: 'Bestellnummer',
+            fixed_price: 'Festpreis',
+            hourly_price: 'Stundensatz',
+            proposal_number: 'Angebotsnummer',
+            price: 'Preis',
+            estimated: 'Geschätzte',
+            service: 'Service',
+            proposal: 'Angebot',
+            budget_number: 'Budgetnummer',
+            budget: 'Budget',
+            hours: 'Stunden',
+            expenses: 'Kosten',
+            issue_date: 'Ausgabedatum',
+            page: 'Seite',
+            from: 'Von',
+            budget_for: 'Budget für',
+            proposal_for: 'Angebot für',
+            invoice_for: 'Rechnung für',
+            formats: { date: { default: '%d.%m.%Y' } },
+            owner: 'Projektleiter',
+            subject: 'Gegenstand',
+            company_vat_domestic: 'Steuer ID',
+            locale_country_english: 'Germany',
+            tax: 'Steuer',
+            credit_note: 'Gutschrift',
+            discount_amount: 'Rabattbetrag',
+            billing_type: 'Abrechnungsart',
+            budget_total: 'Gesamtbudget',
+            budget_used: 'Gebrauchtes Budget',
+            grand_total: 'Gesamtsumme',
+            invoice_number: 'Rechnungsnummer',
+            phone: 'Telefon',
+            budget_date: 'Budgetdatum',
+            export_date: 'Exportdatum',
+            billable_amount: 'Abrechenbarer Betrag',
+          },
+          en_AU: {
+            invoice: 'Invoice',
+            client: 'Client',
+            date: 'Date',
+            due_date: 'Due date',
+            delivery_date: 'Delivery date',
+            created_by: 'Created by',
+            description: 'Description',
+            unit: 'Unit',
+            quantity: 'Qty',
+            rate: 'Rate',
+            amount: 'Amount',
+            subtotal: 'Subtotal',
+            discount: 'Discount',
+            total: 'Total',
+            note: 'Notes',
+            unit_enum: { day: 'day', hour: 'hour', piece: 'piece' },
+            company_vat: 'Tax ID',
+            purchase_order_number: 'PO number',
+            fixed_price: 'Fixed Price',
+            hourly_price: 'Hourly Price',
+            proposal_number: 'Proposal number',
+            price: 'Price',
+            estimated: 'Estimated',
+            service: 'Service',
+            proposal: 'Proposal',
+            budget_number: 'Budget number',
+            budget: 'Budget',
+            hours: 'Hours',
+            expenses: 'Expenses',
+            issue_date: 'Issue date',
+            page: 'Page',
+            from: 'From',
+            budget_for: 'Budget for',
+            proposal_for: 'Proposal for',
+            invoice_for: 'Invoice for',
+            formats: { date: { default: '%d/%m/%Y' } },
+            owner: 'Owner',
+            subject: 'Subject',
+            company_vat_domestic: 'ABN',
+            locale_country_english: 'Australia',
+            tax: 'Tax',
+            credit_note: 'Credit note',
+            discount_amount: 'Discount Amount',
+            billing_type: 'Billing type',
+            budget_total: 'Total budget',
+            budget_used: 'Used budget',
+            grand_total: 'Grand total',
+            invoice_number: 'Invoice number',
+            phone: 'Phone',
+            budget_date: 'Budget date',
+            export_date: 'Export date',
+            billable_amount: 'Billable amount',
+          },
+          en_GB: {
+            invoice: 'Invoice',
+            client: 'Client',
+            date: 'Date',
+            due_date: 'Due date',
+            delivery_date: 'Delivery date',
+            created_by: 'Created by',
+            description: 'Description',
+            unit: 'Unit',
+            quantity: 'Qty',
+            rate: 'Rate',
+            amount: 'Amount',
+            subtotal: 'Subtotal',
+            discount: 'Discount',
+            total: 'Total',
+            note: 'Notes',
+            unit_enum: { day: 'day', hour: 'hour', piece: 'piece' },
+            company_vat: 'Tax ID',
+            purchase_order_number: 'PO number',
+            fixed_price: 'Fixed Price',
+            hourly_price: 'Hourly Price',
+            proposal_number: 'Proposal number',
+            price: 'Price',
+            estimated: 'Estimated',
+            service: 'Service',
+            proposal: 'Proposal',
+            budget_number: 'Budget number',
+            budget: 'Budget',
+            hours: 'Hours',
+            expenses: 'Expenses',
+            issue_date: 'Issue date',
+            page: 'Page',
+            from: 'From',
+            budget_for: 'Budget for',
+            proposal_for: 'Proposal for',
+            invoice_for: 'Invoice for',
+            formats: { date: { default: '%d/%m/%Y' } },
+            owner: 'Owner',
+            subject: 'Subject',
+            company_vat_domestic: 'Tax ID',
+            locale_country_english: 'United Kingdom',
+            tax: 'Tax',
+            credit_note: 'Credit note',
+            discount_amount: 'Discount Amount',
+            billing_type: 'Billing type',
+            budget_total: 'Total budget',
+            budget_used: 'Used budget',
+            grand_total: 'Grand total',
+            invoice_number: 'Invoice number',
+            phone: 'Phone',
+            budget_date: 'Budget date',
+            export_date: 'Export date',
+            billable_amount: 'Billable amount',
+          },
+          en_US: {
+            invoice: 'Invoice',
+            client: 'Client',
+            date: 'Date',
+            due_date: 'Due date',
+            delivery_date: 'Delivery date',
+            created_by: 'Created by',
+            description: 'Description',
+            unit: 'Unit',
+            quantity: 'Qty',
+            rate: 'Rate',
+            amount: 'Amount',
+            subtotal: 'Subtotal',
+            discount: 'Discount',
+            total: 'Total',
+            note: 'Notes',
+            unit_enum: { day: 'day', hour: 'hour', piece: 'piece' },
+            company_vat: 'Tax ID',
+            purchase_order_number: 'PO number',
+            fixed_price: 'Fixed Price',
+            hourly_price: 'Hourly Price',
+            proposal_number: 'Proposal number',
+            price: 'Price',
+            estimated: 'Estimated',
+            service: 'Service',
+            proposal: 'Proposal',
+            budget_number: 'Budget number',
+            budget: 'Budget',
+            hours: 'Hours',
+            expenses: 'Expenses',
+            issue_date: 'Issue date',
+            page: 'Page',
+            from: 'From',
+            budget_for: 'Budget for',
+            proposal_for: 'Proposal for',
+            invoice_for: 'Invoice for',
+            formats: { date: { default: '%m/%d/%Y' } },
+            owner: 'Owner',
+            subject: 'Subject',
+            company_vat_domestic: 'Tax ID',
+            locale_country_english: 'United States',
+            tax: 'Tax',
+            credit_note: 'Credit note',
+            discount_amount: 'Discount Amount',
+            billing_type: 'Billing type',
+            budget_total: 'Total budget',
+            budget_used: 'Used budget',
+            grand_total: 'Grand total',
+            invoice_number: 'Invoice number',
+            phone: 'Phone',
+            budget_date: 'Budget date',
+            export_date: 'Export date',
+            billable_amount: 'Billable amount',
+          },
+          es_ES: {
+            invoice: 'Factura',
+            client: 'Cliente',
+            date: 'Fecha',
+            due_date: 'Fecha de vencimiento',
+            delivery_date: 'Fecha de entrega',
+            created_by: 'Creado por',
+            description: 'Descripción',
+            unit: 'Unidad',
+            quantity: 'Ctd.',
+            rate: 'Tarifa',
+            amount: 'Importe',
+            subtotal: 'Subtotal',
+            discount: 'Descuento',
+            total: 'Total',
+            note: 'Notas',
+            unit_enum: { day: 'día', hour: 'hora', piece: 'pieza' },
+            company_vat: 'ID fiscal',
+            purchase_order_number: 'Número de orden',
+            fixed_price: 'Precio fijo',
+            hourly_price: 'Precio hora',
+            proposal_number: 'Numero de propuesta',
+            price: 'Precio',
+            estimated: 'Estimación',
+            service: 'Servicio',
+            proposal: 'Propuesta',
+            budget_number: 'Número de presupuesto',
+            budget: 'Presupuesto',
+            hours: 'Horas',
+            expenses: 'Gastos',
+            issue_date: 'Fecha de asunto',
+            page: 'Página',
+            from: 'De',
+            budget_for: 'Presupuesto para',
+            proposal_for: 'Oferta para',
+            invoice_for: 'Factura para',
+            formats: { date: { default: '%d/%m/%Y' } },
+            owner: 'Propietario',
+            subject: 'Sujeto',
+            company_vat_domestic: 'ID fiscal',
+            locale_country_english: 'Spain',
+            tax: 'Impuesto',
+            credit_note: 'Nota de crédito',
+            discount_amount: 'Importe de descuento',
+            billing_type: 'Tipo de facturación',
+            budget_total: 'Presupuesto total',
+            budget_used: 'Presupuesto usado',
+            grand_total: 'Gran total',
+            invoice_number: 'número de factura',
+            phone: 'Teléfono',
+            budget_date: 'Fecha del presupuesto',
+            export_date: 'Fecha de exportación',
+            billable_amount: 'Importe facturable',
+          },
+          fr_FR: {
+            amount: 'Montant',
+            budget: 'Budget',
+            budget_number: 'N° de budget',
+            client: 'Client',
+            company_vat: 'ID fiscale',
+            created_by: 'Créé par',
+            date: 'Date',
+            delivery_date: 'Date de livraison',
+            description: 'Description',
+            discount: 'Remise',
+            due_date: "Date d'échéance",
+            estimated: 'Estimé',
+            expenses: 'Dépenses',
+            fixed_price: 'Prix fixe',
+            hourly_price: 'Prix horaire',
+            hours: 'Heure',
+            invoice: 'Facture',
+            note: 'Notes',
+            price: 'Prix',
+            proposal: 'Devis',
+            proposal_number: 'N° de devis',
+            purchase_order_number: 'Référence de commande',
+            quantity: 'Quantité',
+            rate: 'Taux',
+            service: 'Service',
+            subtotal: 'Sous-total',
+            total: 'Total',
+            unit: 'Unité',
+            unit_enum: { day: 'jour', hour: 'heure', piece: 'pièce' },
+            issue_date: "Date d'émission",
+            page: 'Page',
+            from: 'De',
+            budget_for: 'Budget pour',
+            proposal_for: 'Offre pour',
+            invoice_for: 'Facture à',
+            formats: { date: { default: '%d/%m/%Y' } },
+            owner: 'Propriétaire',
+            subject: 'Sujet',
+            company_vat_domestic: 'ID fiscale',
+            locale_country_english: 'France',
+            tax: 'Impôt',
+            credit_note: 'Note de crédit',
+            discount_amount: 'Montant de la remise',
+            billing_type: 'Type de facturation',
+            budget_total: 'Budget total',
+            budget_used: 'Budget utilisé',
+            grand_total: 'Somme finale',
+            invoice_number: 'Numéro de facture\\n',
+            phone: 'Téléphone',
+            budget_date: 'Date budgétaire',
+            export_date: "Date d'exportation",
+            billable_amount: 'Montant facturable',
+          },
+          hr_HR: {
+            invoice: 'Račun',
+            client: 'Klijent',
+            date: 'Datum',
+            due_date: 'Datum dospijeća',
+            delivery_date: 'Datum isporuke',
+            created_by: 'Operater',
+            description: 'Opis',
+            unit: 'Jed',
+            quantity: 'Kol',
+            rate: 'Jed.cijena',
+            amount: 'Iznos',
+            subtotal: 'Iznos',
+            discount: 'Popust',
+            total: 'Ukupno',
+            note: 'Napomene',
+            unit_enum: { day: 'dan', hour: 'sat', piece: 'kom' },
+            company_vat: 'Porezni broj',
+            purchase_order_number: 'Broj narudžbe',
+            fixed_price: 'Fiksna cijena',
+            hourly_price: 'Cijena po satu',
+            proposal_number: 'Broj ponude',
+            price: 'Cijena',
+            estimated: 'Procjena',
+            service: 'Usluga',
+            proposal: 'Ponuda',
+            budget_number: 'Broj budžeta',
+            budget: 'Budžet',
+            hours: 'Sati',
+            expenses: 'Troškovi',
+            issue_date: 'Datum izdavanja',
+            page: 'Stranica',
+            from: 'Od',
+            budget_for: 'Budžet za',
+            proposal_for: 'Ponuda za',
+            invoice_for: 'Račun za',
+            formats: { date: { default: '%d.%m.%Y' } },
+            owner: 'Operater',
+            subject: 'Predmet',
+            company_vat_domestic: 'Porezni broj',
+            locale_country_english: 'Croatia',
+            tax: 'Porez',
+            credit_note: 'Odobrenje',
+            discount_amount: 'Iznos popusta',
+            billing_type: 'Vrsta naplate',
+            budget_total: 'Ukupni budžet',
+            budget_used: 'Iskorišten budžet',
+            grand_total: 'Ukupni zbroj',
+            invoice_number: 'Broj računa',
+            phone: 'Telefon',
+            budget_date: 'Datum budžeta',
+            export_date: 'Datum izvoza',
+            billable_amount: 'Naplativi iznos',
+          },
+          it_IT: {
+            amount: 'Somma',
+            client: 'Cliente',
+            created_by: 'Creato da',
+            due_date: 'Scadenza',
+            invoice: 'Fattura',
+            note: 'Appunti',
+            discount: 'Sconto',
+            description: 'Descrizione',
+            delivery_date: 'Data di consegna',
+            date: 'Data',
+            quantity: 'qt.',
+            rate: 'Tariffa',
+            unit: 'Unità',
+            total: 'Totale',
+            subtotal: 'Subtotale',
+            unit_enum: { day: 'giorno', hour: 'ora', piece: 'pezzo' },
+            company_vat: 'ID fiscale',
+            purchase_order_number: "Numero d'ordine",
+            fixed_price: 'Costo fisso',
+            hourly_price: 'Prezzo orario',
+            proposal_number: 'Numero di offerta',
+            price: 'Prezzo',
+            estimated: 'Stimato',
+            service: 'Servizio',
+            proposal: 'Offerta',
+            budget_number: 'Numero di budget',
+            budget: 'Budget',
+            hours: 'Ore',
+            expenses: 'Spese',
+            issue_date: 'Data di rilascio',
+            page: 'Pagina',
+            from: 'Da',
+            budget_for: 'Budget per',
+            proposal_for: 'Offerta per',
+            invoice_for: 'Fattura per',
+            formats: { date: { default: '%d/%m/%Y' } },
+            owner: 'Proprietario',
+            subject: 'Soggetto',
+            company_vat_domestic: 'ID fiscale',
+            locale_country_english: 'Italy',
+            tax: 'Imposta',
+            credit_note: 'Nota di credito',
+            discount_amount: 'Totale sconto',
+            billing_type: 'Tipo di fatturazione',
+            budget_total: 'Budget totale',
+            budget_used: 'Budget usato',
+            grand_total: 'Somma totale',
+            invoice_number: 'Numero di fattura',
+            phone: 'Telefono',
+            budget_date: 'Data di budget',
+            export_date: 'Data di esportazione',
+            billable_amount: 'Importo fatturabile',
+          },
+          lt_LT: {
+            amount: 'Suma',
+            budget: 'Biudžetas',
+            budget_for: 'Biudžetas',
+            budget_number: 'Biudžeto Nr.',
+            client: 'Klientas',
+            company_vat: 'PVM kodas',
+            company_vat_domestic: 'PVM kodas',
+            created_by: 'Išrašė',
+            date: 'Data',
+            delivery_date: 'Pristatymo data',
+            description: 'Aprašymas',
+            discount: 'Nuolaida',
+            due_date: 'Apmokėti iki',
+            estimated: 'Prognozė',
+            expenses: 'Išlaidos',
+            fixed_price: 'Fiksuota kaina',
+            formats: { date: { default: '%Y-%m-%d' } },
+            from: 'Nuo',
+            hourly_price: 'Valandos kaina',
+            hours: 'Valandos',
+            invoice: 'Sąskaita',
+            invoice_for: 'Klientas',
+            issue_date: 'Išrašymo data',
+            locale_country_english: 'Lietuva',
+            note: 'Pastabos',
+            owner: 'Sukūrė',
+            page: 'Lapas',
+            price: 'Kaina',
+            proposal: 'Pasiūlymas',
+            proposal_for: 'Klientas',
+            proposal_number: 'Pasiūlymo Nr.',
+            purchase_order_number: 'Užsakymo Nr.',
+            quantity: 'Kiekis',
+            rate: 'Kaina',
+            service: 'Paslauga',
+            subject: 'Paslaugos',
+            subtotal: 'Tarpinė suma',
+            total: 'Apmokėti',
+            unit: 'Mato vnt.',
+            unit_enum: { day: 'diena', hour: 'valanda', piece: 'vnt.' },
+            tax: 'Mokesčių',
+            credit_note: 'Kredito pažyma\\n',
+            discount_amount: 'Nuolaidos suma',
+            billing_type: 'Atsiskaitymo tipas',
+            budget_total: 'Bendras biudžetas',
+            budget_used: 'Panaudotas biudžetas',
+            grand_total: 'Bendra suma',
+            invoice_number: 'Sąskaitos numeris',
+            phone: 'Telefonas',
+            budget_date: 'Biudžeto data',
+            export_date: 'Eksporto data',
+            billable_amount: 'Atsiskaitoma suma',
+          },
+          mk_MK: {
+            invoice: 'Фактура',
+            client: 'Клиент',
+            date: 'Датум',
+            due_date: 'Датум на плаќање',
+            delivery_date: 'Датум на испорака',
+            created_by: 'Креирано од',
+            description: 'Опис',
+            unit: 'Единица',
+            quantity: 'Количина',
+            rate: 'Единечна цена',
+            amount: 'Износ',
+            subtotal: 'Износ',
+            discount: 'Попуст',
+            total: 'Вкупно',
+            note: 'Забелешка',
+            unit_enum: { day: 'ден', hour: 'час', piece: 'парче' },
+            company_vat: 'ДДВ број',
+            purchase_order_number: 'Број на нарачка',
+            fixed_price: 'Фиксна цена',
+            hourly_price: 'Цена по час',
+            proposal_number: 'Број на понуда',
+            price: 'Цена',
+            estimated: 'Проценети',
+            service: 'Услуга',
+            proposal: 'Понуда ',
+            budget_number: 'Број на буџет',
+            budget: 'Буџет',
+            hours: 'Часови',
+            expenses: 'Трошоци',
+            issue_date: 'Датум на издавање',
+            page: 'Страница',
+            from: 'Од',
+            budget_for: 'Буџет за ',
+            proposal_for: 'Понуда за',
+            invoice_for: 'Фактура за',
+            formats: { date: { default: '%d.%m.%Y' } },
+            owner: 'Сопственик',
+            subject: 'Предмет',
+            company_vat_domestic: 'ДДВ број',
+            locale_country_english: 'Северна Македонија',
+            tax: 'Данок',
+            credit_note: 'Кредитна белешка',
+            discount_amount: 'Износ на попуст',
+            billing_type: 'Тип на наплата',
+            budget_total: 'Вкупен буџет',
+            budget_used: 'Искористен буџет',
+            grand_total: 'Крајна сума',
+            invoice_number: 'Број на фактура',
+            phone: 'Телефон',
+            budget_date: 'Датум на буџетот',
+            export_date: 'Датум на извоз',
+            billable_amount: 'Износ за наплата',
+          },
+          nl_NL: {
+            invoice: 'Factuur',
+            client: 'Opdrachtgever',
+            date: 'Datum',
+            due_date: 'Vervaldatum',
+            delivery_date: 'Leverdatum',
+            created_by: 'Aangemaakt door',
+            description: 'Omschrijving',
+            unit: 'Type',
+            quantity: 'Aantal',
+            rate: 'Bedrag',
+            amount: 'Totaal',
+            subtotal: 'Subtotaal',
+            discount: 'Korting',
+            total: 'Totaal',
+            note: 'Opmerkingen',
+            unit_enum: { day: 'dag', hour: 'uur', piece: 'aantal' },
+            company_vat: 'BTW nummer',
+            purchase_order_number: 'Bestelnummer',
+            fixed_price: 'Vaste prijs',
+            hourly_price: 'Uurprijs',
+            proposal_number: 'Offertenummer',
+            price: 'Prijs',
+            estimated: 'Begroot',
+            service: 'Dienst',
+            proposal: 'Offerte',
+            budget_number: 'Budget nummer',
+            budget: 'Budget',
+            hours: 'Uur',
+            expenses: 'Uitgaven',
+            issue_date: 'Factuurdatum',
+            page: 'Pagina',
+            from: 'Van',
+            budget_for: 'Budget voor',
+            proposal_for: 'Offerte voor',
+            invoice_for: 'Factuur voor',
+            formats: { date: { default: '%d-%m-%Y' } },
+            owner: 'Eigenaar',
+            subject: 'Onderwerpen',
+            company_vat_domestic: 'BTW nummer',
+            locale_country_english: 'Netherlands',
+            tax: 'Belasting',
+            credit_note: 'Creditnota',
+            discount_amount: 'Korting hoeveelheid',
+            billing_type: 'Factureringstype',
+            budget_total: 'Totale budget',
+            budget_used: 'Gebruikt budget',
+            grand_total: 'Algemeen totaal',
+            invoice_number: 'Factuurnummer',
+            phone: 'Telefoon',
+            budget_date: 'Budget datum',
+            export_date: 'Datum exporteren',
+            billable_amount: 'Factureerbaar bedrag',
+          },
+          no_NO: {
+            budget: 'Budsjett',
+            budget_for: 'Til',
+            budget_number: 'Budsjettnummer',
+            client: 'Klient',
+            description: 'Tjeneste',
+            unit: 'Enhet',
+            estimated: 'Estimert',
+            price: 'Pris',
+            amount: 'Sum',
+            company_vat: 'Organisasjonsnummer',
+            company_vat_domestic: 'Organisasjonsnummer',
+            created_by: 'Laget av',
+            date: 'Dato',
+            due_date: 'Forfallsdato',
+            discount: 'Rabatt',
+            invoice: 'Faktura',
+            note: 'Kommentarer',
+            owner: 'Eieren',
+            page: 'Side',
+            proposal: 'Tilbud',
+            locale_country_english: 'Norway',
+            issue_date: 'Utgivelsesdato',
+            invoice_for: 'Til',
+            delivery_date: 'Leveringsdato',
+            expenses: 'Utgifter',
+            fixed_price: 'Fastpris',
+            formats: { date: { default: '%d/%m/%Y' } },
+            from: 'Fra',
+            hourly_price: 'Timepris',
+            hours: 'Timer',
+            proposal_for: 'Til',
+            proposal_number: 'Tilbudsnummer',
+            purchase_order_number: 'Innkjøpsordre',
+            quantity: 'Antall',
+            rate: 'Pris',
+            service: 'Tjeneste',
+            subject: 'Prosjekt',
+            subtotal: 'Delsum',
+            total: 'Total',
+            unit_enum: { day: 'dag', hour: 'time', piece: 'stykke' },
+            tax: 'Avgift',
+            credit_note: 'Kreditnota',
+            discount_amount: 'Rabattbeløp',
+            billing_type: 'Faktureringstype',
+            budget_total: 'Totalt budsjett',
+            budget_used: 'Brukt budsjett',
+            grand_total: 'Totalsum',
+            invoice_number: 'Fakturanummer',
+            phone: 'Telefon',
+            budget_date: 'Budsjettdato',
+            export_date: 'Eksportdato',
+            billable_amount: 'Fakturerbart beløp',
+          },
+          pl_PL: {
+            amount: 'Kwota',
+            billing_type: 'Sposób płatności',
+            budget: 'Budżet',
+            budget_date: 'Budżet za',
+            budget_for: 'Budżet za',
+            budget_total: 'Budżet całkowity',
+            budget_used: 'Budżet wykorzystany',
+            client: 'Klient',
+            company_vat: 'Identyfikator podatkowy (NIP)',
+            company_vat_domestic: 'NIP',
+            created_by: 'Wystawił(a)',
+            credit_note: 'Faktura korygująca',
+            date: 'Data',
+            delivery_date: 'Data sprzedaży',
+            description: 'Opis',
+            discount: 'Rabat',
+            discount_amount: 'Kwota rabatu',
+            due_date: 'Termin płatności',
+            estimated: 'Estymacja',
+            expenses: 'Wydatki',
+            fixed_price: 'Stała Cena',
+            formats: { date: { default: '%d.%m.%Y' } },
+            from: 'Od',
+            grand_total: 'Łączna suma',
+            hourly_price: 'Cena netto za godzinę',
+            hours: 'godziny',
+            invoice: 'Faktura',
+            invoice_for: 'Faktura za',
+            invoice_number: 'Numer faktury',
+            issue_date: 'Data wystawienia',
+            locale_country_english: 'Poland',
+            note: 'Nota',
+            owner: 'Właściciel',
+            page: 'Strona',
+            phone: 'Telefon',
+            price: 'Cena netto',
+            proposal: 'Oferta',
+            proposal_for: 'Oferta na',
+            proposal_number: 'Numer zamówienia',
+            purchase_order_number: 'Numer zamówienia',
+            quantity: 'Ilość',
+            rate: 'Stawka netto',
+            service: 'Usługa',
+            subject: 'Produkt',
+            subtotal: 'Suma częściowa',
+            tax: 'Podatek',
+            total: 'Brutto',
+            unit: 'Jednostka miary',
+            unit_enum: { day: 'dzień', piece: 'sztuka', hour: 'godzina' },
+            billable_amount: 'Kwota podlegająca rozliczeniu',
+            budget_number: 'Numer budżetu',
+            export_date: 'Data eksportu',
+          },
+          ro_RO: {
+            amount: 'Valoarea',
+            budget: 'Buget',
+            budget_for: 'Buget pentru',
+            budget_number: 'Numărul bugetului',
+            client: 'Client',
+            company_vat: 'CIF',
+            company_vat_domestic: 'CIF',
+            created_by: 'Creată de',
+            date: 'Data',
+            delivery_date: 'Data de livrare',
+            description: 'Descriere',
+            discount: 'Reducere',
+            due_date: 'Termen plată',
+            estimated: 'Estimat',
+            expenses: 'Cheltuieli',
+            fixed_price: 'Preț fix',
+            formats: { date: { default: '%d/%m/%Y' } },
+            from: 'De la',
+            hourly_price: 'Preț orar ',
+            hours: 'Ore',
+            invoice: 'Factura',
+            invoice_for: 'Factură pentru',
+            issue_date: 'Data emiterii',
+            note: 'Notițe',
+            owner: 'Proprietar',
+            page: 'Pagina',
+            price: 'Preț',
+            proposal: 'Propunere',
+            proposal_for: 'Propunere pentru',
+            proposal_number: 'Numărul propunerii',
+            purchase_order_number: 'Număr PO ',
+            quantity: 'Cantitate / Cant.',
+            rate: 'Preț unitar',
+            service: 'Servicii',
+            subject: 'Subiect',
+            subtotal: 'Subtotal',
+            total: 'Total',
+            unit: 'Unitate de măsură / U. M.',
+            unit_enum: { day: 'Ziua', hour: 'Ora', piece: 'Bucată / Buc.' },
+            locale_country_english: 'Romania',
+            tax: 'Impozit',
+            credit_note: 'Nota de credit',
+            discount_amount: 'Suma de reducere',
+            billing_type: 'Tip de facturare',
+            budget_total: 'Buget total',
+            budget_used: 'Bugetul folosit',
+            grand_total: 'Total general',
+            invoice_number: 'Număr de factură',
+            phone: 'Telefon',
+            budget_date: 'Data de buget',
+            export_date: 'Data exportului',
+            billable_amount: 'Sumă facturabilă',
+          },
+          sk_SK: {
+            proposal_number: 'Číslo ponuky',
+            amount: 'Cena celkom',
+            subtotal: 'Medzisúčet',
+            total: 'Celkom',
+            quantity: 'Množstvo',
+            rate: 'Sadzba',
+            service: 'Služba',
+            subject: 'Predmet',
+            unit: 'Jednotka',
+            unit_enum: { day: 'deň', hour: 'hodina', piece: 'kus' },
+            purchase_order_number: 'Číslo objednávky',
+            budget: 'Rozpočet',
+            budget_for: 'Rozpočet pre',
+            budget_number: 'Číslo rozpočtu',
+            client: 'Klient',
+            company_vat: 'IČ DPH',
+            company_vat_domestic: 'IČ DPH',
+            created_by: 'Vytvoril',
+            date: 'Dátum',
+            delivery_date: 'Dátum dodania',
+            description: 'Popis',
+            discount: 'Zľava',
+            due_date: 'Dátum splatnosti',
+            estimated: 'Odhadnuté',
+            expenses: 'Výdavky',
+            fixed_price: 'Fixná cena',
+            formats: { date: { default: '%d.%m.%Y' } },
+            from: 'Od',
+            hourly_price: 'Hodinová cena',
+            hours: 'Hodiny',
+            invoice: 'Faktúra',
+            invoice_for: 'Faktúra pre',
+            issue_date: 'Dátum vytvorenia',
+            locale_country_english: 'Slovak Republic',
+            note: 'Poznámky',
+            owner: 'Vlastník',
+            page: 'Stránka',
+            price: 'Jednotková cena',
+            proposal: 'Ponuka',
+            proposal_for: 'Ponuka pre',
+            tax: 'Daň',
+            credit_note: 'Dobropis',
+            discount_amount: 'Výška zľavy',
+            billing_type: 'Typ fakturácie',
+            budget_total: 'Celkový rozpočet',
+            budget_used: 'Použitý rozpočet',
+            grand_total: 'Celková suma',
+            invoice_number: 'Číslo faktúry',
+            phone: 'Telefón',
+            budget_date: 'Dátum rozpočtu',
+            export_date: 'Dátum exportu',
+            billable_amount: 'Fakturovateľná suma',
+          },
+          sl_SI: {
+            invoice: 'Račun',
+            client: 'Naročnik',
+            date: 'Datum',
+            due_date: 'Zapade',
+            delivery_date: 'Opravljeno',
+            created_by: 'Pripravil',
+            description: 'Opis',
+            unit: 'Enota',
+            quantity: 'Kol',
+            rate: 'Cena',
+            amount: 'Znesek',
+            subtotal: 'Vrednost',
+            discount: 'Popust',
+            total: 'Skupaj',
+            note: 'Opombe',
+            unit_enum: { day: 'dan', hour: 'ura', piece: 'kom' },
+            company_vat: 'Davčna številka',
+            purchase_order_number: 'Številka naročilnice',
+            fixed_price: 'Fiksna cena',
+            hourly_price: 'Cena po urah',
+            proposal_number: 'Številka ponudbe',
+            price: 'Cena',
+            estimated: 'Procena',
+            service: 'Storitev',
+            proposal: 'Ponudba',
+            budget_number: 'Številka proračuna',
+            budget: 'Proračun',
+            hours: 'Ure',
+            expenses: 'Stroški',
+            issue_date: 'Datum izdaje',
+            page: 'Stran',
+            from: 'Od',
+            budget_for: 'Proračun za',
+            proposal_for: 'Ponudba za',
+            invoice_for: 'Račun za',
+            formats: { date: { default: '%d.%m.%Y' } },
+            owner: 'Operater',
+            subject: 'Predmet',
+            company_vat_domestic: 'Davčna številka',
+            locale_country_english: 'Slovenia',
+            tax: 'Davek',
+            credit_note: 'Dobropis',
+            discount_amount: 'Znesek popusta',
+            billing_type: 'Vrsta obračunavanja',
+            budget_total: 'Skupni proračun',
+            budget_used: 'Porabljen proračun',
+            grand_total: 'Skupna vsota',
+            invoice_number: 'Številka računa',
+            phone: 'Telefon',
+            budget_date: 'Datum proračuna',
+            export_date: 'Datum izvoza',
+            billable_amount: 'Obračunski znesek',
+          },
+          sr_SR: {
+            invoice: 'Račun',
+            client: 'Klijent',
+            date: 'Datum',
+            due_date: 'Datum dospeća',
+            delivery_date: 'Datum isporuke',
+            created_by: 'Operater',
+            description: 'Opis',
+            unit: 'Jed',
+            quantity: 'Kol',
+            rate: 'Jed.cena',
+            amount: 'Iznos',
+            subtotal: 'Iznos',
+            discount: 'Popust',
+            total: 'Ukupno',
+            note: 'Beleške',
+            unit_enum: { day: 'dan', hour: 'čas', piece: 'kom' },
+            company_vat: 'Porezni broj',
+            purchase_order_number: 'Broj narudžbenice',
+            fixed_price: 'Fiksna cena',
+            hourly_price: 'Cena po satu',
+            proposal_number: 'Broj ponude',
+            price: 'Cena',
+            estimated: 'Procena',
+            service: 'Usluga',
+            proposal: 'Ponuda',
+            budget_number: 'Broj budžeta',
+            budget: 'Budžet',
+            hours: 'Sati',
+            expenses: 'Troškovi',
+            issue_date: 'Datum izdavanja',
+            page: 'Strana',
+            from: 'Od',
+            budget_for: 'Budžet za',
+            proposal_for: 'Ponuda za',
+            invoice_for: 'Račun za',
+            formats: { date: { default: '%d.%m.%Y' } },
+            owner: 'Operater',
+            subject: 'Predmet',
+            company_vat_domestic: 'Porezni broj',
+            locale_country_english: 'Serbia',
+            tax: 'Porez',
+            credit_note: 'Knjižno',
+            discount_amount: 'Iznos popusta',
+            billing_type: 'Tip obračuna',
+            budget_total: 'Ukupan budžet',
+            budget_used: 'Iskorišćeni budžet',
+            grand_total: 'Ukupan zbroj',
+            invoice_number: 'Broj fakture',
+            phone: 'Telefon',
+            budget_date: 'Datum budžeta',
+            export_date: 'Datum izvoza',
+            billable_amount: 'Iznos naplate',
+          },
+          sv_SE: {
+            amount: 'Summa',
+            budget: 'Budget',
+            budget_for: 'Budget för',
+            budget_number: 'Budgetnummer',
+            client: 'Kund',
+            company_vat: 'skatte ID',
+            created_by: 'Skapad av',
+            date: 'Datum',
+            delivery_date: 'Leveransdatum',
+            description: 'Beskrivning',
+            discount: 'Rabatt',
+            due_date: 'Förfallodatum',
+            estimated: 'Upskattad',
+            expenses: 'Kostnader',
+            fixed_price: 'Fastpris',
+            formats: { date: { default: '%Y-%m-%d' } },
+            from: 'Från',
+            hourly_price: 'Timpris',
+            hours: 'Timmar',
+            invoice: 'Faktura',
+            invoice_for: 'Faktura för',
+            note: 'Kommentarer',
+            issue_date: 'Utfärdandedatum',
+            page: 'Sida',
+            price: 'Pris',
+            proposal: 'Förslag',
+            proposal_for: 'Förslag för',
+            proposal_number: 'Förslagsnummer',
+            purchase_order_number: 'Inköpsorder',
+            quantity: 'Antal',
+            rate: 'Taxa',
+            service: 'Tjänst',
+            subtotal: 'Delsumma',
+            total: 'Total',
+            unit: 'Enhet',
+            unit_enum: { day: 'Dag', hour: 'Timma', piece: 'Stycke' },
+            owner: 'Ägare',
+            subject: 'Ämne',
+            company_vat_domestic: 'VAT-nummer',
+            locale_country_english: 'Sweden',
+            tax: 'Beskatta',
+            credit_note: 'Kreditnota',
+            discount_amount: 'Rabattbelopp',
+            billing_type: 'Faktureringstyp',
+            budget_total: 'Total budget',
+            budget_used: 'Använd budget',
+            grand_total: 'Totalsumma',
+            invoice_number: 'Fakturanummer',
+            phone: 'Telefon',
+            budget_date: 'Budgetdatum',
+            export_date: 'Exportdatum',
+            billable_amount: 'Fakturerbart belopp',
+          },
+          zh_CN: {
+            credit_note: '信用票据',
+            invoice: '发票',
+            client: '客户',
+            date: '日期',
+            due_date: '到期日',
+            delivery_date: '送货日期',
+            issue_date: '发出日',
+            created_by: '制作人',
+            description: '描述',
+            unit: '单元',
+            quantity: '数量',
+            rate: '价格',
+            amount: '金额',
+            subtotal: '小计',
+            discount: '折扣',
+            total: '总额',
+            note: '备注',
+            unit_enum: { day: '日', hour: '时', piece: '个' },
+            company_vat: '税号',
+            company_vat_domestic: '税号',
+            purchase_order_number: '订单号码',
+            fixed_price: '固定价格',
+            hourly_price: '小时价格',
+            proposal_number: '方案号码',
+            price: '价格',
+            estimated: '估计',
+            service: '服务',
+            proposal: '方案',
+            budget_number: '预算号码',
+            budget: '预算',
+            hours: '小时',
+            expenses: '开支',
+            page: '页',
+            from: '从',
+            owner: '所有者',
+            subject: '主体',
+            tax: '税',
+            proposal_for: '方案',
+            invoice_for: '发票',
+            budget_for: '预算',
+            locale_country_english: 'Chinese - China',
+            formats: { date: { default: '%Y/%m/%d' } },
+            discount_amount: '折扣金额',
+            billing_type: '计费类型',
+            budget_total: '总预算',
+            budget_used: '已用预算',
+            grand_total: '累计',
+            invoice_number: '发票号码',
+            phone: '电话',
+            budget_date: '预算日期',
+            export_date: '出口日期',
+            billable_amount: '计费金额',
+          },
+        },
+        organization: {
+          name: 'Development d.o.o',
+          number_format_id: 2,
+          date_format_id: 4,
+          time_format_id: 2,
+          currency_format_id: 1,
+          time_display_id: 1,
+          week_start_day_id: 3,
+          decimal_places_id: 4,
+        },
+        template_options: {},
+      };
+
+      (function () {
+        Element.prototype.querySelectorParents = function (sel) {
+          const p = [];
+          let node = this.parentNode;
+          while (node && node !== document) {
+            if (!sel || node.matches(sel)) {
+              p.push(node);
+            }
+            node = node.parentNode;
+          }
+          return p;
+        };
+
+        const data = window.data;
+        const currencyDescriptorMap = {
+          AUD: { symbol: '$', format: '%s %v' },
+          AED: { symbol: 'د.إ', format: '%v %s' },
+          AMD: { symbol: 'դր.', format: '%v %s' },
+          AZN: { symbol: '₼', format: '%s %v' },
+          ARS: { symbol: '$', format: '%s %v' },
+          BAM: { symbol: 'KM', format: '%v %s' },
+          BRL: { symbol: 'R$', format: '%s %v' },
+          CAD: { symbol: '$', format: '%s %v' },
+          CHF: { symbol: 'CHF', format: '%s %v' },
+          CLP: { symbol: '$', format: '%s%v', subunit: 1 },
+          CNY: { symbol: '¥', format: '%s %v' },
+          CRC: { symbol: '₡', format: '%s%v' },
+          CZK: { symbol: 'kč', format: '%v %s' },
+          DKK: { symbol: 'kr.', format: '%v %s' },
+          EGP: { symbol: 'E£', format: '%s%v' },
+          EUR: { symbol: '€', format: '%s%v' },
+          GBP: { symbol: '£', format: '%s %v' },
+          HKD: { symbol: '$', format: '%s %v' },
+          HRK: { symbol: 'kn', format: '%v %s' },
+          HUF: { symbol: 'Ft', format: '%v %s', subunit: 1 },
+          IDR: { symbol: 'Rp', format: '%s %v' },
+          ILS: { symbol: '₪', format: '%s %v' },
+          ISK: { symbol: 'kr', format: '%v %s', subunit: 1 },
+          INR: { symbol: '₹', format: '%s %v' },
+          JPY: { symbol: '¥', format: '%s %v', subunit: 1 },
+          KRW: { symbol: '₩', format: '%s %v', subunit: 1 },
+          KYD: { symbol: '$', format: '%s%v' },
+          MKD: { symbol: 'ден', format: '%v %s' },
+          MXN: { symbol: '$', format: '%s %v' },
+          MYR: { symbol: 'RM', format: '%s%v' },
+          NOK: { symbol: 'kr', format: '%v %s' },
+          NZD: { symbol: '$', format: '%s %v' },
+          PEN: { symbol: 'S/', format: '%s%v' },
+          PHP: { symbol: '₱', format: '%s%v' },
+          PLN: { symbol: 'zł', format: '%v %s' },
+          PYG: { symbol: '₲', format: '%s %v', subunit: 1 },
+          QAR: { symbol: 'ر.ق', format: '%v %s' },
+          RSD: { symbol: 'РСД', format: '%s %v' },
+          RON: { symbol: 'Lei', format: '%v %s' },
+          RUB: { symbol: '₽', format: '%v %s' },
+          SAR: { symbol: 'ر.س', format: '%s %v' },
+          SEK: { symbol: 'kr', format: '%v %s' },
+          SGD: { symbol: '$', format: '%s %v' },
+          TRY: { symbol: '₺', format: '%s %v' },
+          THB: { symbol: '฿', format: '%s %v' },
+          USD: { symbol: '$', format: '%s%v' },
+          ZAR: { symbol: 'R', format: '%s %v' },
+        };
+
+        const NumberFormat = {
+          DOT_COMMA: '1',
+          COMMA_DOT: '2',
+          SPACE_DOT: '3',
+          SPACE_COMMA: '4',
+          APOSTROPHE_DOT: '5',
+        };
+
+        const CurrencyFormat = {
+          SYMBOL: 1,
+          CODE: 2,
+        };
+
+        const numberFormatDescriptorMap = {
+          [NumberFormat.DOT_COMMA]: { separator: '.', decimal: ',' },
+          [NumberFormat.COMMA_DOT]: { separator: ',', decimal: '.' },
+          [NumberFormat.SPACE_DOT]: { separator: ' ', decimal: '.' },
+          [NumberFormat.SPACE_COMMA]: { separator: ' ', decimal: ',' },
+          [NumberFormat.APOSTROPHE_DOT]: { separator: "'", decimal: '.' },
+        };
+
+        function get(obj, path) {
+          return (path || '').split('.').reduce((val, key) => {
+            return val && typeof val === 'object' ? val[key] : val;
+          }, obj);
+        }
+
+        function t(path) {
+          const translations = data.template_options.translations;
+          if (translations && path in translations) {
+            return translations[path];
+          }
+
+          return get(data, `i18n.${data.locale}.${path}`);
+        }
+
+        function toFixed(value, precision) {
+          const power = Math.pow(10, precision);
+          return (Math.round(value * power) / power).toFixed(precision);
+        }
+
+        function padStart(inStr, inLen, inPadStr) {
+          const str = String(inStr);
+          let padStr = String(inPadStr);
+
+          if (str.length > inLen) {
+            return str;
+          }
+
+          const len = inLen - str.length;
+
+          if (len > padStr.length) {
+            padStr += padStr.repeat(len / padStr.length);
+          }
+
+          return `${padStr.slice(0, len)}${str}`;
+        }
+
+        function formatNumber(number, precision, inSeparator, inDecimal) {
+          const negative = number < 0 ? '-' : '';
+          const separator =
+            inSeparator ||
+            numberFormatDescriptorMap[doc.data.organization.number_format_id]
+              ?.separator ||
+            ',';
+          const decimal =
+            inDecimal ||
+            numberFormatDescriptorMap[doc.data.organization.number_format_id]
+              ?.decimal ||
+            '.';
+
+          let base = String(Math.abs(number)).split('.')[0] || '';
+          const mod = base.length > 3 ? base.length % 3 : 0;
+
+          let decimalSegment = String(number).split('.')[1] || '';
+          if (typeof precision === 'number') {
+            base = toFixed(Math.abs(number), precision).split('.')[0];
+            decimalSegment = toFixed(Math.abs(number), precision).split('.')[1];
+          }
+
+          return (
+            negative +
+            (mod ? base.substr(0, mod) + separator : '') +
+            base.substr(mod).replace(/(\d{3})(?=\d)/g, '$1' + separator) + // eslint-disable-line
+            (decimalSegment ? decimal + decimalSegment : '')
+          );
+        }
+
+        function formatMoney(value, currency, opts = {}) {
+          if (!currency) {
+            return 'Invalid money';
+          }
+
+          const currencySymbol = currencyDescriptorMap[currency].symbol;
+          let currencyFormat = currencyDescriptorMap[currency].format;
+          const currencySubunitDivisor =
+            'subunit' in currencyDescriptorMap[currency]
+              ? currencyDescriptorMap[currency].subunit
+              : 100;
+          const numberFormatId =
+            opts.numberFormatId ||
+            data.organization.number_format_id ||
+            NumberFormat.COMMA_DOT;
+          const currencyFormatId =
+            opts.currencyFormatId ||
+            doc.data.organization.currency_format_id ||
+            CurrencyFormat.SYMBOL;
+          const separator = numberFormatDescriptorMap[numberFormatId].separator;
+          const decimal = numberFormatDescriptorMap[numberFormatId].decimal;
+
+          let valueCents = value;
+          let displayValue;
+          let precision = 0;
+
+          if (currencySubunitDivisor > 1) {
+            valueCents = value / currencySubunitDivisor;
+            precision = 'precision' in opts ? opts.precision : 2;
+          }
+
+          if (opts.extraSpacing) {
+            let currencyFormatLeft = currencyFormat.substring(0, 2);
+            let currencyFormatRight = currencyFormat.substring(2);
+
+            currencyFormat =
+              currencyFormatLeft +
+              '\xa0'.repeat(opts.extraSpacing) +
+              currencyFormatRight;
+          }
+
+          if (opts.short) {
+            const absValueCents = Math.abs(valueCents);
+            let shortenedValueCents = valueCents;
+
+            if (absValueCents >= 1000000) {
+              shortenedValueCents /= 1000000;
+            } else if (absValueCents >= 1000) {
+              shortenedValueCents /= 1000;
+            }
+
+            displayValue = formatNumber(
+              shortenedValueCents,
+              precision,
+              separator,
+              decimal
+            );
+
+            if (absValueCents >= 1000000) {
+              displayValue = `${displayValue}M`;
+            } else if (absValueCents >= 1000) {
+              displayValue = `${displayValue}K`;
+            }
+          } else {
+            displayValue = formatNumber(
+              valueCents,
+              precision,
+              separator,
+              decimal
+            );
+          }
+
+          if (currencyFormatId === CurrencyFormat.CODE) {
+            return `${currency} ${displayValue}`;
+          } else if (data.template_options.iso_currency_format) {
+            return `${displayValue} ${currency}`;
+          }
+
+          if (opts.omitSymbol) {
+            return displayValue;
+          }
+
+          return currencyFormat
+            .replace('%s', currencySymbol)
+            .replace('%v', displayValue);
+        }
+
+        function formatContactDataCityZipState(cd) {
+          if (['en_AU', 'en_US', 'it_IT', 'en_GB'].includes(data.locale)) {
+            return [
+              cd.city,
+              [cd.state, cd.zipcode].filter((x) => !!x).join(' '),
+            ]
+              .filter((x) => !!x)
+              .join(', ');
+          }
+
+          if (data.locale === 'nl_NL') {
+            return [
+              [cd.zipcode, cd.city].filter((x) => !!x).join(' '),
+              cd.state,
+            ]
+              .filter((x) => !!x)
+              .join(', ');
+          }
+
+          return [[cd.zipcode, cd.city].filter((x) => !!x).join(' '), cd.state]
+            .filter((x) => !!x)
+            .join(', ');
+        }
+
+        function customElement(key, resolveInnerHtml) {
+          customElements.define(
+            key,
+            class CompanyInfo extends HTMLElement {
+              connectedCallback() {
+                this.classList.add(key);
+                this.innerHTML = resolveInnerHtml(this);
+              }
+            }
+          );
+        }
+
+        function translateElements(selector, keyAttr) {
+          Array.from(document.querySelectorAll(selector)).forEach((el) => {
+            const localeOverride = el.getAttribute(data.locale);
+            if (localeOverride) {
+              el.textContent = localeOverride;
+              return;
+            }
+
+            const langOverride = el.getAttribute(data.locale.split('_')[0]);
+            if (langOverride) {
+              el.textContent = langOverride;
+              return;
+            }
+
+            const key = el.getAttribute(keyAttr);
+            if (t(key)) {
+              el.textContent = t(key);
+            }
+          });
+        }
+
+        window.doc = {
+          data,
+          t,
+          get,
+          formatMoney,
+          formatNumber,
+          formatContactDataCityZipState,
+          customElement,
+          padStart,
+          translateElements,
+        };
+      })();
+    </script>
+
+    <script>
+      const {
+        data,
+        t,
+        get,
+        formatMoney,
+        formatContactDataCityZipState,
+        formatNumber,
+        customElement,
+        translateElements,
+      } = window.doc;
+
+      customElement('company-info', (el) => {
+        const type = el.getAttribute('type');
+        const cd = type === 'from' ? data.bill_from : data.bill_to;
+        const zipCityState = formatContactDataCityZipState(cd);
+        const oppositeCountry =
+          type === 'from' ? data.bill_to.country : data.bill_from.country;
+        const title = {
+          from: t('from'),
+          'proposal-for': t('proposal_for'),
+          'budget-for': t('budget_for'),
+          'invoice-for': t('invoice_for'),
+        }[type];
+        const addressNormalized =
+          cd.address && cd.address.split('\n').join('<br>');
+        const showCountry =
+          cd.country &&
+          (cd.country !== oppositeCountry ||
+            data.template_options.always_show_country);
+
+        return `
+        <table>
+          <tr>
+            <th> ${title} </th>
+            <td>
+              ${
+                cd.name
+                  ? `
+                <div class="company-info__name">${cd.name}</div>
+              `
+                  : ''
+              }
+
+              ${
+                cd.address
+                  ? `
+                <div>${addressNormalized}</div>
+              `
+                  : ''
+              }
+
+              ${
+                zipCityState
+                  ? `
+                <div>${zipCityState}</div>
+              `
+                  : ''
+              }
+
+              ${
+                showCountry
+                  ? `
+                <div>${cd.country}</div>
+              `
+                  : ''
+              }
+
+              ${
+                cd.vat
+                  ? `
+                <div>
+                  ${
+                    cd.country === t('locale_country_english')
+                      ? t('company_vat_domestic')
+                      : t('company_vat')
+                  }:
+                  ${cd.vat}
+                </div>
+              `
+                  : ''
+              }
+            </td>
+          </tr>
+        </table>
+      `;
+      });
+
+      customElement('table-total', (el) => {
+        data.sectionMap = (data.sections || []).reduce((map, s) => {
+          map[s.id] = s;
+          return map;
+        }, {});
+
+        const [section, id] = (el.getAttribute('section') || '').split('.');
+        const isGrandTotal = el.getAttribute('is-grand-total');
+
+        const subtotal = get(
+          data,
+          {
+            fp: 'fp_subtotal',
+            hp: 'hp_subtotal',
+            expenses: 'expenses_subtotal',
+            sections: `sectionMap.${id}.subtotal`,
+          }[section] || 'subtotal'
+        );
+        const subtotal_default = get(
+          data,
+          {
+            fp: 'fp_subtotal_default',
+            hp: 'hp_subtotal_default',
+            expenses: 'expenses_subtotal_default',
+            sections: `sectionMap.${id}.subtotal_default`,
+          }[section] || 'subtotal_default'
+        );
+        const subtotal_dual = get(
+          data,
+          {
+            fp: 'fp_subtotal_dual',
+            hp: 'hp_subtotal_dual',
+            expenses: 'expenses_subtotal_dual',
+            sections: `sectionMap.${id}.subtotal_dual`,
+          }[section] || 'subtotal_dual'
+        );
+
+        const discount = get(data, 'discount');
+        const discount_amount = get(
+          data,
+          {
+            fp: 'fp_discount_amount',
+            hp: 'hp_discount_amount',
+            expenses: 'expenses_discount_amount',
+            sections: `sectionMap.${id}.discount_amount`,
+          }[section] || 'discount_amount'
+        );
+        const discount_amount_default = get(
+          data,
+          {
+            fp: 'fp_discount_amount_default',
+            hp: 'hp_discount_amount_default',
+            expenses: 'expenses_discount_amount_default',
+            sections: `sectionMap.${id}.discount_amount_default`,
+          }[section] || 'discount_amount_default'
+        );
+        const discount_amount_dual = get(
+          data,
+          {
+            fp: 'fp_discount_amount_dual',
+            hp: 'hp_discount_amount_dual',
+            expenses: 'expenses_discount_amount_dual',
+            sections: `sectionMap.${id}.discount_amount_dual`,
+          }[section] || 'discount_amount_dual'
+        );
+
+        const discount_with_services =
+          get(
+            data,
+            { sections: `sectionMap.${id}.discount_percentage` }[section] ||
+              'discount_with_services'
+          ) * -1;
+        const discount_amount_with_services =
+          get(
+            data,
+            { sections: `sectionMap.${id}.discount_amount` }[section] ||
+              'discount_amount_with_services'
+          ) * -1;
+        const discount_amount_with_services_dual =
+          get(
+            data,
+            { sections: `sectionMap.${id}.discount_amount_dual` }[section] ||
+              'discount_amount_with_services_dual'
+          ) * -1;
+        const show_discount_with_services =
+          data.budget_revamp &&
+          !data.show_budget_totals &&
+          discount_with_services &&
+          !discount;
+
+        const tax1_value = get(data, 'tax1_value');
+        const tax1_name = get(data, 'tax1_name');
+        const tax1_amount = get(
+          data,
+          {
+            fp: 'fp_tax1_amount',
+            hp: 'hp_tax1_amount',
+            expenses: 'expenses_tax1_amount',
+            sections: `sectionMap.${id}.tax1_amount`,
+          }[section] || 'tax1_amount'
+        );
+        const tax1_amount_default = get(
+          data,
+          {
+            fp: 'fp_tax1_amount_default',
+            hp: 'hp_tax1_amount_default',
+            expenses: 'expenses_tax1_amount_default',
+            sections: `sectionMap.${id}.tax1_amount_default`,
+          }[section] || 'tax1_amount_default'
+        );
+        const tax1_amount_dual = get(
+          data,
+          {
+            fp: 'fp_tax1_amount_dual',
+            hp: 'hp_tax1_amount_dual',
+            expenses: 'expenses_tax1_amount_dual',
+            sections: `sectionMap.${id}.tax1_amount_dual`,
+          }[section] || 'tax1_amount_dual'
+        );
+
+        const tax2_value = get(data, 'tax2_value');
+        const tax2_name = get(data, 'tax2_name');
+        const tax2_amount = get(
+          data,
+          {
+            fp: 'fp_tax2_amount',
+            hp: 'hp_tax2_amount',
+            expenses: 'expenses_tax2_amount',
+            sections: `sectionMap.${id}.tax2_amount`,
+          }[section] || 'tax2_amount'
+        );
+        const tax2_amount_default = get(
+          data,
+          {
+            fp: 'fp_tax2_amount_default',
+            hp: 'hp_tax2_amount_default',
+            expenses: 'expenses_tax2_amount_default',
+            sections: `sectionMap.${id}.tax2_amount_default`,
+          }[section] || 'tax2_amount_default'
+        );
+        const tax2_amount_dual = get(
+          data,
+          {
+            fp: 'fp_tax2_amount_dual',
+            hp: 'hp_tax2_amount_dual',
+            expenses: 'expenses_tax2_amount_dual',
+            sections: `sectionMap.${id}.tax2_amount_dual`,
+          }[section] || 'tax2_amount_dual'
+        );
+
+        const line_items_taxes = get(data, 'line_items_taxes');
+        const line_item_tax = get(data, 'line_item_tax');
+
+        const total = get(
+          data,
+          {
+            fp: 'fp_total',
+            hp: 'hp_total',
+            expenses: 'expenses_total',
+            sections: `sectionMap.${id}.total`,
+          }[section] || 'total'
+        );
+        const total_default = get(
+          data,
+          {
+            fp: 'fp_total_default',
+            hp: 'hp_total_default',
+            expenses: 'expenses_total_default',
+            sections: `sectionMap.${id}.total_default`,
+          }[section] || 'total_default'
+        );
+        const total_dual = get(
+          data,
+          {
+            fp: 'fp_total_dual',
+            hp: 'hp_total_dual',
+            expenses: 'expenses_total_dual',
+            sections: `sectionMap.${id}.total_dual`,
+          }[section] || 'total_dual'
+        );
+
+        return `
+        <div class="totals">
+          <table>
+
+            ${
+              show_discount_with_services
+                ? `
+              <tr field="discount-with-services">
+                <th>${t('discount_amount')} (${formatNumber(
+                    discount_with_services
+                  )}%)</th>
+                <td>
+                  ${formatMoney(discount_amount_with_services, data.currency)}
+                  ${
+                    data.has_dual_currency_displayed
+                      ? `
+                    <div class="second-currency-value">
+                      ${formatMoney(
+                        discount_amount_with_services_dual,
+                        data.currency_dual
+                      )}
+                    </div>
+                  `
+                      : ''
+                  }
+                </td>
+              </tr>
+            `
+                : ''
+            }
+
+            <tr>
+              <th class="subtotal">${t('subtotal')}</th>
+              <td>
+                ${formatMoney(subtotal, data.currency)}
+                ${
+                  data.has_default_currency_displayed
+                    ? `
+                  <div class="second-currency-value">
+                    ${formatMoney(subtotal_default, data.currency_default)}
+                  </div>
+                `
+                    : ''
+                }
+                ${
+                  data.has_dual_currency_displayed
+                    ? `
+                  <div class="second-currency-value">
+                    ${formatMoney(subtotal_dual, data.currency_dual)}
+                  </div>
+                `
+                    : ''
+                }
+              </td>
+            </tr>
+
+            ${
+              discount
+                ? `
+              <tr>
+                <th>${t('discount')} (${formatNumber(discount)}%)</th>
+                <td>
+                  ${formatMoney(discount_amount, data.currency)}
+                  ${
+                    data.has_default_currency_displayed
+                      ? `
+                    <div class="second-currency-value">
+                      ${formatMoney(
+                        discount_amount_default,
+                        data.currency_default
+                      )}
+                    </div>
+                  `
+                      : ''
+                  }
+                  ${
+                    data.has_dual_currency_displayed
+                      ? `
+                    <div class="second-currency-value">
+                      ${formatMoney(discount_amount_dual, data.currency_dual)}
+                    </div>
+                  `
+                      : ''
+                  }
+                </td>
+              </tr>
+            `
+                : ''
+            }
+
+            ${
+              tax1_value && !line_item_tax
+                ? `
+              <tr>
+                <th>${tax1_name || ''} (${formatNumber(
+                    parseFloat(tax1_value, 10)
+                  )}%)</th>
+                <td>
+                  ${formatMoney(tax1_amount, data.currency)}
+                  ${
+                    data.has_default_currency_displayed
+                      ? `
+                    <div class="second-currency-value">
+                      ${formatMoney(tax1_amount_default, data.currency_default)}
+                    </div>
+                  `
+                      : ''
+                  }
+                  ${
+                    data.has_dual_currency_displayed
+                      ? `
+                    <div class="second-currency-value">
+                      ${formatMoney(tax1_amount_dual, data.currency_dual)}
+                    </div>
+                  `
+                      : ''
+                  }
+                </td>
+              </tr>
+            `
+                : ''
+            }
+
+            ${
+              tax2_value && !line_item_tax
+                ? `
+              <tr>
+                <th>${tax2_name || ''} (${formatNumber(
+                    parseFloat(tax2_value, 10)
+                  )}%)</th>
+                <td>
+                  ${formatMoney(tax2_amount, data.currency)}
+                  ${
+                    data.has_default_currency_displayed
+                      ? `
+                    <div class="second-currency-value">
+                      ${formatMoney(tax2_amount_default, data.currency_default)}
+                    </div>
+                  `
+                      : ''
+                  }
+                  ${
+                    data.has_dual_currency_displayed
+                      ? `
+                    <div class="second-currency-value">
+                      ${formatMoney(tax2_amount_dual, data.currency_dual)}
+                    </div>
+                  `
+                      : ''
+                  }
+                </td>
+              </tr>
+            `
+                : ''
+            }
+
+            ${
+              line_item_tax && line_items_taxes
+                ? line_items_taxes
+                    .map(
+                      (tax) => `
+              ${
+                tax.name && tax.percentage
+                  ? `
+                <tr>
+                  <th>
+                    ${tax.name || ''} ${formatNumber(
+                      parseFloat(tax.percentage, 10)
+                    )}%
+                  </th>
+                  <td>
+                    ${formatMoney(tax.amount, data.currency)}
+                    ${
+                      data.has_default_currency_displayed
+                        ? `
+                      <div class="second-currency-value">
+                        ${formatMoney(
+                          tax.amount_default,
+                          data.currency_default
+                        )}
+                      </div>
+                    `
+                        : ''
+                    }
+                    ${
+                      data.has_dual_currency_displayed
+                        ? `
+                      <div class="second-currency-value">
+                        ${formatMoney(tax.amount_dual, data.currency_dual)}
+                      </div>
+                    `
+                        : ''
+                    }
+                  </td>
+                </tr>
+            `
+                  : ''
+              }`
+                    )
+                    .join(' ')
+                : ''
+            }
+
+            <tr class="totals__total">
+              <th>${isGrandTotal ? t('grand_total') : t('total')}</th>
+              <td>
+                ${formatMoney(total, data.currency)}
+                ${
+                  data.has_default_currency_displayed
+                    ? `
+                  <div class="second-currency-value">
+                    ${formatMoney(total_default, data.currency_default)}
+                  </div>
+                `
+                    : ''
+                }
+                ${
+                  data.has_dual_currency_displayed
+                    ? `
+                  <div class="second-currency-value">
+                    ${formatMoney(total_dual, data.currency_dual)}
+                  </div>
+                `
+                    : ''
+                }
+              </td>
+            </tr>
+          </table>
+        </div>
+      `;
+      });
+
+      customElement('format-money', (el) => {
+        return doc.formatMoney(
+          parseFloat(el.getAttribute('value'), 10),
+          el.getAttribute('currency')
+        );
+      });
+
+      customElement('format-number', (el) => {
+        const value = parseFloat(el.getAttribute('value'), 10);
+        const precision = el.hasAttribute('precision')
+          ? parseInt(el.getAttribute('precision'), 10)
+          : undefined;
+        return doc.formatNumber(value, precision);
+      });
+
+      window.addEventListener('DOMContentLoaded', function () {
+        if (
+          document.querySelector('.header').clientHeight > 400 ||
+          data.template_options.disable_header_reapat
+        ) {
+          document
+            .querySelector('page-body')
+            .insertAdjacentElement(
+              'afterbegin',
+              document.querySelector('.header')
+            );
+        }
+
+        translateElements('t-label', 'key');
+      });
+    </script>
+
+    <document-page>
+      <page-header>
+        <div class="header">
+          <div class="header-left">
+            <div class="header-logo">
+              <img
+                src="./logo.png"
+                class="header-logo__image"
+              />
+            </div>
+
+            <div class="details">
+              <table>
+                <tr>
+                  <th><t-label key="proposal">Proposal</t-label>: #</th>
+                  <td><strong>1744</strong></td>
+                </tr>
+                <tr>
+                  <th><t-label key="subject">Subject</t-label></th>
+                  <td>A brand new deal</td>
+                </tr>
+
+                <tr>
+                  <th>
+                    <t-label key="purchase_order_number">PO Number</t-label>
+                  </th>
+                  <td>yolo69</td>
+                </tr>
+
+                <tr>
+                  <th><t-label key="date">Date</t-label></th>
+                  <td>02/09/2022</td>
+                </tr>
+                <tr>
+                  <th><t-label key="owner">Owner</t-label></th>
+                  <td>Tibor Rogulja</td>
+                </tr>
+                <tr>
+                  <th><t-label key="export_date">Export date</t-label></th>
+                  <td>02/18/2023</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+          <div class="header-right">
+            <company-info type="from"></company-info>
+
+            <company-info type="proposal-for"></company-info>
+          </div>
+
+          <div class="clearfix"></div>
+        </div>
+      </page-header>
+
+      <page-body>
+        <section>
+          <h3 class="data-table-title">section 1</h3>
+
+          <table class="data-table section-table">
+            <tr>
+              <th col="section-service" field="section_service">
+                <t-label key="service">Service</t-label>
+              </th>
+
+              <th col="section-unit" field="section_unit">
+                <t-label key="unit">Unit</t-label>
+              </th>
+
+              <th col="section-quantity" field="section_quantity">
+                <t-label key="quantity">Qty</t-label>
+              </th>
+
+              <th col="section-price" field="section_price">
+                <t-label key="price">Price</t-label>
+              </th>
+
+              <th col="section-discount" field="section_discount">
+                <t-label key="discount">Discount</t-label>
+              </th>
+
+              <th col="section-revenue" field="section_revenue">
+                <t-label key="amount">Amount</t-label>
+              </th>
+            </tr>
+
+            <tr>
+              <td col="section-service" field="section_service">
+                <div class="data-table-service-name has-description">
+                  neki servis za recycle bin
+                </div>
+                <div class="data-table-service-description">
+                  <div>opis</div>
+                </div>
+              </td>
+
+              <td col="section-unit" field="section_unit">
+                <t-label key="unit_enum.day"></t-label>
+              </td>
+
+              <td col="section-quantity" field="section_quantity">
+                <format-number value="11.0" />
+              </td>
+
+              <td col="section-price" field="section_price">
+                <format-money value="11000" currency="CHF" />
+              </td>
+
+              <td col="section-discount" field="section_discount">
+                <format-number value="100.0" />%
+              </td>
+
+              <td col="section-revenue" field="section_revenue">
+                <format-money value="0" currency="CHF" />
+              </td>
+            </tr>
+
+            <tr>
+              <td col="section-service" field="section_service">
+                <div class="data-table-service-name">Price management</div>
+              </td>
+
+              <td col="section-unit" field="section_unit">
+                <t-label key="unit_enum.hour"></t-label>
+              </td>
+
+              <td col="section-quantity" field="section_quantity">
+                <format-number value="100.0" />
+              </td>
+
+              <td col="section-price" field="section_price">
+                <format-money value="100" currency="CHF" />
+              </td>
+
+              <td col="section-discount" field="section_discount">
+                <format-number value="100.0" />%
+              </td>
+
+              <td col="section-revenue" field="section_revenue">
+                <format-money value="0" currency="CHF" />
+              </td>
+            </tr>
+
+            <tr>
+              <td col="section-service" field="section_service">
+                <div class="data-table-service-name">neki itemi</div>
+              </td>
+
+              <td col="section-unit" field="section_unit">
+                <t-label key="unit_enum.piece"></t-label>
+              </td>
+
+              <td col="section-quantity" field="section_quantity">
+                <format-number value="0.0" />
+              </td>
+
+              <td col="section-price" field="section_price">
+                <format-money value="0" currency="CHF" />
+              </td>
+
+              <td col="section-discount" field="section_discount">
+                <format-number value="0.0" />%
+              </td>
+
+              <td col="section-revenue" field="section_revenue">
+                <format-money value="0" currency="CHF" />
+              </td>
+            </tr>
+
+            <tr>
+              <td col="section-service" field="section_service">
+                <div class="data-table-service-name has-description">
+                  some new things that are super nice
+                </div>
+                <div class="data-table-service-description">
+                  <div>here is some description</div>
+                </div>
+              </td>
+
+              <td col="section-unit" field="section_unit">
+                <t-label key="unit_enum.day"></t-label>
+              </td>
+
+              <td col="section-quantity" field="section_quantity">
+                <format-number value="55.0" />
+              </td>
+
+              <td col="section-price" field="section_price">
+                <format-money value="500000" currency="CHF" />
+              </td>
+
+              <td col="section-discount" field="section_discount">
+                <format-number value="50.0" />%
+              </td>
+
+              <td col="section-revenue" field="section_revenue">
+                <format-money value="13750000" currency="CHF" />
+              </td>
+            </tr>
+          </table>
+
+          <table-total section="sections.69"></table-total>
+        </section>
+
+        <section>
+          <h3 class="data-table-title">section 2</h3>
+
+          <table class="data-table section-table">
+            <tr>
+              <th col="section-service" field="section_service">
+                <t-label key="service">Service</t-label>
+              </th>
+
+              <th col="section-unit" field="section_unit">
+                <t-label key="unit">Unit</t-label>
+              </th>
+
+              <th col="section-quantity" field="section_quantity">
+                <t-label key="quantity">Qty</t-label>
+              </th>
+
+              <th col="section-price" field="section_price">
+                <t-label key="price">Price</t-label>
+              </th>
+
+              <th col="section-discount" field="section_discount">
+                <t-label key="discount">Discount</t-label>
+              </th>
+
+              <th col="section-revenue" field="section_revenue">
+                <t-label key="amount">Amount</t-label>
+              </th>
+            </tr>
+
+            <tr>
+              <td col="section-service" field="section_service">
+                <div class="data-table-service-name has-description">
+                  Proba descriptiona
+                </div>
+                <div class="data-table-service-description">
+                  <div>something</div>
+                  <blockquote>new</blockquote>
+                  <div><strong>new</strong><br /><em>new</em><br />new</div>
+                </div>
+              </td>
+
+              <td col="section-unit" field="section_unit">
+                <t-label key="unit_enum.piece"></t-label>
+              </td>
+
+              <td col="section-quantity" field="section_quantity">
+                <format-number value="5000.0" />
+              </td>
+
+              <td col="section-price" field="section_price">
+                <format-money value="2000" currency="CHF" />
+              </td>
+
+              <td col="section-discount" field="section_discount">
+                <format-number value="100.0" />%
+              </td>
+
+              <td col="section-revenue" field="section_revenue">
+                <format-money value="0" currency="CHF" />
+              </td>
+            </tr>
+
+            <tr>
+              <td col="section-service" field="section_service">
+                <div class="data-table-service-name">test</div>
+              </td>
+
+              <td col="section-unit" field="section_unit">
+                <t-label key="unit_enum.hour"></t-label>
+              </td>
+
+              <td col="section-quantity" field="section_quantity">
+                <format-number value="0.0" />
+              </td>
+
+              <td col="section-price" field="section_price">
+                <format-money value="0" currency="CHF" />
+              </td>
+
+              <td col="section-discount" field="section_discount">
+                <format-number value="100.0" />%
+              </td>
+
+              <td col="section-revenue" field="section_revenue">
+                <format-money value="0" currency="CHF" />
+              </td>
+            </tr>
+
+            <tr>
+              <td col="section-service" field="section_service">
+                <div class="data-table-service-name has-description">
+                  Tipkanje u prazno
+                </div>
+                <div class="data-table-service-description">
+                  <div>
+                    Ovo je neki opis ovog servisa<br />Ovo je neki opis ovog
+                    servisa<br />Ovo je neki opis ovog servisa<br />Ovo je neki
+                    opis ovog servisa<br />Ovo je neki opis ovog servisa<br />Ovo
+                    je neki opis ovog servisa<br />Ovo je neki opis ovog servisa
+                  </div>
+                </div>
+              </td>
+
+              <td col="section-unit" field="section_unit">
+                <t-label key="unit_enum.day"></t-label>
+              </td>
+
+              <td col="section-quantity" field="section_quantity">
+                <format-number value="50.0" />
+              </td>
+
+              <td col="section-price" field="section_price">
+                <format-money value="50000" currency="CHF" />
+              </td>
+
+              <td col="section-discount" field="section_discount">
+                <format-number value="20.0" />%
+              </td>
+
+              <td col="section-revenue" field="section_revenue">
+                <format-money value="2000000" currency="CHF" />
+              </td>
+            </tr>
+          </table>
+
+          <table-total section="sections.114"></table-total>
+        </section>
+
+        <section>
+          <h3 class="data-table-title">section 3</h3>
+
+          <table class="data-table section-table">
+            <tr>
+              <th col="section-service" field="section_service">
+                <t-label key="service">Service</t-label>
+              </th>
+
+              <th col="section-unit" field="section_unit">
+                <t-label key="unit">Unit</t-label>
+              </th>
+
+              <th col="section-quantity" field="section_quantity">
+                <t-label key="quantity">Qty</t-label>
+              </th>
+
+              <th col="section-price" field="section_price">
+                <t-label key="price">Price</t-label>
+              </th>
+
+              <th col="section-discount" field="section_discount">
+                <t-label key="discount">Discount</t-label>
+              </th>
+
+              <th col="section-revenue" field="section_revenue">
+                <t-label key="amount">Amount</t-label>
+              </th>
+            </tr>
+
+            <tr>
+              <td col="section-service" field="section_service">
+                <div class="data-table-service-name has-description">magla</div>
+                <div class="data-table-service-description">
+                  <div>
+                    ovdje ide neki opis<br />ovdje ide neki opis<br />ovdje ide
+                    neki opis<br />ovdje ide neki opis<br />ovdje ide neki opis
+                  </div>
+                </div>
+              </td>
+
+              <td col="section-unit" field="section_unit">
+                <t-label key="unit_enum.hour"></t-label>
+              </td>
+
+              <td col="section-quantity" field="section_quantity">
+                <format-number value="11.0" />
+              </td>
+
+              <td col="section-price" field="section_price">
+                <format-money value="111000" currency="CHF" />
+              </td>
+
+              <td col="section-discount" field="section_discount">
+                <format-number value="1.0" />%
+              </td>
+
+              <td col="section-revenue" field="section_revenue">
+                <format-money value="1208790" currency="CHF" />
+              </td>
+            </tr>
+
+            <tr>
+              <td col="section-service" field="section_service">
+                <div class="data-table-service-name has-description">
+                  magla 2
+                </div>
+                <div class="data-table-service-description">
+                  <div>
+                    ovdje ide neki opis<br />ovdje ide neki opis<br />ovdje ide
+                    neki opis<br />ovdje ide neki opis<br />ovdje ide neki opis
+                  </div>
+                </div>
+              </td>
+
+              <td col="section-unit" field="section_unit">
+                <t-label key="unit_enum.hour"></t-label>
+              </td>
+
+              <td col="section-quantity" field="section_quantity">
+                <format-number value="20.0" />
+              </td>
+
+              <td col="section-price" field="section_price">
+                <format-money value="111000" currency="CHF" />
+              </td>
+
+              <td col="section-discount" field="section_discount">
+                <format-number value="2.0" />%
+              </td>
+
+              <td col="section-revenue" field="section_revenue">
+                <format-money value="2175600" currency="CHF" />
+              </td>
+            </tr>
+          </table>
+
+          <table-total section="sections.140"></table-total>
+        </section>
+
+        <section class="grand-total-section2">
+          <table-total is-grand-total="true"></table-total>
+        </section>
+      </page-body>
+
+      <page-footer>
+        <div class="footer">
+          <div></div>
+          <div>
+            Page <span class="page-number"></span> /
+            <span class="total-pages"></span>
+          </div>
+        </div>
+      </page-footer>
+    </document-page>
+  </body>
+</html>
