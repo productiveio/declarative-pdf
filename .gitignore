@@ -22,3 +22,6 @@ lerna-debug.log*
 # debug files
 generated/
 manual_tests/
+
+# build files
+dist/
