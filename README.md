@@ -1,12 +1,20 @@
 # Overview
 
-The "declarative-pdf" npm package is a tool for generating PDF documents from HTML template that use declarative elements to control the layout and content of the PDF. The HTML template is just your classic HTML expanded with a set of custom HTML tags that define the structure and appearance of the PDF document, including `<document-page>`, `<page-background>`, `<page-header>`, `<page-body>`, and `<page-footer>`. Under the hood, it uses puppeteer to slice your template and generate PDF elements from it. Those elements are then used to assemble PDF pages into your PDF document.
-
-> TODO: Name of this package is work in progress. Starting point was `declarative-html2pdf`, working idea is `declarative-pdf` -> but if something better comes along it shall be renamed.
-
-> TODO: neki high level opis problema (zasto trenutna html-to-pdf rjesenja nisu dobra)
+A tool for generating PDF documents from HTML template that use declarative elements to control the layout and content of the PDF.
 
 > TODO: neki dobar vizualni example da netko iz prve moze to brzo skuzit
+
+|          Feature          |                                                                                     Description                                                                                     |
+| :------------------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| headers and footers       | Use `<page-header>` and `<page-footer>` elements to define the header and footer for each `<document-page>`.                                                                        |
+| page backgrounds          | Use `<page-background>` element to specify a custom background for each `<document-page>`.                                                                                          |
+| page size and orientation | Use `<document-page>` element to specify page size and orientation.                                                                                                                 |
+| multi-page content        | Use `<document-page>` element to spans across as many pages as needed. You can have multiple `<document-page>` elements in a single template with different sizes and orientations. |
+| page numbering            | Use `<current-page-number>` and `<total-pages-number>` elements to display page numbers within headers or footers.                                                                  |
+
+Layout is controlled using a set of custom HTML tags that define the structure of the PDF document. The package uses puppeteer to slice your template and generate PDF elements from it. Those elements are then used to assemble PDF pages into your PDF document.
+
+> Unlike other HTML-to-PDF solutions that require manual coding of PDF layout and content, our tool uses declarative HTML elements to control the layout and content of the PDF. This makes it easier and faster to generate PDF documents from HTML templates, as you can simply define the structure of the PDF using custom HTML tags. Additionally, our tool provides features such as headers and footers, page backgrounds, and page numbering, which are not always available in other HTML-to-PDF solutions.
 
 # Table of contents
 - [Installation](#installation)
@@ -18,30 +26,26 @@ The "declarative-pdf" npm package is a tool for generating PDF documents from HT
 
 # Installation
 
-> TODO: This doesn't work yet. This is probably how it will work once it's ready and published.
-
 Install it locally in your project folder:
 
-using npm:
-
 ```bash
+# using npm
 npm install --save declarative-pdf
-```
-
-or if you prefer yarn:
-
-```bash
+# or using yarn
 yarn add declarative-pdf
 ```
 
-# Get started
+> [!NOTE]
+> This package supports both CommonJS and ES modules. If you are using a bundler such as Webpack or Rollup, you can import the package using ES modules syntax. If you are using Node.js, you can import the package using CommonJS syntax.
+
+# Usage
 
 We need a valid template for this to work, so let's use the one supplied in examples folder. For example:
 
-```js
+```typescript
 // Basic imports
-const fs = require('fs/promises');
-const generator = require('declarative-pdf');
+import * as fs from 'fs/promises';
+import generator from 'declarative-pdf';
 
 (async function () {
   // Load html template into string
