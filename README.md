@@ -14,6 +14,7 @@ A tool for generating PDF documents from HTML template that use declarative elem
 
 Layout is controlled using a set of custom HTML tags that define the structure of the PDF document. The package uses puppeteer to slice your template and generate PDF elements from it. Those elements are then used to assemble PDF pages into your PDF document.
 
+> [!NOTE]
 > Unlike other HTML-to-PDF solutions that require manual coding of PDF layout and content, our tool uses declarative HTML elements to control the layout and content of the PDF. This makes it easier and faster to generate PDF documents from HTML templates, as you can simply define the structure of the PDF using custom HTML tags. Additionally, our tool provides features such as headers and footers, page backgrounds, and page numbering, which are not always available in other HTML-to-PDF solutions.
 
 # Table of contents
@@ -36,7 +37,7 @@ yarn add declarative-pdf
 ```
 
 > [!NOTE]
-> This package supports both CommonJS and ES modules. If you are using a bundler such as Webpack or Rollup, you can import the package using ES modules syntax. If you are using Node.js, you can import the package using CommonJS syntax.
+> This package supports both CommonJS and ES modules. So you can either `require` it or `import` it.
 
 # Usage
 
