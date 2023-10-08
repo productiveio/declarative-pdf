@@ -23,7 +23,6 @@ Layout is controlled using a set of custom HTML tags that define the structure o
 - [API reference](#api-reference)
 - [Template syntax](#template-syntax)
 - [Examples](#examples)
-- [Troubleshooting](#troubleshooting)
 
 # Installation
 
@@ -44,18 +43,13 @@ yarn add declarative-pdf
 We need a valid template for this to work, so let's use the one supplied in examples folder. For example:
 
 ```typescript
-// Basic imports
-import * as fs from 'fs/promises';
-import generator from 'declarative-pdf';
+import {readFileSync, writeFileSync} from 'fs';
+import generate from 'declarative-pdf';
 
 (async function () {
-  // Load html template into string
-  const templateBuffer = await fs.readFile('./examples/basic-template.html');
-  const template = templateBuffer.toString();
-
-  // Generate PDF document and save it to disk
-  const pdfBuffer = await generator(template);
-  await fs.writeFile('./example-output.pdf', pdfBuffer);
+  const html = await readFileSync('./examples/basic-template.html', {encoding: 'utf8'});
+  const pdfBuffer = await generator(html);
+  await writeFile('./example-output.pdf', pdfBuffer);
 })();
 ```
 
@@ -70,7 +64,7 @@ const generator = require('declarative-pdf');
 
   app.use(express.urlencoded({
     extended: true,
-    limit: '2000kb' // default limiit is 100kb and templates can grow
+    limit: '2000kb' // default limit is 100kb and templates can grow
   }));
 
   async function generate(req, res) {
@@ -95,6 +89,7 @@ const generator = require('declarative-pdf');
 
 So if you send POST request to this endpoint, with `template` as a string, containing your whole template file and `name` as a string, this would respond with generated PDF file.
 
+> [!NOTE]
 > Spinning up puppeteer browser can be an expensive operation, so in some server scenarios it might be beneficial to keep browser instance running. With `keepAlive` option set to `true`, we are keeping the browser instance running and only disposing individual browser tabs.
 
 # API reference
@@ -211,12 +206,3 @@ pdf.writeBuffer(pdfBuffer, "output.pdf");
 ```
 
 Which generates a new file, `output.pdf`.
-
-
-# Troubleshooting
-
-- wip
-
-# Contributing
-
-- wip
