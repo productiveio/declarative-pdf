@@ -1,8 +1,17 @@
 {
   "name": "declarative-pdf",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A tool for generating PDF documents from declarative HTML templates",
-  "keywords": ["pdf", "html", "declarative", "template", "document", "generate", "generate-pdf", "generate-pdf-from-html"],
+  "keywords": [
+    "pdf",
+    "html",
+    "declarative",
+    "template",
+    "document",
+    "generate",
+    "generate-pdf",
+    "generate-pdf-from-html"
+  ],
   "main": "./dist/index.js",
   "type": "module",
   "exports": {
@@ -16,7 +25,8 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/productiveio/declarative-pdf.git"},
+    "url": "https://github.com/productiveio/declarative-pdf.git"
+  },
   "scripts": {
     "start": "ts-node src/index.ts",
     "create": "npm run build && npm run test",
