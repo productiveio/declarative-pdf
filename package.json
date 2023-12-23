@@ -21,6 +21,7 @@
       "types": "./dist/index.d.ts"
     }
   },
+  "files": ["dist"],
   "author": "The Productive Company",
   "license": "MIT",
   "repository": {
