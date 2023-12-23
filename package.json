@@ -32,7 +32,7 @@
     "start": "ts-node src/index.ts",
     "create": "npm run build && npm run test",
     "build": "rm -rf dist && tsup src/index.ts --format cjs,esm --dts --clean && cp shims/index.wrapper.cjs dist/",
-    "test": "jest"
+    "test": "node ./bin/check-canvas.cjs && jest"
   },
   "devDependencies": {
     "@types/jest": "^29.5.1",
