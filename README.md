@@ -14,6 +14,7 @@ A tool for generating PDF documents from HTML template that use declarative elem
 
 Layout is controlled using a set of custom HTML tags that define the structure of the PDF document. The package uses puppeteer to slice your template and generate PDF elements from it. Those elements are then used to assemble PDF pages into your PDF document.
 
+> [!NOTE]
 > Unlike other HTML-to-PDF solutions that require manual coding of PDF layout and content, our tool uses declarative HTML elements to control the layout and content of the PDF. This makes it easier and faster to generate PDF documents from HTML templates, as you can simply define the structure of the PDF using custom HTML tags. Additionally, our tool provides features such as headers and footers, page backgrounds, and page numbering, which are not always available in other HTML-to-PDF solutions.
 
 # Table of contents
@@ -22,7 +23,6 @@ Layout is controlled using a set of custom HTML tags that define the structure o
 - [API reference](#api-reference)
 - [Template syntax](#template-syntax)
 - [Examples](#examples)
-- [Troubleshooting](#troubleshooting)
 
 # Installation
 
@@ -36,25 +36,20 @@ yarn add declarative-pdf
 ```
 
 > [!NOTE]
-> This package supports both CommonJS and ES modules. If you are using a bundler such as Webpack or Rollup, you can import the package using ES modules syntax. If you are using Node.js, you can import the package using CommonJS syntax.
+> This package supports both CommonJS and ES modules. So you can either `require` it or `import` it.
 
 # Usage
 
 We need a valid template for this to work, so let's use the one supplied in examples folder. For example:
 
 ```typescript
-// Basic imports
-import * as fs from 'fs/promises';
-import generator from 'declarative-pdf';
+import {readFileSync, writeFileSync} from 'fs';
+import generate from 'declarative-pdf';
 
 (async function () {
-  // Load html template into string
-  const templateBuffer = await fs.readFile('./examples/basic-template.html');
-  const template = templateBuffer.toString();
-
-  // Generate PDF document and save it to disk
-  const pdfBuffer = await generator(template);
-  await fs.writeFile('./example-output.pdf', pdfBuffer);
+  const html = await readFileSync('./examples/basic-template.html', {encoding: 'utf8'});
+  const pdfBuffer = await generator(html);
+  await writeFile('./example-output.pdf', pdfBuffer);
 })();
 ```
 
@@ -69,7 +64,7 @@ const generator = require('declarative-pdf');
 
   app.use(express.urlencoded({
     extended: true,
-    limit: '2000kb' // default limiit is 100kb and templates can grow
+    limit: '2000kb' // default limit is 100kb and templates can grow
   }));
 
   async function generate(req, res) {
@@ -94,6 +89,7 @@ const generator = require('declarative-pdf');
 
 So if you send POST request to this endpoint, with `template` as a string, containing your whole template file and `name` as a string, this would respond with generated PDF file.
 
+> [!NOTE]
 > Spinning up puppeteer browser can be an expensive operation, so in some server scenarios it might be beneficial to keep browser instance running. With `keepAlive` option set to `true`, we are keeping the browser instance running and only disposing individual browser tabs.
 
 # API reference
@@ -210,12 +206,3 @@ pdf.writeBuffer(pdfBuffer, "output.pdf");
 ```
 
 Which generates a new file, `output.pdf`.
-
-
-# Troubleshooting
-
-- wip
-
-# Contributing
-
-- wip
