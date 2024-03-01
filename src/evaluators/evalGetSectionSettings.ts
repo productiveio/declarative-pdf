@@ -1,19 +1,28 @@
-import type {IDocumentPagePhase1} from '../types/index.js';
-import type {config} from '../config.js';
+import type { IDocumentPagePhase1 } from '../types/index.js';
+import type { config } from '../config.js';
 import type Variant from '../consts/physicalPageVariant.js';
 
-export default function evalGetSectionSettings(paperJSON: string, documentPageJSON: string) {
+export default function evalGetSectionSettings(
+  paperJSON: string,
+  documentPageJSON: string
+) {
   const documentPage = JSON.parse(documentPageJSON) as IDocumentPagePhase1;
   const paper = JSON.parse(paperJSON) as typeof config.paper;
 
-  const getElementHeight = (el: HTMLElement) => Math.ceil(Math.max(
-    el.clientHeight ?? 0,
-    el.offsetHeight ?? 0,
-    el.scrollHeight ?? 0,
-    el.getBoundingClientRect().height ?? 0,
-  ));
+  const getElementHeight = (el: HTMLElement) =>
+    Math.ceil(
+      Math.max(
+        el.clientHeight ?? 0,
+        el.offsetHeight ?? 0,
+        el.scrollHeight ?? 0,
+        el.getBoundingClientRect().height ?? 0
+      )
+    );
 
-  const calculateHeight = (pages: {height: number}[], totalHeight: number) => {
+  const calculateHeight = (
+    pages: { height: number }[],
+    totalHeight: number
+  ) => {
     if (!pages.length) {
       return totalHeight;
     }
@@ -30,16 +39,20 @@ export default function evalGetSectionSettings(paperJSON: string, documentPageJS
   };
 
   const getPhysical = (docPageEl: HTMLElement) => {
-    const sectionEls = Array.from(docPageEl.querySelectorAll('physical-page') as NodeListOf<HTMLElement>);
+    const sectionEls = Array.from(
+      docPageEl.querySelectorAll('physical-page') as NodeListOf<HTMLElement>
+    );
     // TODO - ovdje uvesti nekakvu normalizaciju
     return sectionEls
       .filter((el) => el && getElementHeight(el) > 0)
       .map((el, index) => ({
         index,
         height: getElementHeight(el),
-        type: Object.values(paper.physicalPageVariant).includes(el.getAttribute('select') as Variant ?? '') ?
-          el.getAttribute('select') as Variant :
-          paper.physicalPageVariant.DEFAULT
+        type: Object.values(paper.physicalPageVariant).includes(
+          (el.getAttribute('select') as Variant) ?? ''
+        )
+          ? (el.getAttribute('select') as Variant)
+          : paper.physicalPageVariant.DEFAULT,
       }));
   };
 
@@ -49,12 +62,16 @@ export default function evalGetSectionSettings(paperJSON: string, documentPageJS
     return !!(currentPageNumber || totalPagesNumber);
   };
 
-  const docPageEls = document.querySelectorAll('document-page') as NodeListOf<HTMLElement>;
+  const docPageEls = document.querySelectorAll(
+    'document-page'
+  ) as NodeListOf<HTMLElement>;
   const docPageEl = docPageEls[documentPage.index];
 
   const header = docPageEl?.querySelector('page-header') as HTMLElement | null;
   const footer = docPageEl?.querySelector('page-footer') as HTMLElement | null;
-  const background = docPageEl?.querySelector('page-background') as HTMLElement | null;
+  const background = docPageEl?.querySelector(
+    'page-background'
+  ) as HTMLElement | null;
 
   const headerPages = header ? getPhysical(header) : [];
   const footerPages = footer ? getPhysical(footer) : [];
@@ -63,12 +80,16 @@ export default function evalGetSectionSettings(paperJSON: string, documentPageJS
   return {
     ...documentPage,
     header: {
-      height: header ? calculateHeight(headerPages, getElementHeight(header)) : 0,
+      height: header
+        ? calculateHeight(headerPages, getElementHeight(header))
+        : 0,
       hasPageNumber: header ? checkForPageNumber(header) : false,
       collection: headerPages,
     },
     footer: {
-      height: footer ? calculateHeight(footerPages, getElementHeight(footer)) : 0,
+      height: footer
+        ? calculateHeight(footerPages, getElementHeight(footer))
+        : 0,
       hasPageNumber: footer ? checkForPageNumber(footer) : false,
       collection: footerPages,
     },
@@ -76,6 +97,6 @@ export default function evalGetSectionSettings(paperJSON: string, documentPageJS
       height: background ? documentPage.height : 0,
       hasPageNumber: background ? checkForPageNumber(background) : false,
       collection: backgroundPages,
-    }
-  }
+    },
+  };
 }

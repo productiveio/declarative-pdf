@@ -1,5 +1,7 @@
 export default function evalInjectTotalPages(totalPages: number) {
-  Array.from(document.querySelectorAll('total-pages-number') as NodeListOf<HTMLElement>).forEach((el) => {
+  Array.from(
+    document.querySelectorAll('total-pages-number') as NodeListOf<HTMLElement>
+  ).forEach((el) => {
     el.textContent = String(totalPages);
   });
 

@@ -1,8 +1,12 @@
-import type {config} from '../config.js';
+import type { config } from '../config.js';
 
-export default function evalGetDocumentPageSettings(paper: typeof config.paper) {
-  const isFormat = (format: unknown): format is keyof typeof paper.size => typeof format === 'string' && Object.keys(paper.size).includes(format);
-  const convertMmToPx = (mm: number, ppi: number) => Math.round(mm * (ppi / 25.4));
+export default function evalGetDocumentPageSettings(
+  paper: typeof config.paper
+) {
+  const isFormat = (format: unknown): format is keyof typeof paper.size =>
+    typeof format === 'string' && Object.keys(paper.size).includes(format);
+  const convertMmToPx = (mm: number, ppi: number) =>
+    Math.round(mm * (ppi / 25.4));
 
   const getPageSettings = (docPageEl: HTMLElement, index: number) => {
     const attrFormat = docPageEl.getAttribute('format');
@@ -26,10 +30,12 @@ export default function evalGetDocumentPageSettings(paper: typeof config.paper) 
       height = paper.default.height;
     }
 
-    return {index, width, height};
+    return { index, width, height };
   };
 
-  const docPageEls = Array.from(document.querySelectorAll('document-page') as NodeListOf<HTMLElement>);
+  const docPageEls = Array.from(
+    document.querySelectorAll('document-page') as NodeListOf<HTMLElement>
+  );
 
   return docPageEls.map(getPageSettings);
 }

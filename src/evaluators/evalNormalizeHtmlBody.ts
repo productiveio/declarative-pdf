@@ -1,10 +1,19 @@
 export default function evalNormalizeHtmlBody() {
   document.body.classList.add('pdf');
 
-  const freeEls = Array.from(document.body.children)
-    .filter((el) => el.tagName !== 'DOCUMENT-PAGE' && el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE');
+  const freeEls = Array.from(document.body.children).filter(
+    (el) =>
+      el.tagName !== 'DOCUMENT-PAGE' &&
+      el.tagName !== 'SCRIPT' &&
+      el.tagName !== 'STYLE'
+  );
 
-  if (freeEls.length && !Array.from(document.body.children).filter((el) => el.tagName === 'DOCUMENT-PAGE').length) {
+  if (
+    freeEls.length &&
+    !Array.from(document.body.children).filter(
+      (el) => el.tagName === 'DOCUMENT-PAGE'
+    ).length
+  ) {
     const docPage = document.createElement('document-page');
     freeEls.forEach((el) => docPage.insertAdjacentElement('beforeend', el));
     document.body.insertAdjacentElement('beforeend', docPage);
