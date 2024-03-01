@@ -20,8 +20,12 @@ describe('evalInjectCurrentPageNumber', () => {
       </document-page>
     `;
 
-    const headerTarget = document.querySelector('page-header current-page-number') as HTMLElement;
-    const footerTarget = document.querySelector('page-footer current-page-number') as HTMLElement;
+    const headerTarget = document.querySelector(
+      'page-header current-page-number'
+    ) as HTMLElement;
+    const footerTarget = document.querySelector(
+      'page-footer current-page-number'
+    ) as HTMLElement;
     expect(headerTarget.textContent).toEqual('1');
     expect(footerTarget.textContent).toEqual('1');
 
@@ -46,7 +50,9 @@ describe('evalInjectCurrentPageNumber', () => {
       </document-page>
     `;
 
-    const targets = document.querySelectorAll('current-page-number') as NodeListOf<HTMLElement>;
+    const targets = document.querySelectorAll(
+      'current-page-number'
+    ) as NodeListOf<HTMLElement>;
     expect(targets[0].textContent).toEqual('1');
     expect(targets[1].textContent).toEqual('1');
     expect(targets[2].textContent).toEqual('1');

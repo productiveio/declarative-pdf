@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import evalGetDocumentPageSettings from '../../src/evaluators/evalGetDocumentPageSettings';
-import {config} from '../../src/config';
+import { config } from '../../src/config';
 
 jest.mock('puppeteer');
 jest.mock('jsdom');
@@ -18,10 +18,10 @@ describe('evalGetDocumentPageSettings', () => {
     const result = evalGetDocumentPageSettings(config.paper);
 
     expect(result).toEqual([
-      {index: 0, width: 612, height: 791},
-      {index: 1, width: 2480, height: 3508},
-      {index: 2, width: 600, height: 800},
-      {index: 3, width: 595, height: 842},
+      { index: 0, width: 612, height: 791 },
+      { index: 1, width: 2480, height: 3508 },
+      { index: 2, width: 600, height: 800 },
+      { index: 3, width: 595, height: 842 },
     ]);
   });
 });

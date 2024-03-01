@@ -24,13 +24,17 @@ describe('evalShowOnlyPageWithSection', () => {
     `;
     evalShowOnlyPageWithSection(1, 'page-body');
 
-    const docPages = document.querySelectorAll('document-page') as NodeListOf<HTMLElement>;
+    const docPages = document.querySelectorAll(
+      'document-page'
+    ) as NodeListOf<HTMLElement>;
     expect(docPages[0].style.display).toBe('none');
     expect(docPages[1].style.display).toBe('block');
 
     // visible document-page
     const docPage = docPages[1];
-    const pageBackground = docPage.querySelector('page-background') as HTMLElement;
+    const pageBackground = docPage.querySelector(
+      'page-background'
+    ) as HTMLElement;
     expect(pageBackground.style.display).toBe('none');
 
     const pageHeader = docPage.querySelector('page-header') as HTMLElement;
@@ -63,7 +67,9 @@ describe('evalShowOnlyPageWithSection', () => {
     `;
     evalShowOnlyPageWithSection(0, 'page-footer', 1);
 
-    const pageBackground = document.querySelector('page-background') as HTMLElement;
+    const pageBackground = document.querySelector(
+      'page-background'
+    ) as HTMLElement;
     expect(pageBackground.style.display).toBe('none');
 
     const pageHeader = document.querySelector('page-header') as HTMLElement;
@@ -75,7 +81,9 @@ describe('evalShowOnlyPageWithSection', () => {
     const pageFooter = document.querySelector('page-footer') as HTMLElement;
     expect(pageFooter.style.display).toBe('block');
 
-    const pageFooterPhysicalPages = pageFooter.querySelectorAll('physical-page') as NodeListOf<HTMLElement>;
+    const pageFooterPhysicalPages = pageFooter.querySelectorAll(
+      'physical-page'
+    ) as NodeListOf<HTMLElement>;
     expect(pageFooterPhysicalPages[0].style.display).toBe('none');
     expect(pageFooterPhysicalPages[1].style.display).toBe('block');
   });
@@ -92,12 +100,15 @@ describe('evalShowOnlyPageWithSection', () => {
     `;
     evalShowOnlyPageWithSection(0, 'page-background', -1);
 
-    const pageBackground = document.querySelector('page-background') as HTMLElement;
+    const pageBackground = document.querySelector(
+      'page-background'
+    ) as HTMLElement;
     expect(pageBackground.style.display).toBe('block');
 
-    const pageBackgroundPhysicalPages = pageBackground.querySelectorAll('physical-page') as NodeListOf<HTMLElement>;
+    const pageBackgroundPhysicalPages = pageBackground.querySelectorAll(
+      'physical-page'
+    ) as NodeListOf<HTMLElement>;
     expect(pageBackgroundPhysicalPages[0].style.display).toBe('none');
     expect(pageBackgroundPhysicalPages[1].style.display).toBe('none');
-
   });
 });

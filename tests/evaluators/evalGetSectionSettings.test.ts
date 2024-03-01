@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import evalGetSectionSettings from '../../src/evaluators/evalGetSectionSettings';
-import {config} from '../../src/config';
+import { config } from '../../src/config';
 
 jest.mock('puppeteer');
 jest.mock('jsdom');
@@ -23,9 +23,15 @@ describe('evalGetSectionSettings', () => {
     `;
 
     // in tests, HTMLElement.clientHeight is 0, so we need to mock it
-    Object.defineProperty(HTMLElement.prototype, 'clientHeight', {configurable: true, value: 20});
+    Object.defineProperty(HTMLElement.prototype, 'clientHeight', {
+      configurable: true,
+      value: 20,
+    });
 
-    const result = evalGetSectionSettings(JSON.stringify(config.paper), JSON.stringify({index: 0, width: 612, height: 791}));
+    const result = evalGetSectionSettings(
+      JSON.stringify(config.paper),
+      JSON.stringify({ index: 0, width: 612, height: 791 })
+    );
 
     expect(result).toEqual({
       index: 0,
@@ -72,9 +78,15 @@ describe('evalGetSectionSettings', () => {
     `;
 
     // in tests, HTMLElement.clientHeight is 0, so we need to mock it
-    Object.defineProperty(HTMLElement.prototype, 'clientHeight', {configurable: true, value: 20});
+    Object.defineProperty(HTMLElement.prototype, 'clientHeight', {
+      configurable: true,
+      value: 20,
+    });
 
-    const result = evalGetSectionSettings(JSON.stringify(config.paper), JSON.stringify({index: 0, width: 595, height: 842}));
+    const result = evalGetSectionSettings(
+      JSON.stringify(config.paper),
+      JSON.stringify({ index: 0, width: 595, height: 842 })
+    );
 
     expect(result).toEqual({
       index: 0,
@@ -84,27 +96,27 @@ describe('evalGetSectionSettings', () => {
         height: -20, // this is because of mocking -> everything is 20, so math works
         hasPageNumber: false,
         collection: [
-          {index: 0, height: 20, type: 'first'},
-          {index: 1, height: 20, type: 'default'},
-          {index: 2, height: 20, type: 'last'},
+          { index: 0, height: 20, type: 'first' },
+          { index: 1, height: 20, type: 'default' },
+          { index: 2, height: 20, type: 'last' },
         ],
       },
       footer: {
         height: -20, // this is because of mocking -> everything is 20, so math works
         hasPageNumber: false,
         collection: [
-          {index: 0, height: 20, type: 'first'},
-          {index: 1, height: 20, type: 'default'},
-          {index: 2, height: 20, type: 'last'},
+          { index: 0, height: 20, type: 'first' },
+          { index: 1, height: 20, type: 'default' },
+          { index: 2, height: 20, type: 'last' },
         ],
       },
       background: {
         height: 842,
         hasPageNumber: false,
         collection: [
-          {index: 0, height: 20, type: 'first'},
-          {index: 1, height: 20, type: 'default'},
-          {index: 2, height: 20, type: 'last'},
+          { index: 0, height: 20, type: 'first' },
+          { index: 1, height: 20, type: 'default' },
+          { index: 2, height: 20, type: 'last' },
         ],
       },
     });

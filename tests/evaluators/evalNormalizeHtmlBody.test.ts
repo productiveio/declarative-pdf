@@ -11,7 +11,9 @@ describe('evalNormalizeHtmlBody', () => {
     document.body.innerHTML = `<div> ... </div><div> ... </div>`;
     evalNormalizeHtmlBody();
 
-    expect(document.body.innerHTML.trim()).toEqual('<document-page><div> ... </div><div> ... </div></document-page>');
+    expect(document.body.innerHTML.trim()).toEqual(
+      '<document-page><div> ... </div><div> ... </div></document-page>'
+    );
   });
 
   test('it removes free elements if document-page exists', () => {
@@ -22,7 +24,9 @@ describe('evalNormalizeHtmlBody', () => {
     `;
     evalNormalizeHtmlBody();
 
-    expect(document.body.innerHTML.trim()).toEqual('<document-page> ... </document-page>');
+    expect(document.body.innerHTML.trim()).toEqual(
+      '<document-page> ... </document-page>'
+    );
   });
 
   test('it adds pdf class and styles to body', () => {
