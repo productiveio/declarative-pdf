@@ -1,20 +1,17 @@
-/** @type { import("eslint").Linter.Config } */
 module.exports = {
-  root: true,
+  parser: '@typescript-eslint/parser', // Specifies the ESLint parser
   extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/recommended', // Uses the recommended rules from the @typescript-eslint/eslint-plugin
     'prettier',
+    'plugin:prettier/recommended', // Enables eslint-plugin-prettier and eslint-config-prettier. This will display prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
   ],
-  parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint'],
   parserOptions: {
-    sourceType: 'module',
-    ecmaVersion: 2020,
+    ecmaVersion: 2019, // Allows for the parsing of modern ECMAScript features
+    sourceType: 'module', // Allows for the use of imports
   },
-  env: {
-    browser: true,
-    es2017: true,
-    node: true,
+  rules: {
+    '@typescript-eslint/explicit-function-return-type': 0,
+    '@typescript-eslint/no-empty-function': 0,
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
   },
 };
