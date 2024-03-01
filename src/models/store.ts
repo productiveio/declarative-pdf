@@ -1,5 +1,6 @@
-import { PageElement } from './page-element';
+import DeclarativePDF from './declarative-pdf';
 import { DocumentPage } from './document-page';
+import { PageElement } from './page-element';
 import crypto from 'crypto';
 
 // import type {PDFDocument} from 'pdf-lib';
@@ -15,7 +16,7 @@ type ModelFactoryMap = typeof modelFactories;
 
 type ModelOpts<K extends keyof ModelFactoryMap> = Omit<
   ConstructorParameters<ModelFactoryMap[K]>[0],
-  'id' | 'type'
+  'id' | 'type' | 'owner'
 >;
 
 type ModelInstance<K extends keyof ModelFactoryMap> = InstanceType<
@@ -23,7 +24,12 @@ type ModelInstance<K extends keyof ModelFactoryMap> = InstanceType<
 >;
 
 export class Store {
+  declare owner: DeclarativePDF;
   private models: Record<string, ModelInstance<keyof ModelFactoryMap>> = {};
+
+  constructor(owner: DeclarativePDF) {
+    this.owner = owner;
+  }
 
   getNewId(): string {
     const id = crypto.randomBytes(16).toString('hex');
@@ -41,7 +47,7 @@ export class Store {
     ) => ModelInstance<K>;
 
     const id = this.getNewId();
-    const model = new ModelClass({ ...opts, id, type: key });
+    const model = new ModelClass({ ...opts, id, type: key, owner: this.owner });
 
     this.models[id] = model;
     return model;
