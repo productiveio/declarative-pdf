@@ -1,6 +1,6 @@
 export default function evalIsolateSection(
   docPageIndex: number,
-  type: 'background' | 'header' | 'body' | 'footer',
+  type?: 'background' | 'header' | 'footer',
   physicalPageIndex?: number
 ) {
   function hideAllExcept(els: NodeListOf<HTMLElement>, visIdx: number) {
@@ -17,6 +17,8 @@ export default function evalIsolateSection(
     el.style.display = 'block';
   }
 
+  const secType = type ? `page-${type}` : 'page-body';
+
   const docPages = document.querySelectorAll<HTMLElement>('document-page');
   if (!docPages.length) return false;
   hideAllExcept(docPages, docPageIndex);
@@ -30,7 +32,7 @@ export default function evalIsolateSection(
   if (!sectionEls.length) return false;
   hideAll(sectionEls);
 
-  const sectionEl = docPage.querySelector<HTMLElement>(`page-${type}`);
+  const sectionEl = docPage.querySelector<HTMLElement>(secType);
   if (!sectionEl) return false;
   show(sectionEl);
 
