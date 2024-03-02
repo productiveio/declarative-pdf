@@ -1,8 +1,8 @@
 /**
  * @jest-environment jsdom
  */
-import evalDocumentPageSettings from '../../src/evaluators/document-page-settings';
-import Variant from '../../src/consts/physicalPageVariant.js';
+import evalDocumentPageSettings from '@app/evaluators/document-page-settings';
+import Variant from '@app/consts/physicalPageVariant.js';
 
 jest.mock('puppeteer');
 jest.mock('jsdom');

@@ -1,8 +1,8 @@
 /**
  * @jest-environment jsdom
  */
-import evalTemplateSettings from '../../src/evaluators/template-settings';
-import { config } from '../../src/config';
+import evalTemplateSettings from '@app/evaluators/template-settings';
+import { config } from '@app/config';
 
 jest.mock('puppeteer');
 jest.mock('jsdom');

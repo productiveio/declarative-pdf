@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import evalShowOnlyPageWithSection from '../../src/evaluators/evalShowOnlyPageWithSection';
+import evalShowOnlyPageWithSection from '@app/evaluators/evalShowOnlyPageWithSection';
 
 jest.mock('puppeteer');
 jest.mock('jsdom');

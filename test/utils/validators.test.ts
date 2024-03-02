@@ -1,4 +1,4 @@
-import { validateTemplateSetting } from '../../src/utils/validators';
+import { validateTemplateSetting } from '@app/utils/validators';
 
 describe('validateTemplateSetting', () => {
   test('throws error for malformed setting', () => {

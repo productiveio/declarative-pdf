@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import evalInjectTotalPageCount from '../../src/evaluators/evalInjectTotalPageCount';
+import evalInjectTotalPageCount from '@app/evaluators/evalInjectTotalPageCount';
 
 jest.mock('puppeteer');
 jest.mock('jsdom');

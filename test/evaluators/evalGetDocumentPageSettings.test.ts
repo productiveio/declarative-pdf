@@ -1,8 +1,8 @@
 /**
  * @jest-environment jsdom
  */
-import evalGetDocumentPageSettings from '../../src/evaluators/evalGetDocumentPageSettings';
-import { config } from '../../src/config';
+import evalGetDocumentPageSettings from '@app/evaluators/evalGetDocumentPageSettings';
+import { config } from '@app/config';
 
 jest.mock('puppeteer');
 jest.mock('jsdom');

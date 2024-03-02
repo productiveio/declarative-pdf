@@ -1,9 +1,9 @@
 /**
  * @jest-environment jest-environment-node
  */
-import generate from '../src/index';
+import generate from '@app/index';
 import fs from 'fs';
-import writeBuffer from '../src/utils/writeBuffer.js';
+import writeBuffer from '@app/utils/writeBuffer.js';
 import ComparePdf from 'compare-pdf';
 
 jest.useRealTimers();

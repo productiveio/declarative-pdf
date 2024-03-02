@@ -38,6 +38,7 @@
     "create": "npm run build && npm run test",
     "build": "rm -rf dist && tsup src/index.ts --format cjs,esm --dts --clean && cp shims/index.wrapper.cjs dist/",
     "lint": "eslint --ext .js,.ts .",
+    "jest": "jest",
     "test": "node ./bin/check-canvas.cjs && jest"
   },
   "devDependencies": {
@@ -56,6 +57,7 @@
     "prettier": "^3.2.5",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "tsup": "^8.0.2",
     "typescript": "^5.3.3"
   },

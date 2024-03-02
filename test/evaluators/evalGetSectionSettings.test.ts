@@ -1,8 +1,8 @@
 /**
  * @jest-environment jsdom
  */
-import evalGetSectionSettings from '../../src/evaluators/evalGetSectionSettings';
-import { config } from '../../src/config';
+import evalGetSectionSettings from '@app/evaluators/evalGetSectionSettings';
+import { config } from '@app/config';
 
 jest.mock('puppeteer');
 jest.mock('jsdom');

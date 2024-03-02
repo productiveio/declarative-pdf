@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import evalNormalizeHtmlBody from '../../src/evaluators/evalNormalizeHtmlBody';
+import evalNormalizeHtmlBody from '@app/evaluators/evalNormalizeHtmlBody';
 
 jest.mock('puppeteer');
 jest.mock('jsdom');

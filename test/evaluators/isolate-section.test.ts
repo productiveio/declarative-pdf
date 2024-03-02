@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import evalIsolateSection from '../../src/evaluators/isolate-section';
+import evalIsolateSection from '@app/evaluators/isolate-section';
 
 jest.mock('puppeteer');
 jest.mock('jsdom');
@@ -93,6 +93,22 @@ describe('evalIsolateSection', () => {
     expect(docPages[0].style.display).toBe('none');
     expect(docPages[1].style.display).toBe('block');
     expect(docPages[2].style.display).toBe('none');
+  });
+
+  test('it falls back to body section when no section is specified', () => {
+    document.body.innerHTML = `
+      <document-page>
+        <page-header> ... </page-header>
+        <page-body> ... </page-body>
+      </document>
+    `;
+    evalIsolateSection(0);
+    const docPage = document.querySelector<HTMLElement>('document-page');
+    expect(docPage?.style.display).toBe('block');
+    const header = docPage?.querySelector<HTMLElement>('page-header');
+    expect(header?.style.display).toBe('none');
+    const body = docPage?.querySelector<HTMLElement>('page-body');
+    expect(body?.style.display).toBe('block');
   });
 
   test('it works in complex scenarios', () => {

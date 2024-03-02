@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import evalInjectCurrentPageNumber from '../../src/evaluators/evalInjectCurrentPageNumber';
+import evalInjectCurrentPageNumber from '@app/evaluators/evalInjectCurrentPageNumber';
 
 jest.mock('puppeteer');
 jest.mock('jsdom');

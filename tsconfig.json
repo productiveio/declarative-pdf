@@ -1,21 +1,27 @@
 {
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  },
   "compilerOptions": {
+    "types": ["node", "jest"],
+    "lib": ["ESNext", "DOM"],
+    "target": "es2020",
     "module": "es2020",
     "moduleResolution": "node",
-    "target": "es2020",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "baseUrl": ".",
-    "declaration": true,
-    "lib": ["ESNext", "DOM"],
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": "./",
     "outDir": "dist",
-    "rootDir": "src",
-    "sourceMap": true,
-    "types": ["node", "jest"]
+    "paths": {
+      "@app/*": ["src/*"],
+      "@test/*": ["test/*"]
+    }
   },
-  "ts-node": {
-    "esm": true
-  },
-  "exclude": ["node_modules", "dist", "tests", "manual_tests"]
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

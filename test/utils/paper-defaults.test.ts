@@ -1,4 +1,4 @@
-import { PaperDefaults } from '../../src/utils/paper-defaults';
+import { PaperDefaults } from '@app/utils/paper-defaults';
 
 describe('PaperDefaults', () => {
   test('defaults to A4 format when no options are provided', () => {
