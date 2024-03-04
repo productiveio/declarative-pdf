@@ -1,3 +1,13 @@
+/**
+ * Load the template into the page and normalize the HTML body.
+ *
+ * Normalization includes:
+ * - adding the `pdf` class to the body
+ * - setting the body `margin` and `padding` to `0`
+ * for any direct body child that is not a `document-page` or `script` or `style` element:
+ * - if `document-page` exists, remove them all
+ * - if `document-page` does not exist, move them all into a new `document-page` element
+ */
 export default function evalTemplateNormalize() {
   document.body.classList.add('pdf');
   document.body.style.margin = '0';
