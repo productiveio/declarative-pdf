@@ -3,7 +3,7 @@ import DeclarativePDF from './declarative-pdf';
 
 export type TModel = {
   id: string;
-  type: 'footer' | 'header' | 'background' | 'document-page';
+  type: 'footer' | 'header' | 'background' | 'body';
   owner: DeclarativePDF;
 };
 
