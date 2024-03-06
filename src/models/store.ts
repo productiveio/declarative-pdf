@@ -7,6 +7,7 @@ import crypto from 'crypto';
 
 const modelFactories = {
   page: DocumentPage,
+  body: PageElement,
   footer: PageElement,
   header: PageElement,
   background: PageElement,
