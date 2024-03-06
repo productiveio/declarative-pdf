@@ -75,7 +75,7 @@ export default class HTMLAdapter {
     });
   }
 
-  close() {
-    return this.page.close();
+  async close() {
+    return await this.page.close();
   }
 }

@@ -79,19 +79,11 @@ export default class DeclarativePDF {
     /** for every document page model, process any element they might have */
     await this.processDocumentPageModels();
 
-    /** we should have everything, time to build pdf */
+    /** close the tab in browser */
     await this.html.close();
+
+    /** we should have everything, time to build pdf */
     return await this.buildPDF();
-
-    // zato sto sad znamo sirinu i visinu, mozemo izracunati ostale visine i dohvatiti ostale podatke
-    // ovdje dovrsavamo inicijalizaciju documentPage modela
-    // oni sad imaju svoj body, te meta podatke za header, footer i background
-    // moramo prvo sve bodye dohvatiti, zbog total page numbera
-    // await this.initializePageElementModels();
-
-    // sad imamo i total page number, mozemo izgenerirati sve elemente i injectati brojeve stranica ako treba
-    // ovdje dovrsavamo posao i trebali bi imat u pdf-u sve, pa mozemo u fazu konstrukcije pdf-a
-    // await this.processPageElements();
   }
 
   /**
@@ -108,6 +100,7 @@ export default class DeclarativePDF {
     });
 
     documentPageSettings.forEach((setting) => {
+      // TODO: umjesto da validiramo da li su ispravni settinzi, trebamo ih fallbackat na defaulte ako nisu
       validateTemplateSetting(setting);
 
       this.documentPages.push(this.store.createModel('page', setting));

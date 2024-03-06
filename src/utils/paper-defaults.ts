@@ -1,7 +1,8 @@
 import { PAPER_SIZE } from '@app/consts/paper-size';
 
 /**
- * (Utility) Guards a string to be a valid format
+ * Asserts that a string is a valid format
+ *
  * @param format A format name: 'a4' or 'letter'
  * @returns true if format is a valid format
  */
@@ -9,14 +10,17 @@ const isFormat = (format: unknown): format is keyof typeof PAPER_SIZE =>
   typeof format === 'string' && Object.keys(PAPER_SIZE).includes(format);
 
 /**
- * (Utility) Guards a number to be a valid ppi (pixels per inch)
+ * Asserts that a number is a valid ppi (pixels per inch)
+ *
  * @param ppi a valid number
  * @returns true if ppi is a valid number
  */
 const isPpi = (ppi: unknown): ppi is number =>
   typeof ppi === 'number' && !isNaN(ppi) && ppi > 42 && ppi < 1642;
+
 /**
- * (Utility) Converts millimeters to pixels
+ * Converts millimeters to pixels
+ *
  * @param mm Millimeter value
  * @param ppi Pixels per inch
  * @returns Pixel value

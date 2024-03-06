@@ -8,6 +8,11 @@ type TemplateSetting = {
   height?: number;
 };
 
+/**
+ * Validates that template settings are within expected bounds
+ *
+ * @param setting Config read from the template that was passed in
+ */
 export function validateTemplateSetting(setting?: TemplateSetting) {
   if (
     !(

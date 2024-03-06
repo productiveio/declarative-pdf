@@ -10,9 +10,10 @@ const findVariant = (variants: SectionVariantSetting[], condition: Variant) => {
 };
 
 /**
- * A guard function that checks if the section collection includes a section
- * with physical pages. If it does, it means that the all sections are variants.
+ * Checks if the section collection includes a section with physical pages.
+ * If it does, it means that the all sections are variants.
  * If it doesn't, it means that there is only one section which is not a variant.
+ *
  * @param sections Either a regular section or a section containing physical pages
  */
 export const areSectionVariants = (
@@ -26,7 +27,7 @@ export const areSectionVariants = (
 };
 
 /**
- * A function that returns a variant for a given page in the layout.
+ * Selects a variant for a given page in the layout.
  * If the variant is not found, it returns undefined which means that
  * the specific section on that page will be blank.
  *
@@ -57,8 +58,8 @@ export const selectVariant = (
 };
 
 /**
- * A guard function that checks if the section is a regular section or a section
- * containing physical pages.
+ * Checks if the section is a regular section or a section with physical pages
+ *
  * @param section Either a regular section or a section containing physical pages
  */
 export const isSectionVariantSetting = (
