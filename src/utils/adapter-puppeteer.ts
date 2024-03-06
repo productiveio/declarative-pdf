@@ -1,8 +1,8 @@
 import { PAPER_SIZE } from '@app/consts/paper-size';
+import evalDocumentPageSettings from '@app/evaluators/document-page-settings';
+import evalPrepareSection from '@app/evaluators/prepare-section';
 import evalTemplateNormalize from '@app/evaluators/template-normalize';
 import evalTemplateSettings from '@app/evaluators/template-settings';
-import evalIsolateSection from '@app/evaluators/isolate-section';
-import evalDocumentPageSettings from '@app/evaluators/document-page-settings';
 
 import type { Browser, Page } from 'puppeteer';
 
@@ -56,19 +56,14 @@ export default class HTMLAdapter {
     return this.page.evaluate(evalDocumentPageSettings, opts.index);
   }
 
-  isolate(opts: {
-    index: number;
-    type?: 'header' | 'footer' | 'background';
-    subIndex?: number;
+  prepareSection(opts: {
+    documentPageIndex: number;
+    sectionType?: 'header' | 'footer' | 'background';
+    physicalPageIndex?: number;
+    currentPageNumber?: number;
+    totalPagesNumber?: number;
   }) {
-    return opts.type
-      ? this.page.evaluate(
-          evalIsolateSection,
-          opts.index,
-          opts.type,
-          opts.subIndex
-        )
-      : this.page.evaluate(evalIsolateSection, opts.index);
+    return this.page.evaluate(evalPrepareSection, opts);
   }
 
   pdf(opts: { width: number; height: number; transparentBg?: boolean }) {
