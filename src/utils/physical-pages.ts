@@ -1,4 +1,4 @@
-import Variant from '@app/consts/physicalPageVariant';
+import Variant from '@app/consts/physical-page';
 
 import type {
   SectionSetting,

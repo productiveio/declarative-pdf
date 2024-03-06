@@ -1,6 +1,6 @@
 import type { SectionVariantSetting } from '@app/models/document-page';
 import { selectVariant } from '@app/utils/physical-pages';
-import Variant from '@app/consts/physicalPageVariant';
+import Variant from '@app/consts/physical-page';
 
 type MockSetting = Partial<SectionVariantSetting>;
 const makeSetting = (opts: MockSetting) => {
