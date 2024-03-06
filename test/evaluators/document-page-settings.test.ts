@@ -86,63 +86,60 @@ describe('evalDocumentPageSettings', () => {
     `;
     const result = evalDocumentPageSettings(0);
 
-    console.log(Variant);
     expect(result).toEqual([
       {
-        index: 0,
-        type: 'header',
-        height: 20,
+        sectionType: 'header',
+        sectionHeight: 20,
         hasCurrentPageNumber: false,
         hasTotalPagesNumber: false,
-        subSelector: undefined,
       },
       {
-        index: 0,
-        type: 'footer',
-        height: 20,
+        sectionType: 'footer',
+        sectionHeight: 20,
         hasCurrentPageNumber: false,
         hasTotalPagesNumber: false,
-        subSelector: Variant.FIRST,
+        physicalPageIndex: 0,
+        physicalPageType: Variant.FIRST,
       },
       {
-        index: 1,
-        type: 'footer',
-        height: 20,
+        sectionType: 'footer',
+        sectionHeight: 20,
         hasCurrentPageNumber: true,
         hasTotalPagesNumber: false,
-        subSelector: Variant.LAST,
+        physicalPageIndex: 1,
+        physicalPageType: Variant.LAST,
       },
       {
-        index: 2,
-        type: 'footer',
-        height: 20,
+        sectionType: 'footer',
+        sectionHeight: 20,
         hasCurrentPageNumber: false,
         hasTotalPagesNumber: true,
-        subSelector: Variant.EVEN,
+        physicalPageIndex: 2,
+        physicalPageType: Variant.EVEN,
       },
       {
-        index: 3,
-        type: 'footer',
-        height: 20,
+        sectionType: 'footer',
+        sectionHeight: 20,
         hasCurrentPageNumber: true,
         hasTotalPagesNumber: true,
-        subSelector: Variant.ODD,
+        physicalPageIndex: 3,
+        physicalPageType: Variant.ODD,
       },
       {
-        index: 0,
-        type: 'background',
-        height: 20,
+        sectionType: 'background',
+        sectionHeight: 20,
         hasCurrentPageNumber: false,
         hasTotalPagesNumber: false,
-        subSelector: Variant.DEFAULT,
+        physicalPageIndex: 0,
+        physicalPageType: Variant.DEFAULT,
       },
       {
-        index: 1,
-        type: 'background',
-        height: 20,
+        sectionType: 'background',
+        sectionHeight: 20,
         hasCurrentPageNumber: false,
         hasTotalPagesNumber: false,
-        subSelector: Variant.DEFAULT,
+        physicalPageIndex: 1,
+        physicalPageType: Variant.DEFAULT,
       },
     ]);
   });
@@ -162,12 +159,12 @@ describe('evalDocumentPageSettings', () => {
     const result = evalDocumentPageSettings(0);
     expect(result).toEqual([
       {
-        index: 0,
-        type: 'footer',
-        height: 20,
+        sectionType: 'footer',
+        sectionHeight: 20,
         hasCurrentPageNumber: false,
         hasTotalPagesNumber: false,
-        subSelector: Variant.DEFAULT,
+        physicalPageIndex: 0,
+        physicalPageType: Variant.DEFAULT,
       },
     ]);
   });

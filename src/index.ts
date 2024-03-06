@@ -80,7 +80,8 @@ export default class DeclarativePDF {
     await this.processDocumentPageModels();
 
     /** we should have everything, time to build pdf */
-    await this.buildPDF();
+    await this.html.close();
+    return await this.buildPDF();
 
     // zato sto sad znamo sirinu i visinu, mozemo izracunati ostale visine i dohvatiti ostale podatke
     // ovdje dovrsavamo inicijalizaciju documentPage modela
@@ -127,7 +128,7 @@ export default class DeclarativePDF {
       await this.html.setViewport(doc.viewPort);
       const settings = await this.html.documentPageSettings({ index });
       // TODO - what happens if there is no settings (only body, and without the required page-body element)?
-      doc.createLayoutAndBody(settings);
+      await doc.createLayoutAndBody(settings);
     }
   }
 

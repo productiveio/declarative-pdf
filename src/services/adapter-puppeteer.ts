@@ -29,8 +29,8 @@ export default class HTMLAdapter {
     return this._page;
   }
 
-  newPage() {
-    return this.browser.newPage();
+  async newPage() {
+    this._page = await this.browser.newPage();
   }
 
   setContent(content: string) {

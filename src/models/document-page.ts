@@ -92,19 +92,17 @@ export class DocumentPage extends Model {
   // TODO: ovdje treba neka validacija
   // broj mora biti veci od 0
   // body mora postojati
-  declare _pageCount: number;
   get pageCount() {
-    return (this._pageCount ??= this.body!.pdf.getPageCount());
+    return this.body!.pdf.getPageCount();
   }
 
   // TODO: ovdje isto treba neka validacija
   // broj ne smije biti manji od broja documentPagesa
-  declare _pageCountOffset: number;
   get pageCountOffset() {
-    return (this._pageCountOffset ??= this.previousDocumentPages.reduce(
+    return this.previousDocumentPages.reduce(
       (acc, doc) => acc + doc.pageCount,
       0
-    ));
+    );
   }
 
   get totalPagesNumber() {

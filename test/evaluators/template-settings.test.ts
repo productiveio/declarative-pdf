@@ -2,7 +2,21 @@
  * @jest-environment jsdom
  */
 import evalTemplateSettings from '@app/evaluators/template-settings';
-import { config } from '@app/config';
+import { PAPER_SIZE } from '@app/consts/paper-size';
+import {
+  DEFAULT_HEIGHT,
+  DEFAULT_WIDTH,
+  DEFAULT_PPI,
+} from '@app/utils/paper-defaults';
+
+const templateDefaults = {
+  default: {
+    width: DEFAULT_WIDTH,
+    height: DEFAULT_HEIGHT,
+    ppi: DEFAULT_PPI,
+  },
+  size: PAPER_SIZE,
+};
 
 jest.mock('puppeteer');
 jest.mock('jsdom');
@@ -15,7 +29,7 @@ describe('evalTemplateSettings', () => {
       <document-page size="600x800"> ... </document-page>
       <document-page> ... </document-page>
     `;
-    const result = evalTemplateSettings(config.paper);
+    const result = evalTemplateSettings(templateDefaults);
 
     expect(result).toEqual([
       { index: 0, width: 612, height: 791 },
@@ -35,7 +49,7 @@ describe('evalTemplateSettings', () => {
       <document-page format="invalid" size="invalid"> ... </document-page>
       <document-page format="invalid" size="invalid" ppi="invalid"> ... </document-page>
     `;
-    const result = evalTemplateSettings(config.paper);
+    const result = evalTemplateSettings(templateDefaults);
 
     expect(result).toEqual([
       { index: 0, width: 595, height: 842 },
@@ -52,7 +66,7 @@ describe('evalTemplateSettings', () => {
     document.body.innerHTML = `
       <document-page size="invalidx800"> ... </document-page>
     `;
-    const result = evalTemplateSettings(config.paper);
+    const result = evalTemplateSettings(templateDefaults);
 
     expect(result).toEqual([{ index: 0, width: 595, height: 842 }]);
   });
@@ -61,7 +75,7 @@ describe('evalTemplateSettings', () => {
     document.body.innerHTML = `
       <document-page size="600xinvalid"> ... </document-page>
     `;
-    const result = evalTemplateSettings(config.paper);
+    const result = evalTemplateSettings(templateDefaults);
 
     expect(result).toEqual([{ index: 0, width: 600, height: 600 }]);
   });
@@ -70,7 +84,7 @@ describe('evalTemplateSettings', () => {
     document.body.innerHTML = `
       <document-page format="letter" size="600x800"> ... </document-page>
     `;
-    const result = evalTemplateSettings(config.paper);
+    const result = evalTemplateSettings(templateDefaults);
 
     expect(result).toEqual([{ index: 0, width: 612, height: 791 }]);
   });
@@ -79,7 +93,7 @@ describe('evalTemplateSettings', () => {
     document.body.innerHTML = `
       <document-page format="invalid" size="600x800"> ... </document-page>
     `;
-    const result = evalTemplateSettings(config.paper);
+    const result = evalTemplateSettings(templateDefaults);
 
     expect(result).toEqual([{ index: 0, width: 600, height: 800 }]);
   });

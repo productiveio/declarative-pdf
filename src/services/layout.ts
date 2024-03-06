@@ -98,19 +98,19 @@ export class Layout {
     if (!this.hasConfig) return;
 
     const count = this.documentPage.pageCount;
-    if (!count || count < 1) {
+    if (typeof count !== 'number' || count < 1) {
       throw new Error('Layout unable to create page, invalid page count');
     }
 
     const offset = this.documentPage.pageCountOffset;
-    if (!offset || offset < 0) {
+    if (typeof offset !== 'number' || offset < 0) {
       throw new Error(
         'Layout unable to create page, invalid page count offset'
       );
     }
 
     const total = this.documentPage.owner.totalPagesNumber;
-    if (!total || total < count) {
+    if (typeof total !== 'number' || total < count) {
       throw new Error(
         'Layout unable to create page, invalid total page number'
       );

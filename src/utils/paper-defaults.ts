@@ -31,10 +31,10 @@ type PaperOpts = {
   height?: number;
 };
 
-const DEFAULT_FORMAT = 'a4';
-const DEFAULT_PPI = 72;
-const DEFAULT_WIDTH = 595;
-const DEFAULT_HEIGHT = 842;
+export const DEFAULT_FORMAT = 'a4';
+export const DEFAULT_PPI = 72;
+export const DEFAULT_WIDTH = 595;
+export const DEFAULT_HEIGHT = 842;
 
 export class PaperDefaults {
   readonly ppi: NonNullable<PaperOpts['ppi']>;

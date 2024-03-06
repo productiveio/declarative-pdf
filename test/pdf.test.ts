@@ -1,7 +1,8 @@
 /**
  * @jest-environment jest-environment-node
  */
-import generate from '@app/index';
+import puppeteer, { type Browser } from 'puppeteer';
+import DeclarativePDF from '@app/index';
 import fs from 'fs';
 import writeBuffer from '@app/utils/writeBuffer.js';
 import ComparePdf from 'compare-pdf';
@@ -11,11 +12,11 @@ jest.setTimeout(60_000);
 
 const config = {
   paths: {
-    actualPdfRootFolder: process.cwd() + '/tests/data/actualPdfs',
-    baselinePdfRootFolder: process.cwd() + '/tests/data/baselinePdfs',
-    actualPngRootFolder: process.cwd() + '/tests/data/actualPngs',
-    baselinePngRootFolder: process.cwd() + '/tests/data/baselinePngs',
-    diffPngRootFolder: process.cwd() + '/tests/data/diffPngs',
+    actualPdfRootFolder: process.cwd() + '/test/data/actualPdfs',
+    baselinePdfRootFolder: process.cwd() + '/test/data/baselinePdfs',
+    actualPngRootFolder: process.cwd() + '/test/data/actualPngs',
+    baselinePngRootFolder: process.cwd() + '/test/data/baselinePngs',
+    diffPngRootFolder: process.cwd() + '/test/data/diffPngs',
   },
   settings: {
     imageEngine: 'graphicsMagick',
@@ -30,12 +31,31 @@ const config = {
   },
 };
 
+let browser: Browser;
+
+beforeAll(async () => {
+  browser = await puppeteer.launch({
+    pipe: true,
+    headless: 'new',
+    args: [
+      '--no-sandbox',
+      '--disable-web-security',
+      '--font-render-hinting=none',
+    ],
+  });
+});
+
+afterAll(async () => {
+  await browser.close();
+});
+
 describe('PDF visual regression test', () => {
   test('standard template', async () => {
-    const html = fs.readFileSync(`./tests/examples/standard.html`, {
+    const html = fs.readFileSync(`./test/examples/standard.html`, {
       encoding: 'utf8',
     });
-    const actualPdfBuffer = await generate(html);
+    const declarativePDF = new DeclarativePDF(browser);
+    const actualPdfBuffer = await declarativePDF.generate(html);
     await writeBuffer(
       actualPdfBuffer,
       `${config.paths.actualPdfRootFolder}/standard.pdf`
@@ -50,10 +70,11 @@ describe('PDF visual regression test', () => {
   });
 
   test('elegant template', async () => {
-    const html = fs.readFileSync(`./tests/examples/elegant.html`, {
+    const html = fs.readFileSync(`./test/examples/elegant.html`, {
       encoding: 'utf8',
     });
-    const actualPdfBuffer = await generate(html);
+    const declarativePDF = new DeclarativePDF(browser);
+    const actualPdfBuffer = await declarativePDF.generate(html);
     await writeBuffer(
       actualPdfBuffer,
       `${config.paths.actualPdfRootFolder}/elegant.pdf`
