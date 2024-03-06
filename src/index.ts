@@ -1,8 +1,8 @@
 import { PDFDocument } from 'pdf-lib';
-import { Store } from '@app/models/store';
+import { Store } from '@app/services/store';
 import { validateTemplateSetting } from '@app/utils/validators';
 import { PaperDefaults } from '@app/utils/paper-defaults';
-import HTMLAdapter from '@app/utils/adapter-puppeteer';
+import HTMLAdapter from '@app/services/adapter-puppeteer';
 
 import type { PAPER_SIZE } from '@app/consts/paper-size';
 import type { DocumentPage } from '@app/models/document-page';
