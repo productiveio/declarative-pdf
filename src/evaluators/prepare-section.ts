@@ -6,7 +6,13 @@ type PrepareSection = {
   totalPagesNumber?: number;
 };
 
-// TODO: add comments here to describe the side effects of this function
+/**
+ * Prepare a section of the document for pdf printing.
+ *
+ * This function is used to isolate a specific section of the document
+ * for printing. It hides all other sections and pages, and injects
+ * the current and total page numbers if needed.
+ */
 export default function evalPrepareSection(opts: PrepareSection) {
   function hideAllExcept(
     els: NodeListOf<HTMLElement>,
