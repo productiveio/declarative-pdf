@@ -1,4 +1,4 @@
-import { PAPER_SIZE } from '../consts/paper-size';
+import { PAPER_SIZE } from '@app/consts/paper-size';
 
 /**
  * (Utility) Guards a string to be a valid format

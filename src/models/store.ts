@@ -1,6 +1,6 @@
-import DeclarativePDF from './declarative-pdf';
-import { DocumentPage } from './document-page';
-import { PageElement } from './page-element';
+import DeclarativePDF from '@app/index';
+import { DocumentPage } from '@app/models/document-page';
+import { PageElement } from '@app/models/page-element';
 import crypto from 'crypto';
 
 // import type {PDFDocument} from 'pdf-lib';

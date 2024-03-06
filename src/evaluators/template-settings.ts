@@ -1,4 +1,4 @@
-import { type PAPER_SIZE } from '../consts/paper-size';
+import { type PAPER_SIZE } from '@app/consts/paper-size';
 
 type TemplateSettingOpts = {
   default: {

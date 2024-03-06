@@ -1,5 +1,5 @@
 // import type { PDFDocument } from 'pdf-lib';
-import DeclarativePDF from './declarative-pdf';
+import DeclarativePDF from '@app/index';
 
 export type TModel = {
   id: string;

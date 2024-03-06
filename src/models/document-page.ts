@@ -13,21 +13,23 @@ type DocumentPageOpts = {
   height: number;
 } & TModel;
 
-export type ElementSettings = {
-  index: number;
-  type: 'header' | 'footer' | 'background';
-  subSelector?: 'first' | 'last' | 'even' | 'odd' | 'default';
-  height: number;
+export type SectionSetting = {
+  sectionHeight: number;
+  sectionType: 'header' | 'footer' | 'background';
   hasCurrentPageNumber: boolean;
   hasTotalPagesNumber: boolean;
-}[];
+};
+
+export type SectionVariantSetting = {
+  physicalPageIndex: number;
+  physicalPageType: 'first' | 'last' | 'even' | 'odd' | 'default';
+} & SectionSetting;
 
 export class DocumentPage extends Model {
   declare height: number;
   declare width: number;
   declare index: number;
 
-  declare settings?: ElementSettings;
   declare layout?: Layout;
   declare body?: PageElement;
 
@@ -66,7 +68,9 @@ export class DocumentPage extends Model {
    *
    * @throws {Error} If the settings is not valid
    */
-  async createLayoutAndBody(settings: ElementSettings) {
+  async createLayoutAndBody(
+    settings: (SectionSetting | SectionVariantSetting)[]
+  ) {
     // TODO: validirati settinge?
     this.layout = new Layout(this, settings);
 
@@ -107,41 +111,6 @@ export class DocumentPage extends Model {
     return this.owner.totalPagesNumber;
   }
 
-  /** Initializes this model. - deprecated, remove it */
-  async initialize(settings: ElementSettings) {
-    this.settings = settings;
-    // TODO: validirati settingse?
-
-    // flow:
-    // - trebamo inicijalizirati layout i dohvatiti sve visine
-    // - zatim trebamo body isprocesirati i dohvatiti broj stranica
-    // - zatim nam treba total broj stranica (suma svih document-page elemenata) -> parent klasa
-
-    // - zatim parent klasa treba izvrtiti sve sto je potrebno i dovrsiti prikupljanje pdf-ova
-    // - zatim parent klasa treba od svega pripremljenoga napraviti pdf
-
-    // this.layout = new Layout(this, settings);
-    // await this.processBody();
-
-    // this.layout.processSettings(2);
-
-    // u ovom trenutku imamo samo body, ne znamo jos totalni broj stranica
-    // mozda samo trebamo odrediti ima li ovdje necega za postProcessing
-
-    // ovo govno treba nacrtati
-    // now we have to create header, footer and background
-    // if they exist and place them in correct order, by id
-    // flow per element type:
-    // - check if this type have any elements (skip if no)
-    // - if yes, for each page determine which element to use
-    // - check
-    // - create a new element, link to settings index
-    //
-    // - check if there are injectables (fork)
-    // flow for injectables:
-    //
-  }
-
   async process() {
     if (!this.layout) throw new Error('Layout is not initialized');
     this.layout.createLayoutPages();
@@ -158,27 +127,5 @@ export class DocumentPage extends Model {
     for (const page of this.layout.pagesForProcessing) {
       await page.process();
     }
-
-    // there is something to process, we need to build those pdf's
-    // we need to check if those pages are reusable
   }
-
-  // processLayout() {
-  //   const pageCount = this.pageCount ?? 0;
-
-  // }
-
-  // async processElements() {
-  //   // for every page we will create or link an element
-
-  //   const pageCount = this.pageCount ?? 0;
-
-  //   // index: number;
-  //   // type: "footer" | "header" | "background";
-  //   // subSelector?: "first" | "last" | "even" | "odd" | "default" | undefined;
-  //   // height: number;
-  //   // hasCurrentPageNumber: boolean;
-  //   // hasTotalPagesNumber: boolean;
-
-  // }
 }

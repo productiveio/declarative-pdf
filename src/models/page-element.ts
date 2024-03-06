@@ -1,4 +1,4 @@
-import { Model, type TModel } from './model';
+import { Model, type TModel } from '@app/models/model';
 import type { PDFDocument } from 'pdf-lib';
 
 export type TPageElement = {
