@@ -1,6 +1,6 @@
 import { PDFDocument } from 'pdf-lib';
 import { Model, type TModel } from '@app/models/model';
-import { Layout } from '@app/services/layout';
+import { Layout } from '@app/models/layout';
 
 import type { PageElement } from '@app/models/page-element';
 
