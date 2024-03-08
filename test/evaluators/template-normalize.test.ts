@@ -11,28 +11,55 @@ describe('evalTemplateNormalize', () => {
     document.body.innerHTML = '';
   });
 
-  test('creates a document-page element when none exists', () => {
+  test('creates a document-page and page-body for free elements', () => {
     document.body.innerHTML = '<div>Test</div>';
     evalTemplateNormalize();
-    expect(document.body.children.length).toBe(1);
-    expect(document.body.children[0].tagName).toBe('DOCUMENT-PAGE');
-    expect(document.body.children[0].children.length).toBe(1);
-    expect(document.body.children[0].children[0].tagName).toBe('DIV');
-    expect(document.body.children[0].children[0].textContent).toBe('Test');
+    expect(document.body.innerHTML).toBe(
+      '<document-page><page-body><div>Test</div></page-body></document-page>'
+    );
   });
 
-  test('does not create a document-page element when one already exists', () => {
+  test('creates a page-body for free elements in document-page', () => {
     document.body.innerHTML = '<document-page>Test</document-page>';
-    const preNormalized = document.body.innerHTML;
     evalTemplateNormalize();
-    expect(document.body.innerHTML).toBe(preNormalized);
+    expect(document.body.innerHTML).toBe(
+      '<document-page><page-body>Test</page-body></document-page>'
+    );
   });
 
-  test('removes free elements when a document-page element exists', () => {
-    document.body.innerHTML =
-      '<document-page>Test</document-page><div>Test</div>';
+  test('removes free childNodes when a document-page element exists', () => {
+    document.body.innerHTML = '<document-page>Test</document-page>Temp';
     evalTemplateNormalize();
-    expect(document.body.querySelector('div')).toBeNull();
+    expect(document.body.innerHTML).toBe(
+      '<document-page><page-body>Test</page-body></document-page>'
+    );
+  });
+
+  test('does not remove script or style elements', () => {
+    document.body.innerHTML =
+      '<script>Script</script><style>Style</style><div>Div</div>Text<document-page><page-body>Test</page-body><script>inner script</script><style>inner style</style></document-page>';
+    evalTemplateNormalize();
+    expect(document.body.innerHTML).toBe(
+      '<script>Script</script><style>Style</style><document-page><page-body>Test</page-body><script>inner script</script><style>inner style</style></document-page>'
+    );
+  });
+
+  test('removes free childNodes when a page-body element exists', () => {
+    document.body.innerHTML =
+      '<document-page><page-body>Test</page-body>Temp</document-page>';
+    evalTemplateNormalize();
+    expect(document.body.innerHTML).toBe(
+      '<document-page><page-body>Test</page-body></document-page>'
+    );
+  });
+
+  test('removes empty document-pages or ones containing empty page-bodies', () => {
+    document.body.innerHTML =
+      '<document-page><page-body></page-body><page-footer>A</page-footer></document-page><document-page><page-body>B</page-body></document-page>';
+    evalTemplateNormalize();
+    expect(document.body.innerHTML).toBe(
+      '<document-page><page-body>B</page-body></document-page>'
+    );
   });
 
   test('sets body margin and padding to 0', () => {
