@@ -2,7 +2,7 @@
  * @jest-environment jest-environment-node
  */
 import puppeteer, { type Browser } from 'puppeteer';
-import DeclarativePDF from '@app/index';
+import PDF from '@app/index';
 import fs from 'fs';
 import writeBuffer from '@app/utils/writeBuffer.js';
 import ComparePdf from 'compare-pdf';
@@ -54,8 +54,7 @@ describe('PDF visual regression test', () => {
     const html = fs.readFileSync(`./test/examples/standard.html`, {
       encoding: 'utf8',
     });
-    const declarativePDF = new DeclarativePDF(browser);
-    const actualPdfBuffer = await declarativePDF.generate(html);
+    const actualPdfBuffer = await new PDF(browser).generate(html);
     await writeBuffer(
       actualPdfBuffer,
       `${config.paths.actualPdfRootFolder}/standard.pdf`
@@ -73,8 +72,7 @@ describe('PDF visual regression test', () => {
     const html = fs.readFileSync(`./test/examples/elegant.html`, {
       encoding: 'utf8',
     });
-    const declarativePDF = new DeclarativePDF(browser);
-    const actualPdfBuffer = await declarativePDF.generate(html);
+    const actualPdfBuffer = await new PDF(browser).generate(html);
     await writeBuffer(
       actualPdfBuffer,
       `${config.paths.actualPdfRootFolder}/elegant.pdf`

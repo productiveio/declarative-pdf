@@ -11,7 +11,7 @@ type TemplateSettingOpts = {
 
 export default function evalTemplateSettings(opts: TemplateSettingOpts) {
   /**
-   * (Utility) Guards a string to be a valid format
+   * Guards a string to be a valid format
    * @param format A format name: 'a4' or 'letter'
    * @returns true if format is a valid format
    */
@@ -19,7 +19,7 @@ export default function evalTemplateSettings(opts: TemplateSettingOpts) {
     typeof format === 'string' && Object.keys(opts.size).includes(format);
 
   /**
-   * (Utility) Converts millimeters to pixels
+   * Converts millimeters to pixels
    * @param mm Millimeter value
    * @param ppi Pixels per inch
    * @returns Pixel value
@@ -28,7 +28,7 @@ export default function evalTemplateSettings(opts: TemplateSettingOpts) {
     Math.round(mm * (ppi / 25.4));
 
   /**
-   * (Utility) Gets width and height from a size string
+   * Gets width and height from a size string
    * @param str A size string: '300' or '300x600'
    * @returns Two numbers or two undefines if nothing valid found
    */
@@ -39,7 +39,7 @@ export default function evalTemplateSettings(opts: TemplateSettingOpts) {
   };
 
   /**
-   * (Worker) Gets settings for a document-page element (width, height, index)
+   * Gets settings for a document-page element (width, height, index)
    * @param docPageEl a document-page element
    * @param index location of the document-page element in the DOM
    * @returns settings for the document-page element

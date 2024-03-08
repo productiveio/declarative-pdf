@@ -25,6 +25,9 @@ export type SectionVariantSetting = {
   physicalPageType: 'first' | 'last' | 'even' | 'odd' | 'default';
 } & SectionSetting;
 
+// TODO: implement state & various checks for state
+// type PageProcessingState = 'idle' | 'processing' | 'processed';
+
 export class DocumentPage extends Model {
   declare height: number;
   declare width: number;
@@ -92,6 +95,8 @@ export class DocumentPage extends Model {
   // TODO: ovdje treba neka validacija
   // broj mora biti veci od 0
   // body mora postojati
+  // mozemo ovdje dodati console.warn ako nismo u state u kojem bi trebali biti
+  // takodjer bi trebali handleati state ovdje -> prije createBodyAndLayout i nakon
   get pageCount() {
     return this.body!.pdf.getPageCount();
   }

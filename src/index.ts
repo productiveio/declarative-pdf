@@ -1,6 +1,6 @@
 import { PDFDocument } from 'pdf-lib';
 import { Store } from '@app/services/store';
-import { validateTemplateSetting } from '@app/utils/validators';
+import { normalizeSetting } from '@app/utils/normalize-setting';
 import { PaperDefaults } from '@app/utils/paper-defaults';
 import HTMLAdapter from '@app/services/adapter-puppeteer';
 
@@ -8,8 +8,8 @@ import type { PAPER_SIZE } from '@app/consts/paper-size';
 import type { DocumentPage } from '@app/models/document-page';
 import type { Browser } from 'puppeteer';
 
+// TODO: refactor ovog tipa, da moze bit il format based il size based (po readmeu)
 type DeclarativePDFOpts = {
-  debug?: boolean;
   ppi?: number;
   format?: keyof typeof PAPER_SIZE;
   width?: number;
@@ -17,7 +17,6 @@ type DeclarativePDFOpts = {
 };
 
 export default class DeclarativePDF {
-  declare debug: boolean;
   declare store: Store;
   declare html: HTMLAdapter;
   declare defaults: PaperDefaults;
@@ -37,7 +36,6 @@ export default class DeclarativePDF {
       width: opts?.width,
       height: opts?.height,
     });
-    this.debug = opts?.debug ?? false;
   }
 
   // TODO: treba neka validacija za ovo
@@ -100,10 +98,9 @@ export default class DeclarativePDF {
     });
 
     documentPageSettings.forEach((setting) => {
-      // TODO: umjesto da validiramo da li su ispravni settinzi, trebamo ih fallbackat na defaulte ako nisu
-      validateTemplateSetting(setting);
-
-      this.documentPages.push(this.store.createModel('page', setting));
+      this.documentPages.push(
+        this.store.createModel('page', normalizeSetting(setting))
+      );
     });
   }
 
