@@ -11,7 +11,7 @@ export default function evalDocumentPageSettings(documentPageIndex: number) {
   const variants = ['first', 'last', 'even', 'odd', 'default'] as const;
 
   /**
-   * (Utility) Gets the pixel height of an element (including padding and border)
+   * Gets the pixel height of an element (including padding and border)
    * @param el A section or physical page element
    * @returns Pixel height of the element
    */
@@ -27,7 +27,7 @@ export default function evalDocumentPageSettings(documentPageIndex: number) {
   };
 
   /**
-   * (Utility) Checks if an element contains an injectable element (current-page-number)
+   * Checks if an element contains an injectable element (current-page-number)
    * @param el A section or physical page element
    * @returns true if the element contains a current page number element
    */
@@ -37,7 +37,7 @@ export default function evalDocumentPageSettings(documentPageIndex: number) {
   };
 
   /**
-   * (Utility) Checks if an element contains a total pages number element (total-pages-number)
+   * Checks if an element contains a total pages number element (total-pages-number)
    * @param el A section or physical page element
    * @returns true if the element contains a total pages number element
    */
@@ -47,7 +47,7 @@ export default function evalDocumentPageSettings(documentPageIndex: number) {
   };
 
   /**
-   * (Utility) Guards a string to be a valid variant (first, last, even, odd, default)
+   * Guards a string to be a valid variant (first, last, even, odd, default)
    * @param s A string to check if it belongs to the variants array
    * @returns true if the string is a variant
    */
@@ -56,7 +56,7 @@ export default function evalDocumentPageSettings(documentPageIndex: number) {
   };
 
   /**
-   * (Worker) For a given section or physical page element, returns the settings for that element
+   * For a given section or physical page element, returns the settings for that element
    * @param el A section or physical page element
    * @param sectionType A section type (header, footer, background)
    * @param physicalPageIndex A number if the element is a physical page within the section
