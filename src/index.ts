@@ -127,6 +127,7 @@ export default class DeclarativePDF {
     for (const [index, doc] of this.documentPages.entries()) {
       await this.html.setViewport(doc.viewPort);
       const settings = await this.html.documentPageSettings({ index });
+      // TODO: treba li nam neka normalizacija settinga ovdje?
       await doc.createLayoutAndBody(settings);
     }
   }
@@ -175,7 +176,6 @@ export default class DeclarativePDF {
               const settingName = `${section}Setting` as const;
               if (!page[elementName]?.pdf) continue;
 
-              // TODO: ovdje je jako lose ako imamo vise od jedne stranice
               const sectionPage = page[elementName]?.pdf.getPage(0);
               if (!sectionPage) continue;
 

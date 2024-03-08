@@ -291,6 +291,13 @@ class LayoutPage {
     });
     const pdf = await PDFDocument.load(buffer);
 
+    const count = pdf.getPageCount();
+    if (count !== 1) {
+      throw new Error(
+        `While generating ${type} section PDF with ${setting.sectionHeight} height, instead of a single page, we got ${count} instead`
+      );
+    }
+
     this[elementName] = this.store.createModel(setting.sectionType, {
       pdf,
       buffer,

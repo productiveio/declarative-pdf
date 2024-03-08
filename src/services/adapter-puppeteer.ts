@@ -34,7 +34,9 @@ export default class HTMLAdapter {
   }
 
   setContent(content: string) {
-    return this.page.setContent(content);
+    return this.page.setContent(content, {
+      waitUntil: ['load', 'networkidle0'],
+    });
   }
 
   setViewport(opts: { width: number; height: number }) {
@@ -70,6 +72,7 @@ export default class HTMLAdapter {
     return this.page.pdf({
       width: opts.width,
       height: opts.height,
+      preferCSSPageSize: true,
       omitBackground: opts.transparentBg,
       printBackground: true,
     });
