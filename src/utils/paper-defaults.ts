@@ -1,22 +1,40 @@
 import { PAPER_SIZE } from '@app/consts/paper-size';
 
-/**
- * Asserts that a string is a valid format
- *
- * @param format A format name: 'a4' or 'letter'
- * @returns true if format is a valid format
- */
-const isFormat = (format: unknown): format is keyof typeof PAPER_SIZE =>
-  typeof format === 'string' && Object.keys(PAPER_SIZE).includes(format);
+/** Asserts that obj.format is a valid format */
+const hasFormat = (
+  obj: PaperOpts | undefined
+): obj is { format: keyof typeof PAPER_SIZE } =>
+  !!obj &&
+  'format' in obj &&
+  typeof obj.format === 'string' &&
+  Object.keys(PAPER_SIZE).includes(obj.format);
 
-/**
- * Asserts that a number is a valid ppi (pixels per inch)
- *
- * @param ppi a valid number
- * @returns true if ppi is a valid number
- */
-const isPpi = (ppi: unknown): ppi is number =>
-  typeof ppi === 'number' && !isNaN(ppi) && ppi > 42 && ppi < 1642;
+/** Asserts that obj.ppi is a valid ppi (pixels per inch) */
+const hasPpi = (obj: PaperOpts | undefined): obj is { ppi: number } =>
+  !!obj &&
+  'ppi' in obj &&
+  typeof obj?.ppi === 'number' &&
+  !isNaN(obj.ppi) &&
+  obj.ppi > 42 &&
+  obj.ppi < 1642;
+
+/** Asserts that obj.width is a valid width */
+const hasWidth = (obj: PaperOpts | undefined): obj is { width: number } =>
+  !!obj &&
+  'width' in obj &&
+  typeof obj?.width === 'number' &&
+  !isNaN(obj.width) &&
+  obj.width > 0 &&
+  obj.width <= 420_000;
+
+/** Asserts that obj.height is a valid height */
+const hasHeight = (obj: PaperOpts | undefined): obj is { height: number } =>
+  !!obj &&
+  'height' in obj &&
+  typeof obj?.height === 'number' &&
+  !isNaN(obj.height) &&
+  obj.height > 0 &&
+  obj.height <= 420_000;
 
 /**
  * Converts millimeters to pixels
@@ -28,12 +46,15 @@ const isPpi = (ppi: unknown): ppi is number =>
 const convertMmToPx = (mm: number, ppi: number) =>
   Math.round(mm * (ppi / 25.4));
 
-type PaperOpts = {
-  ppi?: number;
-  format?: keyof typeof PAPER_SIZE;
-  width?: number;
-  height?: number;
-};
+type PaperOpts =
+  | {
+      ppi?: number;
+      format?: keyof typeof PAPER_SIZE;
+    }
+  | {
+      width?: number;
+      height?: number;
+    };
 
 export const DEFAULT_FORMAT = 'a4';
 export const DEFAULT_PPI = 72;
@@ -41,26 +62,30 @@ export const DEFAULT_WIDTH = 595;
 export const DEFAULT_HEIGHT = 842;
 
 export class PaperDefaults {
-  readonly ppi: NonNullable<PaperOpts['ppi']>;
-  readonly format: PaperOpts['format'];
-  readonly width: NonNullable<PaperOpts['width']>;
-  readonly height: NonNullable<PaperOpts['height']>;
+  readonly ppi: number;
+  readonly format: keyof typeof PAPER_SIZE | undefined;
+  readonly width: number;
+  readonly height: number;
 
   constructor(opts?: PaperOpts) {
-    this.ppi = isPpi(opts?.ppi) ? opts.ppi : DEFAULT_PPI;
+    this.ppi = hasPpi(opts) ? opts.ppi : DEFAULT_PPI;
 
-    if (isFormat(opts?.format)) {
+    if (hasFormat(opts)) {
       this.format = opts.format;
       this.width = convertMmToPx(PAPER_SIZE[this.format].width, this.ppi);
       this.height = convertMmToPx(PAPER_SIZE[this.format].height, this.ppi);
-    } else if (opts?.width && opts?.height) {
+    } else if (hasWidth(opts) && hasHeight(opts)) {
       this.format = undefined;
       this.width = opts.width;
       this.height = opts.height;
-    } else if (opts?.width || opts?.height) {
+    } else if (hasWidth(opts)) {
       this.format = undefined;
-      this.width = opts?.width ?? DEFAULT_WIDTH;
-      this.height = opts?.height ?? DEFAULT_HEIGHT;
+      this.width = opts.width;
+      this.height = DEFAULT_HEIGHT;
+    } else if (hasHeight(opts)) {
+      this.format = undefined;
+      this.width = DEFAULT_WIDTH;
+      this.height = opts.height;
     } else {
       this.format = DEFAULT_FORMAT;
       this.width = DEFAULT_WIDTH;

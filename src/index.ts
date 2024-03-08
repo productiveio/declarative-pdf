@@ -8,13 +8,15 @@ import type { PAPER_SIZE } from '@app/consts/paper-size';
 import type { DocumentPage } from '@app/models/document-page';
 import type { Browser } from 'puppeteer';
 
-// TODO: refactor ovog tipa, da moze bit il format based il size based (po readmeu)
-type DeclarativePDFOpts = {
-  ppi?: number;
-  format?: keyof typeof PAPER_SIZE;
-  width?: number;
-  height?: number;
-};
+type DeclarativePDFOpts =
+  | {
+      ppi?: number;
+      format?: keyof typeof PAPER_SIZE;
+    }
+  | {
+      width?: number;
+      height?: number;
+    };
 
 export default class DeclarativePDF {
   declare store: Store;
@@ -30,12 +32,20 @@ export default class DeclarativePDF {
    */
   constructor(browser: Browser, opts?: DeclarativePDFOpts) {
     this.html = new HTMLAdapter(browser);
-    this.defaults = new PaperDefaults({
-      ppi: opts?.ppi,
-      format: opts?.format,
-      width: opts?.width,
-      height: opts?.height,
-    });
+
+    if (opts && 'format' in opts) {
+      this.defaults = new PaperDefaults({
+        ppi: opts?.ppi,
+        format: opts?.format,
+      });
+    } else if (opts && ('width' in opts || 'height' in opts)) {
+      this.defaults = new PaperDefaults({
+        width: opts?.width,
+        height: opts?.height,
+      });
+    } else {
+      this.defaults = new PaperDefaults();
+    }
   }
 
   // TODO: treba neka validacija za ovo
@@ -117,7 +127,6 @@ export default class DeclarativePDF {
     for (const [index, doc] of this.documentPages.entries()) {
       await this.html.setViewport(doc.viewPort);
       const settings = await this.html.documentPageSettings({ index });
-      // TODO - what happens if there is no settings (only body, and without the required page-body element)?
       await doc.createLayoutAndBody(settings);
     }
   }
