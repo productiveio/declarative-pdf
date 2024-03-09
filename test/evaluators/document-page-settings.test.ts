@@ -74,8 +74,8 @@ describe('evalDocumentPageSettings', () => {
             <total-pages-number> ... </total-pages-number>
           </physical-page>
           <physical-page select="odd">
-            <current-page-number> ... </current-page-number>
-            <total-pages-number> ... </total-pages-number>
+            <span class="total-pages"> ... </span>
+            <span class="page-number"> ... </span>
           </physical-page>
         </page-footer>
         <page-background>

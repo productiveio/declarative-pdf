@@ -272,4 +272,55 @@ describe('evalPrepareSection', () => {
         ?.textContent
     ).toBe('42');
   });
+
+  test('it injects page numbers for span elements', () => {
+    document.body.innerHTML = `
+      <document-page>
+        <page-header>
+          <span class="page-number"> ... </span>
+          /
+          <span class="total-pages"> ... </span>
+        </page-header>
+      </document-page>
+    `;
+    evalPrepareSection({
+      documentPageIndex: 0,
+      sectionType: 'header',
+      currentPageNumber: 24,
+      totalPagesNumber: 42,
+    });
+
+    const totalPages = document.querySelector<HTMLElement>('.total-pages');
+    expect(totalPages?.textContent).toBe('42');
+
+    const pageNumber = document.querySelector<HTMLElement>('.page-number');
+    expect(pageNumber?.textContent).toBe('24');
+  });
+
+  test('it injects page numbers for declarative elements', () => {
+    document.body.innerHTML = `
+      <document-page>
+        <page-header>
+          <current-page-number> ... </current-page-number>
+          /
+          <total-pages-number> ... </total-pages-number>
+        </page-header>
+      </document-page>
+    `;
+    evalPrepareSection({
+      documentPageIndex: 0,
+      sectionType: 'header',
+      currentPageNumber: 24,
+      totalPagesNumber: 42,
+    });
+
+    const totalPages =
+      document.querySelector<HTMLElement>('total-pages-number');
+    expect(totalPages?.textContent).toBe('42');
+
+    const pageNumber = document.querySelector<HTMLElement>(
+      'current-page-number'
+    );
+    expect(pageNumber?.textContent).toBe('24');
+  });
 });

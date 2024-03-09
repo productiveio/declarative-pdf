@@ -38,7 +38,9 @@ export default function evalPrepareSection(opts: PrepareSection) {
   function injectNumbers(el: HTMLElement) {
     if (opts.currentPageNumber) {
       Array.from(
-        el.querySelectorAll<HTMLElement>('current-page-number')
+        el.querySelectorAll<HTMLElement>(
+          'current-page-number, span.page-number'
+        )
       ).forEach((el) => {
         el.textContent = String(opts.currentPageNumber);
       });
@@ -46,7 +48,7 @@ export default function evalPrepareSection(opts: PrepareSection) {
 
     if (opts.totalPagesNumber) {
       Array.from(
-        el.querySelectorAll<HTMLElement>('total-pages-number')
+        el.querySelectorAll<HTMLElement>('total-pages-number, span.total-pages')
       ).forEach((el) => {
         el.textContent = String(opts.totalPagesNumber);
       });

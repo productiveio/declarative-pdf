@@ -32,7 +32,9 @@ export default function evalDocumentPageSettings(documentPageIndex: number) {
    * @returns true if the element contains a current page number element
    */
   const hasCurrentPageNumber = (el: HTMLElement) => {
-    const currentPageNumber = el.querySelector('current-page-number');
+    const currentPageNumber = el.querySelector(
+      'current-page-number, span.page-number'
+    );
     return !!currentPageNumber;
   };
 
@@ -42,7 +44,9 @@ export default function evalDocumentPageSettings(documentPageIndex: number) {
    * @returns true if the element contains a total pages number element
    */
   const hasTotalPagesNumber = (el: HTMLElement) => {
-    const totalPagesNumber = el.querySelector('total-pages-number');
+    const totalPagesNumber = el.querySelector(
+      'total-pages-number, span.total-pages'
+    );
     return !!totalPagesNumber;
   };
 
