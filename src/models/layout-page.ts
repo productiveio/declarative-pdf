@@ -24,11 +24,6 @@ export type LayoutPageOpts = {
  * This class should exist only if sections (header, footer, background)
  * are defined in this layout and there is a need to create output PDF
  * by placing various elements on the page
- *
- * TODO: refactor workflow, so that this class isn't constructed
- * if there are no sections defined in the layout
- * - then we don't need to check for `hasElements` and `needsProcessing`
- * because we know that it must have elements and needs processing
  */
 export class LayoutPage {
   declare layout: Layout;

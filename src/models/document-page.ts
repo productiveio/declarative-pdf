@@ -25,9 +25,6 @@ export type SectionVariantMeta = {
   physicalPageType: 'first' | 'last' | 'even' | 'odd' | 'default';
 } & SectionMeta;
 
-// TODO: implement state & various checks for state
-// type PageProcessingState = 'idle' | 'processing' | 'processed';
-
 export class DocumentPage {
   declare parent: DeclarativePDF;
   declare height: number;
@@ -67,7 +64,6 @@ export class DocumentPage {
    * across all documentPage models
    */
   async createLayoutAndBody(meta: (SectionMeta | SectionVariantMeta)[]) {
-    // TODO: validirati ili normalizirati settinge?
     this.layout = new Layout(this, meta);
 
     await this.html.prepareSection({ documentPageIndex: this.index });
@@ -85,22 +81,31 @@ export class DocumentPage {
     return this.parent.documentPages.slice(0, this.index);
   }
 
-  // TODO: ovdje treba neka validacija
-  // broj mora biti veci od 0
-  // body mora postojati
-  // mozemo ovdje dodati console.warn ako nismo u state u kojem bi trebali biti
-  // takodjer bi trebali handleati state ovdje -> prije createBodyAndLayout i nakon
   get pageCount() {
-    return this.body!.pdf.getPageCount();
+    const count = this.body!.pdf.getPageCount();
+
+    if (count < 1) {
+      throw new Error(
+        `Body generated for document page ${this.index} has no pages`
+      );
+    }
+
+    return count;
   }
 
-  // TODO: ovdje isto treba neka validacija
-  // broj ne smije biti manji od broja documentPagesa
   get pageCountOffset() {
-    return this.previousDocumentPages.reduce(
+    const offset = this.previousDocumentPages.reduce(
       (acc, doc) => acc + doc.pageCount,
       0
     );
+
+    if (offset < this.previousDocumentPages.length) {
+      throw new Error(
+        'Page count offset is less than number of document pages'
+      );
+    }
+
+    return offset;
   }
 
   get totalPagesNumber() {

@@ -46,14 +46,8 @@ export default class DeclarativePDF {
     }
   }
 
-  // TODO: treba neka validacija za ovo
-  // - broj ne smije biti manji od broja documentPagesa
-  declare _totalPagesNumber: number;
   get totalPagesNumber() {
-    return (this._totalPagesNumber ??= this.documentPages.reduce(
-      (acc, doc) => acc + doc.pageCount,
-      0
-    ));
+    return this.documentPages.reduce((acc, doc) => acc + doc.pageCount, 0);
   }
 
   /**
@@ -124,7 +118,6 @@ export default class DeclarativePDF {
     for (const [index, doc] of this.documentPages.entries()) {
       await this.html.setViewport(doc.viewPort);
       const settings = await this.html.documentPageSettings({ index });
-      // TODO: treba li nam neka normalizacija settinga ovdje?
       await doc.createLayoutAndBody(settings);
     }
   }
