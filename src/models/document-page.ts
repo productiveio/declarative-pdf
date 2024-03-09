@@ -1,43 +1,44 @@
 import { PDFDocument } from 'pdf-lib';
-import { Model, type TModel } from '@app/models/model';
 import { Layout } from '@app/models/layout';
 
-import type { PageElement } from '@app/models/page-element';
+import type DeclarativePDF from '@app/index';
 
 type DocumentPageOpts = {
+  parent: DeclarativePDF;
   /** index of document-page element in DOM */
   index: number;
   /** whole page width in pixels */
   width: number;
   /** whole page height in pixels */
   height: number;
-} & TModel;
+};
 
-export type SectionSetting = {
+export type SectionMeta = {
   sectionHeight: number;
   sectionType: 'header' | 'footer' | 'background';
   hasCurrentPageNumber: boolean;
   hasTotalPagesNumber: boolean;
 };
 
-export type SectionVariantSetting = {
+export type SectionVariantMeta = {
   physicalPageIndex: number;
   physicalPageType: 'first' | 'last' | 'even' | 'odd' | 'default';
-} & SectionSetting;
+} & SectionMeta;
 
 // TODO: implement state & various checks for state
 // type PageProcessingState = 'idle' | 'processing' | 'processed';
 
-export class DocumentPage extends Model {
+export class DocumentPage {
+  declare parent: DeclarativePDF;
   declare height: number;
   declare width: number;
   declare index: number;
 
   declare layout?: Layout;
-  declare body?: PageElement;
+  declare body?: { buffer: Buffer; pdf: PDFDocument };
 
   constructor(opts: DocumentPageOpts) {
-    super(opts);
+    this.parent = opts.parent;
     this.index = opts.index;
     this.width = opts.width;
     this.height = opts.height;
@@ -51,31 +52,23 @@ export class DocumentPage extends Model {
   }
 
   get html() {
-    return this.owner.html;
-  }
-
-  get store() {
-    return this.owner.store;
+    return this.parent.html;
   }
 
   /**
    * Create the layout and body element.
    *
    * This method creates the body PDF and sets the number
-   * of pages this document-page have.
+   * of pages for this document-page.
    *
    * At this point, layout knows only of heights and what
    * page elements exist. To finish the layouting, we need
    * number of pages for this doc and total number of pages
    * across all documentPage models
-   *
-   * @throws {Error} If the settings is not valid
    */
-  async createLayoutAndBody(
-    settings: (SectionSetting | SectionVariantSetting)[]
-  ) {
-    // TODO: validirati settinge?
-    this.layout = new Layout(this, settings);
+  async createLayoutAndBody(meta: (SectionMeta | SectionVariantMeta)[]) {
+    // TODO: validirati ili normalizirati settinge?
+    this.layout = new Layout(this, meta);
 
     await this.html.prepareSection({ documentPageIndex: this.index });
     const buffer = await this.html.pdf({
@@ -85,11 +78,11 @@ export class DocumentPage extends Model {
     });
     const pdf = await PDFDocument.load(buffer);
 
-    this.body = this.store.createModel('body', { pdf, buffer });
+    this.body = { pdf, buffer };
   }
 
   get previousDocumentPages() {
-    return this.owner.documentPages.slice(0, this.index);
+    return this.parent.documentPages.slice(0, this.index);
   }
 
   // TODO: ovdje treba neka validacija
@@ -111,7 +104,7 @@ export class DocumentPage extends Model {
   }
 
   get totalPagesNumber() {
-    return this.owner.totalPagesNumber;
+    return this.parent.totalPagesNumber;
   }
 
   async process() {
@@ -120,11 +113,6 @@ export class DocumentPage extends Model {
 
     // there is nothing to process, so bail out
     if (!this.layout.needsProcessing) return;
-
-    // at this point we should have some pages for processing
-    if (!this.layout.pagesForProcessing) {
-      throw new Error('Unable to find pages for processing');
-    }
 
     // process every page that needs processing in sequence
     for (const page of this.layout.pagesForProcessing) {

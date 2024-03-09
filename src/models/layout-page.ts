@@ -1,43 +1,46 @@
-import { PDFDocument } from 'pdf-lib';
-import { isSectionVariantSetting } from '@app/utils/physical-pages';
+import { LayoutPageElement } from '@app/models/layout-page-element';
 
 import type {
-  SectionSetting,
-  SectionVariantSetting,
+  SectionMeta,
+  SectionVariantMeta,
 } from '@app/models/document-page';
-import type { PageElement } from '@app/models/page-element';
-import type { Layout } from '@app/models/layout';
+import { Layout } from '@app/models/layout';
 
-export type LayoutPageSetting =
-  | SectionSetting
-  | SectionVariantSetting
-  | undefined;
+export type LayoutPageMeta = SectionMeta | SectionVariantMeta | undefined;
 
 export type LayoutPageOpts = {
   layout: Layout;
   pageIndex: number;
   currentPageNumber: number;
   totalPagesNumber: number;
-  headerSetting: LayoutPageSetting;
-  footerSetting: LayoutPageSetting;
-  backgroundSetting: LayoutPageSetting;
+  headerMeta: LayoutPageMeta;
+  footerMeta: LayoutPageMeta;
+  backgroundMeta: LayoutPageMeta;
 };
 
+/**
+ * Represents a single page in a layout
+ *
+ * This class should exist only if sections (header, footer, background)
+ * are defined in this layout and there is a need to create output PDF
+ * by placing various elements on the page
+ *
+ * TODO: refactor workflow, so that this class isn't constructed
+ * if there are no sections defined in the layout
+ * - then we don't need to check for `hasElements` and `needsProcessing`
+ * because we know that it must have elements and needs processing
+ */
 export class LayoutPage {
   declare layout: Layout;
-  declare pageIndex: number;
 
+  declare pageIndex: number;
   declare currentPageNumber: number;
   declare totalPagesNumber: number;
 
-  declare headerSetting: LayoutPageSetting;
-  declare headerElement?: PageElement | undefined;
-
-  declare footerSetting: LayoutPageSetting;
-  declare footerElement?: PageElement | undefined;
-
-  declare backgroundSetting: LayoutPageSetting;
-  declare backgroundElement?: PageElement | undefined;
+  declare header: LayoutPageElement | undefined;
+  declare footer: LayoutPageElement | undefined;
+  declare background: LayoutPageElement | undefined;
+  declare body: LayoutPageElement;
 
   constructor(opts: LayoutPageOpts) {
     this.layout = opts.layout;
@@ -46,36 +49,49 @@ export class LayoutPage {
     this.currentPageNumber = opts.currentPageNumber;
     this.totalPagesNumber = opts.totalPagesNumber;
 
-    this.headerSetting = opts.headerSetting;
-    this.footerSetting = opts.footerSetting;
-    this.backgroundSetting = opts.backgroundSetting;
-  }
+    if (opts.headerMeta) {
+      this.header = new LayoutPageElement({
+        layoutPage: this,
+        ...opts.headerMeta,
+      });
+    }
 
-  get store() {
-    return this.layout.documentPage.owner.store;
+    if (opts.footerMeta) {
+      this.footer = new LayoutPageElement({
+        layoutPage: this,
+        ...opts.footerMeta,
+      });
+    }
+
+    if (opts.backgroundMeta) {
+      this.background = new LayoutPageElement({
+        layoutPage: this,
+        ...opts.backgroundMeta,
+      });
+    }
+
+    this.body = new LayoutPageElement({
+      layoutPage: this,
+      sectionHeight: this.layout.bodyHeight,
+      sectionType: 'body',
+      hasCurrentPageNumber: false,
+      hasTotalPagesNumber: false,
+    });
   }
 
   get html() {
-    return this.layout.documentPage.owner.html;
-  }
-
-  get hasElements() {
-    return !!(
-      this.headerSetting ||
-      this.footerSetting ||
-      this.backgroundSetting
-    );
+    return this.layout.documentPage.html;
   }
 
   get hasBackgroundElement() {
-    return !!this.backgroundSetting;
+    return !!this.background;
   }
 
   get needsProcessing() {
     return (
-      (this.headerSetting && !this.headerElement) ||
-      (this.footerSetting && !this.footerElement) ||
-      (this.backgroundSetting && !this.backgroundElement)
+      (this.header && !this.header.pdfPage) ||
+      (this.footer && !this.footer.pdfPage) ||
+      (this.background && !this.background.pdfPage)
     );
   }
 
@@ -84,83 +100,9 @@ export class LayoutPage {
   }
 
   async process() {
-    if (this.hasElements) {
-      await this.processElement('header');
-      await this.processElement('footer');
-      await this.processElement('background');
-    }
-  }
-
-  private async processElement(type: 'header' | 'footer' | 'background') {
-    const settingName = `${type}Setting` as const;
-    const elementName = `${type}Element` as const;
-
-    const setting = this[settingName];
-    if (!setting) return;
-
-    if (this[elementName]) {
-      throw new Error('Trying to process already processed element');
-    }
-
-    const isReusable = !!setting.hasCurrentPageNumber;
-    const isVariant = isSectionVariantSetting(setting);
-
-    let matchingPage: LayoutPage | undefined;
-    if (isReusable && !isVariant) {
-      // for regular sections, match only by type
-      matchingPage = this.layout.pages!.find(
-        (page) => !page.needsProcessing && page[elementName]
-      );
-    } else if (isReusable && isVariant) {
-      // for variant sections, match by type and physical page index
-      matchingPage = this.layout.pages!.find((page) => {
-        if (page.needsProcessing) return false;
-
-        const targetSetting = page[settingName];
-        if (!isSectionVariantSetting(targetSetting)) return false;
-
-        return targetSetting.physicalPageIndex === setting.physicalPageIndex;
-      });
-    }
-
-    if (matchingPage) {
-      this[elementName] = matchingPage[elementName];
-      return;
-    }
-
-    // we can't reuse any existing element, so we need to create a new one
-    await this.html.prepareSection({
-      documentPageIndex: this.layout.documentPage.index,
-      sectionType: setting.sectionType,
-      physicalPageIndex:
-        'physicalPageIndex' in setting ? setting.physicalPageIndex : undefined,
-      currentPageNumber: setting.hasCurrentPageNumber
-        ? this.currentPageNumber
-        : undefined,
-      totalPagesNumber: setting.hasTotalPagesNumber
-        ? this.totalPagesNumber
-        : undefined,
-    });
-
-    const buffer = await this.html.pdf({
-      width: this.layout.pageWidth,
-      height: setting.sectionHeight,
-      transparentBg:
-        this.hasBackgroundElement && setting.sectionType !== 'background',
-    });
-    const pdf = await PDFDocument.load(buffer);
-
-    // TODO: implement this error throwing
-    // const count = pdf.getPageCount();
-    // if (count !== 1) {
-    //   throw new Error(
-    //     `While generating ${type} section PDF with ${setting.sectionHeight} height, instead of a single page, we got ${count} instead`
-    //   );
-    // }
-
-    this[elementName] = this.store.createModel(setting.sectionType, {
-      pdf,
-      buffer,
-    });
+    await this.background?.process();
+    await this.header?.process();
+    await this.footer?.process();
+    await this.body.process();
   }
 }

@@ -1,11 +1,11 @@
 import Variant from '@app/consts/physical-page';
 
 import type {
-  SectionSetting,
-  SectionVariantSetting,
+  SectionMeta,
+  SectionVariantMeta,
 } from '@app/models/document-page';
 
-const findVariant = (variants: SectionVariantSetting[], condition: Variant) => {
+const findVariant = (variants: SectionVariantMeta[], condition: Variant) => {
   return variants.find((variant) => variant.physicalPageType === condition);
 };
 
@@ -17,8 +17,8 @@ const findVariant = (variants: SectionVariantSetting[], condition: Variant) => {
  * @param sections Either a regular section or a section containing physical pages
  */
 export const areSectionVariants = (
-  sections: (SectionSetting | SectionVariantSetting)[]
-): sections is SectionVariantSetting[] => {
+  sections: (SectionMeta | SectionVariantMeta)[]
+): sections is SectionVariantMeta[] => {
   return (
     Array.isArray(sections) &&
     'physicalPageIndex' in sections[0] &&
@@ -37,7 +37,7 @@ export const areSectionVariants = (
  * @param count A count of pages this document-page have
  */
 export const selectVariant = (
-  variants: SectionVariantSetting[],
+  variants: SectionVariantMeta[],
   pageIndex: number,
   offset: number,
   count: number
@@ -62,9 +62,9 @@ export const selectVariant = (
  *
  * @param section Either a regular section or a section containing physical pages
  */
-export const isSectionVariantSetting = (
-  section: SectionSetting | SectionVariantSetting | undefined
-): section is SectionVariantSetting => {
+export const isSectionVariantMeta = (
+  section: SectionMeta | SectionVariantMeta | undefined
+): section is SectionVariantMeta => {
   return (
     !!section &&
     'physicalPageIndex' in section &&

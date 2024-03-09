@@ -1,21 +1,36 @@
 import { areSectionVariants, selectVariant } from '@app/utils/physical-pages';
-import { LayoutPage, type LayoutPageSetting } from '@app/models/layout-page';
+import { LayoutPage, type LayoutPageMeta } from '@app/models/layout-page';
 
-import type {
-  DocumentPage,
-  SectionSetting,
-  SectionVariantSetting,
-} from '@app/models/document-page';
+import type { DocumentPage } from '@app/models/document-page';
 
-const getMaxHeight = (els: (SectionSetting | SectionVariantSetting)[]) => {
+const getMaxHeight = (els: NonNullable<LayoutPageMeta>[]) => {
   return els.reduce((x, s) => Math.max(x, s.sectionHeight), 0);
+};
+
+const pickMeta = (
+  collection: NonNullable<LayoutPageMeta>[],
+  offset: number,
+  count: number
+): LayoutPageMeta => {
+  if (!collection.length) return undefined;
+
+  if (areSectionVariants(collection)) {
+    return selectVariant(collection, 0, offset, count);
+  }
+
+  if (collection.length > 1) {
+    throw new Error('More than one setting for a regular section');
+  }
+
+  return collection[0];
 };
 
 export class Layout {
   declare documentPage: DocumentPage;
-  declare headerSettings: (SectionSetting | SectionVariantSetting)[];
-  declare footerSettings: (SectionSetting | SectionVariantSetting)[];
-  declare backgroundSettings: (SectionSetting | SectionVariantSetting)[];
+
+  declare headersMeta: NonNullable<LayoutPageMeta>[];
+  declare footersMeta: NonNullable<LayoutPageMeta>[];
+  declare backgroundsMeta: NonNullable<LayoutPageMeta>[];
 
   declare headerHeight: number;
   declare footerHeight: number;
@@ -28,16 +43,11 @@ export class Layout {
 
   declare pages?: LayoutPage[];
 
-  constructor(
-    documentPage: DocumentPage,
-    settings: (SectionSetting | SectionVariantSetting)[]
-  ) {
+  constructor(documentPage: DocumentPage, meta: NonNullable<LayoutPageMeta>[]) {
     this.documentPage = documentPage;
-    this.headerSettings = settings.filter((s) => s.sectionType === 'header');
-    this.footerSettings = settings.filter((s) => s.sectionType === 'footer');
-    this.backgroundSettings = settings.filter(
-      (s) => s.sectionType === 'background'
-    );
+    this.headersMeta = meta.filter((s) => s.sectionType === 'header');
+    this.footersMeta = meta.filter((s) => s.sectionType === 'footer');
+    this.backgroundsMeta = meta.filter((s) => s.sectionType === 'background');
     this.setHeights();
   }
 
@@ -49,31 +59,29 @@ export class Layout {
     return this.documentPage.width;
   }
 
-  get hasConfig() {
+  get needsLayoutPages() {
     return (
-      this.headerSettings.length ||
-      this.footerSettings.length ||
-      this.backgroundSettings.length
+      this.headersMeta.length ||
+      this.footersMeta.length ||
+      this.backgroundsMeta.length
     );
   }
 
   get hasBackgroundElement() {
-    return !!this.backgroundSettings.length;
+    return !!this.pages?.some((p) => p.hasBackgroundElement);
   }
 
   get needsProcessing() {
-    return (
-      !this.pages || this.pages.some((p) => p.hasElements && p.needsProcessing)
-    );
+    return !!this.pages?.some((p) => p.needsProcessing);
   }
 
   get pagesForProcessing() {
-    return this.pages?.filter((p) => p.needsProcessing);
+    return this.pages?.filter((p) => p.needsProcessing) ?? [];
   }
 
   private setHeights() {
-    this.headerHeight = getMaxHeight(this.headerSettings);
-    this.footerHeight = getMaxHeight(this.footerSettings);
+    this.headerHeight = getMaxHeight(this.headersMeta);
+    this.footerHeight = getMaxHeight(this.footersMeta);
     this.bodyHeight = this.pageHeight - this.headerHeight - this.footerHeight;
     this.backgroundHeight = this.pageHeight;
     this.headerY = this.pageHeight - this.headerHeight;
@@ -88,9 +96,16 @@ export class Layout {
     }
   }
 
+  /**
+   * This method will create layout pages only if there are some elements
+   * that must be used to construct a final page (headers, footers, backgrounds)
+   *
+   * It will throw errors if it is called before the body is printed to pdf
+   * because only after that will the page count be available
+   */
   createLayoutPages() {
     // Do not create layout pages if there are no elements
-    if (!this.hasConfig) return;
+    if (!this.needsLayoutPages) return;
 
     const count = this.documentPage.pageCount;
     if (typeof count !== 'number' || count < 1) {
@@ -104,45 +119,23 @@ export class Layout {
       );
     }
 
-    const total = this.documentPage.owner.totalPagesNumber;
+    const total = this.documentPage.totalPagesNumber;
     if (typeof total !== 'number' || total < count) {
       throw new Error(
         'Layout unable to create page, invalid total page number'
       );
     }
 
-    const pickSetting = (
-      settings: (SectionSetting | SectionVariantSetting)[]
-    ): LayoutPageSetting => {
-      if (!settings.length) return undefined;
-
-      if (areSectionVariants(settings)) {
-        return selectVariant(settings, 0, offset, count);
-      }
-
-      if (settings.length > 1) {
-        throw new Error('More than one setting for a regular section');
-      }
-
-      return settings[0] as SectionSetting;
-    };
-
     this.pages = Array.from({ length: count }, (_, i) => {
-      const headerSetting = pickSetting(this.headerSettings);
-      const footerSetting = pickSetting(this.footerSettings);
-      const backgroundSetting = pickSetting(this.backgroundSettings);
-
       return new LayoutPage({
         layout: this,
         pageIndex: i,
         currentPageNumber: i + 1 + offset,
         totalPagesNumber: total,
-        headerSetting,
-        footerSetting,
-        backgroundSetting,
+        headerMeta: pickMeta(this.headersMeta, offset, count),
+        footerMeta: pickMeta(this.footersMeta, offset, count),
+        backgroundMeta: pickMeta(this.backgroundsMeta, offset, count),
       });
     });
-
-    // ovdje sad znam za svaku stranicu koji header, footer i background treba koristiti
   }
 }

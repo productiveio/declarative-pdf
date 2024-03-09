@@ -1,11 +1,10 @@
 import { PDFDocument } from 'pdf-lib';
-import { Store } from '@app/services/store';
 import { normalizeSetting } from '@app/utils/normalize-setting';
 import { PaperDefaults } from '@app/utils/paper-defaults';
-import HTMLAdapter from '@app/services/adapter-puppeteer';
+import HTMLAdapter from '@app/utils/adapter-puppeteer';
 
 import type { PAPER_SIZE } from '@app/consts/paper-size';
-import type { DocumentPage } from '@app/models/document-page';
+import { DocumentPage } from '@app/models/document-page';
 import type { Browser } from 'puppeteer';
 
 type DeclarativePDFOpts =
@@ -19,7 +18,6 @@ type DeclarativePDFOpts =
     };
 
 export default class DeclarativePDF {
-  declare store: Store;
   declare html: HTMLAdapter;
   declare defaults: PaperDefaults;
 
@@ -68,9 +66,8 @@ export default class DeclarativePDF {
    * @param template A string containing valid HTML document
    */
   async generate(template: string) {
-    /** (re)set everything */
+    /** (re)set documentPages */
     this.documentPages = [];
-    this.store = new Store(this);
 
     /** open new tab in browser */
     await this.html.newPage();
@@ -109,7 +106,7 @@ export default class DeclarativePDF {
 
     documentPageSettings.forEach((setting) => {
       this.documentPages.push(
-        this.store.createModel('page', normalizeSetting(setting))
+        new DocumentPage({ parent: this, ...normalizeSetting(setting) })
       );
     });
   }
@@ -145,7 +142,7 @@ export default class DeclarativePDF {
 
     if (
       this.documentPages.length === 1 &&
-      !this.documentPages[0].layout!.hasConfig
+      !this.documentPages[0].layout!.pages?.length
     ) {
       // flow 1: nemamo headere i footere, imamo samo jedan body
       // - vracamo vec postojeci buffer i izlazimo iz funkcije
@@ -156,7 +153,7 @@ export default class DeclarativePDF {
       const outputPDF = await PDFDocument.create();
 
       for (const doc of this.documentPages) {
-        if (!doc.layout!.hasConfig) {
+        if (!doc.layout!.pages?.length) {
           // case 1 - we only have a body, we can copy pages
           const copiedPages = await outputPDF.copyPages(
             doc.body!.pdf,
@@ -171,33 +168,36 @@ export default class DeclarativePDF {
               doc.height,
             ]);
 
-            for (const section of ['background', 'header', 'footer'] as const) {
-              const elementName = `${section}Element` as const;
-              const settingName = `${section}Setting` as const;
-              if (!page[elementName]?.pdf) continue;
+            for (const section of [
+              'background',
+              'header',
+              'footer',
+              'body',
+            ] as const) {
+              const el = page[section];
+              if (!el) continue;
 
-              const sectionPage = page[elementName]?.pdf.getPage(0);
-              if (!sectionPage) continue;
+              const sectionPage = el.pdfPage;
+              if (!sectionPage) {
+                throw new Error(
+                  'Missing sectionPage ... TODO: napisi neki error'
+                );
+              }
 
               const embeddedPage = await outputPDF.embedPage(sectionPage);
-              if (!embeddedPage) continue;
+              if (!embeddedPage) {
+                throw new Error(
+                  'Missing embeddedPage ... TODO: napisi neki error'
+                );
+              }
 
               currentOutputPage.drawPage(embeddedPage, {
-                width: page.layout.pageWidth,
-                height: page[settingName]?.sectionHeight,
-                x: 0,
-                y: page.layout[`${section}Y`],
+                width: el.width,
+                height: el.height,
+                x: el.x,
+                y: el.y,
               });
             }
-
-            const bodyPage = page.bodyPdf;
-            const embeddedPage = await outputPDF.embedPage(bodyPage);
-            currentOutputPage.drawPage(embeddedPage, {
-              width: page.layout.pageWidth,
-              height: page.layout.bodyHeight,
-              x: 0,
-              y: page.layout.bodyY,
-            });
           }
         }
       }

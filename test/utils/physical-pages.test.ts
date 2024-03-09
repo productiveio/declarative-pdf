@@ -1,10 +1,10 @@
-import type { SectionVariantSetting } from '@app/models/document-page';
+import type { SectionVariantMeta } from '@app/models/document-page';
 import { selectVariant } from '@app/utils/physical-pages';
 import Variant from '@app/consts/physical-page';
 
-type MockSetting = Partial<SectionVariantSetting>;
+type MockSetting = Partial<SectionVariantMeta>;
 const makeSetting = (opts: MockSetting) => {
-  const setting: SectionVariantSetting = {
+  const setting: SectionVariantMeta = {
     sectionHeight: 20,
     sectionType: 'header',
     hasCurrentPageNumber: true,
