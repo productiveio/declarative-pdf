@@ -72,7 +72,6 @@ export default class HTMLAdapter {
     return this.page.pdf({
       width: opts.width,
       height: opts.height,
-      preferCSSPageSize: true,
       omitBackground: opts.transparentBg,
       printBackground: true,
     });

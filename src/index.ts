@@ -180,14 +180,14 @@ export default class DeclarativePDF {
               const sectionPage = el.pdfPage;
               if (!sectionPage) {
                 throw new Error(
-                  'Missing sectionPage ... TODO: napisi neki error'
+                  `No PDF page found for section ${section} on document page ${doc.index}`
                 );
               }
 
               const embeddedPage = await outputPDF.embedPage(sectionPage);
               if (!embeddedPage) {
                 throw new Error(
-                  'Missing embeddedPage ... TODO: napisi neki error'
+                  `Failed to embed PDF page for section ${section} on document page ${doc.index}`
                 );
               }
 

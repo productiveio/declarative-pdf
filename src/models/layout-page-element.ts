@@ -103,24 +103,29 @@ export class LayoutPageElement {
       totalPagesNumber: this.totalPagesNumber,
     });
 
+    /**
+     * There is some bug in the PDF generation process, where the height and
+     * the width of the resulting PDF page get smaller by approximate factor
+     * of 0.75. During this process, some rounding issues occur and we end
+     * up with 2 pages instead of 1. To mitigate this, we add 1 to the height
+     * for the elements that are expected to have only 1 page.
+     */
     const buffer = await this.html.pdf({
       width: this.width,
-      height: this.height,
+      height: this.height + 1,
       transparentBg:
         this.layoutPage.hasBackgroundElement && this.type !== 'background',
     });
 
     const pdfDoc = await PDFDocument.load(buffer);
 
-    // TODO: implement this error throwing
-    // const count = pdfDoc.getPageCount();
+    const count = pdfDoc.getPageCount();
 
-    // if (count !== 1) {
-    //   throw new Error(
-    //     `While generating ${type} section PDF with ${setting.sectionHeight} height, instead of a single page, we got ${count} instead`
-    //     `Invalid number of pages for ${this.type} element. Expected 1, got ${count}`
-    //   );
-    // }
+    if (count !== 1) {
+      throw new Error(
+        `While generating ${this.type} section PDF with ${this.height} height, instead of a single page, we got ${count} instead`
+      );
+    }
 
     return pdfDoc.getPage(0);
   }
