@@ -2,7 +2,7 @@
 
 A tool for generating PDF documents from HTML template that use declarative elements to control the layout and content of the PDF.
 
-> TODO: neki dobar vizualni example da netko iz prve moze to brzo skuzit
+> TODO: insert a visual representation of the template conversion to PDF
 
 |          Feature          |                                                                                     Description                                                                                     |
 | :------------------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -11,6 +11,7 @@ A tool for generating PDF documents from HTML template that use declarative elem
 | page size and orientation | Use `<document-page>` element to specify page size and orientation.                                                                                                                 |
 | multi-page content        | Use `<document-page>` element to spans across as many pages as needed. You can have multiple `<document-page>` elements in a single template with different sizes and orientations. |
 | page numbering            | Use `<current-page-number>` and `<total-pages-number>` elements to display page numbers within headers or footers.                                                                  |
+| physical page variants    | Use `<physical-page>` element to specify different sections (headers, footers, backgrounds) placement. Variants are: `first`, `last`, `even`, `odd`.                                |
 
 Layout is controlled using a set of custom HTML tags that define the structure of the PDF document. The package uses puppeteer to slice your template and generate PDF elements from it. Those elements are then used to assemble PDF pages into your PDF document.
 
@@ -22,7 +23,7 @@ Layout is controlled using a set of custom HTML tags that define the structure o
 - [Usage](#usage)
 - [API reference](#api-reference)
 - [Template syntax](#template-syntax)
-- [Examples](#examples)
+- [Template examples](#template-examples)
 
 # Installation
 
@@ -44,11 +45,14 @@ We need a valid template for this to work, so let's use the one supplied in exam
 
 ```typescript
 import {readFileSync, writeFileSync} from 'fs';
-import generate from 'declarative-pdf';
+import puppeteer from 'puppeteer';
+import PDF from 'declarative-pdf';
 
 (async function () {
   const html = await readFileSync('./examples/basic-template.html', {encoding: 'utf8'});
-  const pdfBuffer = await generator(html);
+  const browser = await puppeteer.launch();
+
+  const pdfBuffer = await new PDF(browser).generate(html);
   await writeFile('./example-output.pdf', pdfBuffer);
 })();
 ```
@@ -57,10 +61,12 @@ This would generate a PDF file `example-output.pdf` in your project folder. But 
 
 ```js
 const express = require('express');
-const generator = require('declarative-pdf');
+const PDF = require('declarative-pdf');
+const puppeteer = require('puppeteer');
 
 (async function() {
   const app = express();
+  const browser = await puppeteer.launch();
 
   app.use(express.urlencoded({
     extended: true,
@@ -72,7 +78,7 @@ const generator = require('declarative-pdf');
     const name = req.body.name;
     const filename = `${name}.pdf`;
 
-    const pdfBuffer = await generator(template, {keepAlive: true});
+    const pdfBuffer = await new PDF(browser).generate(template);
 
     res.setHeader('Content-disposition', `inline; name="${name}"; filename="${filename}"`);
     res.setHeader('Content-Type', 'application/pdf');
@@ -94,30 +100,56 @@ So if you send POST request to this endpoint, with `template` as a string, conta
 
 # API reference
 
-"declarative-pdf" exports only a single method. It accepts an HTML template string as the first argument and an optional `options` object as the second argument.
+"declarative-pdf" exports a class. To instantiate this class a `Browser` instance is needed as mandatory first parameter, and optional `options` second parameter. This instance is then used to generate PDF documents from HTML templates via the `generate` method, which accepts only one mandatory parameter, the HTML template string.
 
 ```js
-const generate = require('declarative-pdf');
+const PDF = require('declarative-pdf');
 
+/**
+ * Create a new PDF generator instance.
+ *
+ * @param {puppeteer.Browser} browser - A puppeteer browser instance.
+ * @param {object} options - Optional options for the PDF generation.
+ *
+ * @returns {PDF} - A new PDF generator instance.
+ */
+const pdf = new PDF(browser, options);
+```
+
+The options object is used to change the PDF page size defaults, for cases when template does not specify it:
+
+```typescript
+type Options =
+  | {
+      ppi: number; // a number of pixels per inch, ranging from 18 to 42_000, default is 72
+      format: 'a0' | 'a1' | 'a2' | 'a3' | 'a4' | 'a5' | 'a6' | 'letter' | 'legal' | 'tabloid' | 'ledger'; // default is 'a4'
+    }
+  | {
+      ppi: number; // a number of pixels per inch, ranging from 18 to 42_000, default is 72
+      width: number; // a width of the page in pixels, ranging from 1 to 420_000, default is 595
+      height: number; // a height of the page in pixels, ranging from 1 to 420_000, default is 842
+    };
+```
+
+- `ppi`: a number only used to calculate the width and the height from the values defined by the `format`, ranging from 18 to 42_000
+- `format`: is one of the common paper formats... for custom formats, use `width` and `height` instead
+- `width`: is a number of pixels, ranging from 1 to 420_000
+- `height`: is a number of pixels, ranging from 1 to 420_000
+
+In case of invalid options, a default value will be used.
+
+```js
 /**
  * Generates a PDF document from the given HTML template string.
  *
  * @param {string} html - The HTML template to use for the PDF document.
- * @param {object} options - Optional options for the PDF generation.
  *
  * @returns {Promise<Buffer>} - A promise that resolves with the PDF document as a Buffer.
  */
-const pdfBuffer = await generate(html, options)
+const pdfBuffer = await pdf.generate(html)
 ```
-The options object can include the following properties:
-
-- `debug`: (boolean) A flag indicating whether to enable debug mode.
-- `debugFilename`: (string) The name of the PDF file used for debug purposes.
-- `keepAlive`: (boolean) A flag indicating whether to keep the puppeteer browser alive after the PDF has been generated.
 
 The `generate` method returns a promise that resolves with the generated PDF document as a Buffer.
-
-> TODO: explain what debug and debugFilename do
 
 # Template syntax
 
@@ -150,59 +182,8 @@ Template example:
 
 In this template, the `<page-header>`, `<page-body>`, and `<page-footer>` elements are used to define the structure of the PDF, with the `<page-header>` and `<page-footer>` elements being used as the header and footer, respectively, for each page. The `<page-body>` element spans multiple pages if necessary. The `<page-background>` element can be used to specify a custom background for each page. The `<document-page>` element acts as a container for the other elements.
 
-Detailed explanation can be found here: [README-HTML-TEMPLATE.md](README-HTML-TEMPLATE.md)
+Detailed explanation can be found here: [template.md](docs/template.md).
 
+# Template examples
 
-# Examples
-
-> TODO: this part needs some better examples...
-
-```html
-<!-- file: ./template.html -->
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My amazing template</title>
-    <style>
-      page-background {
-        background-image: url("https://via.placeholder.com/595x842");
-      }
-    </style>
-  </head>
-  <body>
-    <document-page>
-      <page-background></page-background>
-
-      <page-header>
-        <div>A header that repeats on every page</div>
-      </page-header>
-
-      <page-body>
-        <div>Hello world!</div>
-      </page-body>
-
-      <page-footer>
-        <div>A footer that repeats on every page</div>
-      </page-footer>
-    </document-page>
-  </body>
-</html>
-```
-
-And then you pass html as a string into generator:
-
-```js
-// file: ./index.js
-const fs = require("fs");
-const pdf = require("declarative-html2pdf");
-const html = fs.readFileSync("./template.html");
-
-const pdfBuffer = pdf.generate(html, options);
-
-pdf.writeBuffer(pdfBuffer, "output.pdf");
-```
-
-Which generates a new file, `output.pdf`.
+Included template examples can be found in the `examples` folder. They are meant to be used as a starting point for your own projects. Detailed explanation can be found here: [examples.md](docs/examples.md).
