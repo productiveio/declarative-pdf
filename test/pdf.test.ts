@@ -36,9 +36,10 @@ let browser: Browser;
 beforeAll(async () => {
   browser = await puppeteer.launch({
     pipe: true,
-    headless: 'new',
+    headless: true,
     args: [
       '--no-sandbox',
+      '--disable-setuid-sandbox',
       '--disable-web-security',
       '--font-render-hinting=none',
     ],
