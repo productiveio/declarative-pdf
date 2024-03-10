@@ -86,4 +86,46 @@ describe('PDF visual regression test', () => {
       .compare();
     expect(result?.status).toBe('passed');
   });
+
+  test('a4 72 standard template', async () => {
+    const html = fs.readFileSync(`./test/examples/a4-72-standard.html`, {
+      encoding: 'utf8',
+    });
+    const actualPdfBuffer = await new PDF(browser, {
+      ppi: 72,
+      format: 'a4',
+    }).generate(html);
+    await writeBuffer(
+      actualPdfBuffer,
+      `${config.paths.actualPdfRootFolder}/a4-72-standard.pdf`
+    );
+
+    const comparePdf = new ComparePdf(config);
+    const result = await comparePdf
+      .actualPdfFile('a4-72-standard.pdf')
+      .baselinePdfFile('a4-72-standard.pdf')
+      .compare();
+    expect(result?.status).toBe('passed');
+  });
+
+  test('a4 297 standard template', async () => {
+    const html = fs.readFileSync(`./test/examples/a4-297-standard.html`, {
+      encoding: 'utf8',
+    });
+    const actualPdfBuffer = await new PDF(browser, {
+      ppi: 297,
+      format: 'a4',
+    }).generate(html);
+    await writeBuffer(
+      actualPdfBuffer,
+      `${config.paths.actualPdfRootFolder}/a4-297-standard.pdf`
+    );
+
+    const comparePdf = new ComparePdf(config);
+    const result = await comparePdf
+      .actualPdfFile('a4-297-standard.pdf')
+      .baselinePdfFile('a4-297-standard.pdf')
+      .compare();
+    expect(result?.status).toBe('passed');
+  });
 });

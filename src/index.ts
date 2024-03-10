@@ -7,6 +7,7 @@ import type { PAPER_SIZE } from '@app/consts/paper-size';
 import { DocumentPage } from '@app/models/document-page';
 import type { Browser } from 'puppeteer';
 
+// TODO: ppi can be in the width and height object
 type DeclarativePDFOpts =
   | {
       ppi?: number;

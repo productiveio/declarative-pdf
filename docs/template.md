@@ -28,6 +28,7 @@ You can include any valid HTML content within these elements.
 # Table of contents
 
 - [Template structure](#template-structure)
+- [A very important note on page size (ppi)](#a-very-important-note-on-page-size-ppi)
 - [Document page collection](#document-page-collection)
 - [Main section - page body](#main-section---page-body)
 - [Repeating sections](#repeating-sections)
@@ -82,6 +83,18 @@ Some good practices to avoid potential headaches:
 
 - it is a good practice to put any number into the `<current-page-number>` or `<total-pages-number>` tags, to avoid any potential issues with layout shifting
 - try to avoid using `margin` and `padding` on `<html>`, `<body>` or `<document-page>` as it can lead to unexpected results
+
+## A very important notes on page size (ppi)
+
+When building your template, you should be aware of how the size on the screen will transfer to the size on the paper. By default, the ppi (pixels per inch) is set to 72, which is the default for most screens. This means that 1px on the screen will be 1pt on the paper. It is not possible to change this default value, so you should be aware of it when designing your template.
+
+Luckily, we can get around this limitation by using the `ppi` attribute on the `<document-page>` element. This, however, changes the size of everything on the page, so you should account for it when defining pixel sizes for your elements.
+
+For example, if you set font size to 9px, and you want to print it on A4 paper and be able to read it, your ppi should be 72. Increasing ppi to something like 300 will make the font size of 9px look like ~2.25pt on the paper, which is way too small.
+
+Now, you might think that 72dpi is way too small to print anything meaningful, but it is not. Because of the way the PDF is generated (embedding linked images), elements retain their original dpi. So, when the document is printed, upscaling will be done by the printer, and the quality will be preserved.
+
+There is a limitation, however, and that is when there are embedded graphics in the HTML template (like inline SVGs). During the conversion to pdf process, such elements will be rasterized and then 72ppi will be way too small.
 
 ## Document page collection
 

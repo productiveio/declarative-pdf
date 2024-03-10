@@ -112,7 +112,7 @@ export class LayoutPageElement {
      */
     const buffer = await this.html.pdf({
       width: this.width,
-      height: this.height + 1,
+      height: this.height + (this.type === 'background' ? 0 : 1),
       transparentBg:
         this.layoutPage.hasBackgroundElement && this.type !== 'background',
     });
@@ -121,7 +121,7 @@ export class LayoutPageElement {
 
     const count = pdfDoc.getPageCount();
 
-    if (count !== 1) {
+    if (count !== 1 && this.type !== 'background') {
       throw new Error(
         `While generating ${this.type} section PDF with ${this.height} height, instead of a single page, we got ${count} instead`
       );

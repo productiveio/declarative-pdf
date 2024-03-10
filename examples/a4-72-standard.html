@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Standard template</title>
+    <style>
+      * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        box-sizing: border-box;
+      }
+
+      html {
+        font-size: 16px; /* 72dpi */
+        /* font-size: 20px; 90dpi */
+        /* font-size: 34px; 153dpi */
+        /* font-size: 66px; 297dpi */
+
+        --color-heading: #3b6bff;
+        --color-text: #4a4a4a;
+        --color-light-text: #888888;
+        --color-border: #e6e8e6;
+        --color-light-bg: #f3f3f3;
+        --color-background: #ffffff;
+        --page-margin-top: 2.5rem;
+        --page-margin-bottom: 0.625rem;
+        --page-margin-right: 1.875rem;
+        --page-margin-left: 1.875rem;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        color: var(--color-text);
+        font-size: 0.5625rem;
+        line-height: 0.625rem;
+        font-family: 'arial', sans-serif;
+      }
+
+      body:not(.pdf) document-page {
+        margin: 1.25rem auto;
+        box-shadow: 0 0 0.3125rem 0 rgba(0, 0, 0, 0.4);
+        min-height: 52.625rem;
+        page-break-before: always;
+        background-color: var(--color-background);
+        position: relative;
+        width: 37.1875rem;
+      }
+
+      document-page,
+      page-background,
+      page-header,
+      page-body,
+      page-footer {
+        display: block;
+      }
+
+      document-page {
+        position: relative;
+        z-index: 1;
+      }
+
+      page-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 37.1875rem;
+        height: 52.625rem;
+        z-index: -1;
+        background-image: url("https://placehold.co/595x842/b4cded/f0f4ef");
+        background-size: cover;
+        background-position: center;
+      }
+
+      page-header,
+      page-body,
+      page-footer {
+        padding-top: 0;
+        padding-bottom: 0;
+        padding-right: var(--page-margin-right);
+        padding-left: var(--page-margin-left);
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        margin-top: 0;
+        color: var(--color-heading);
+      }
+
+      section {
+        margin-bottom: 0;
+        padding-bottom: 0.875rem;
+      }
+
+      table {
+        border-spacing: 0;
+        border-collapse: collapse;
+        border-spacing: 0;
+      }
+
+      th {
+        text-transform: uppercase;
+        color: var(--color-light-text);
+        text-align: left;
+        padding: 0.3125rem 0;
+        font-weight: normal;
+      }
+
+      td {
+        padding: 0.3125rem 0;
+        vertical-align: top;
+      }
+
+      .clearfix::after {
+        content: '';
+        clear: both;
+        display: table;
+      }
+
+      .header-spacing {
+        height: var(--page-margin-top);
+      }
+
+      .footer-spacing {
+        height: var(--page-margin-bottom);
+      }
+
+      .company-info__image {
+        max-height: 3.75rem;
+        max-width: 100%;
+        margin-bottom: 0.625rem;
+      }
+
+      .horizontal-table {
+        width: 100%;
+      }
+
+      .horizontal-table th {
+        font-size: 0.5rem;
+        padding-bottom: 0.125rem;
+        padding-right: 0.25rem;
+      }
+
+      .horizontal-table td {
+        padding-top: 0.125rem;
+        padding-right: 0.25rem;
+        font-size: 0.5625rem;
+      }
+
+      .data-table-title {
+        margin-bottom: 0.875rem;
+        font-size: 0.75rem;
+      }
+
+      .data-table {
+        width: 100%;
+        font-size: 0.5rem;
+      }
+      .data-table tr {
+        border-bottom: 0.0625rem solid var(--color-border);
+        page-break-inside: avoid;
+      }
+      .data-table td {
+        word-break: break-word;
+        min-width: 2.5rem;
+      }
+      .data-table td[col='section-service'],
+      .data-table td[col='section-unit'],
+      .data-table td[col='section-quantity'],
+      .data-table td[col='section-price'],
+      .data-table td[col='section-discount'],
+      .data-table td[col='section-revenue'] {
+        min-width: 0;
+      }
+      .data-table td,
+      .data-table th {
+        padding-right: 0.375rem;
+      }
+      .data-table td:last-child,
+      .data-table th:last-child {
+        padding-right: 0;
+      }
+      .data-table [col='quantity'] {
+        min-width: 1.625rem;
+      }
+      .data-table [col='discount'],
+      .data-table [col='price'],
+      .data-table [col='rate'],
+      .data-table [col='hourly-rate'],
+      .data-table [col='revenue'],
+      .data-table [col='amount'],
+      .data-table [col='tax'],
+      .data-table [col='section-price'],
+      .data-table [col='section-revenue'],
+      .data-table [col='section-quantity'],
+      .data-table [col='section-discount'] {
+        text-align: right;
+        white-space: nowrap;
+      }
+      .data-table [col='service'] {
+        max-width: 6.25rem;
+      }
+      .data-table [col='section-service'] {
+        min-width: 5rem;
+        max-width: 15.625rem;
+      }
+
+      .totals {
+        width: 11.25rem;
+        margin-top: 0.3125rem;
+        margin-left: auto;
+        font-size: 0.5rem;
+        page-break-inside: avoid;
+      }
+      .totals table {
+        width: 100%;
+      }
+      .totals td {
+        text-align: right;
+      }
+      .totals th,
+      .totals td {
+        padding: 0.1875rem 0;
+        vertical-align: top;
+      }
+      .totals [field='discount-with-services'] th,
+      .totals [field='discount-with-services'] td {
+        text-transform: none;
+        font-size: 0.4375rem;
+        color: var(--color-light-text);
+      }
+      .totals .totals__total-table td {
+        font-weight: bold;
+        font-size: 0.625rem;
+        color: var(--color-heading);
+      }
+      .totals .totals__total-table td .second-currency-value {
+        margin-top: 0.25rem;
+      }
+
+      .divider {
+        background-color: var(--color-border);
+        height: 0.0625rem;
+        margin: 0.375rem 0;
+      }
+
+      .footer {
+        text-align: center;
+        font-size: 0.375rem;
+        color: var(--color-light-text);
+        white-space: pre-line;
+        line-height: 0.625rem;
+        min-height: 1.25rem;
+        padding-top: 0.875rem;
+      }
+
+      .white-space-pre-line {
+        white-space: pre-line;
+      }
+      .note-table {
+        width: 100%;
+        font-size: 0.4375rem;
+      }
+      .note-table td {
+        padding-top: 0;
+      }
+
+      .grand-total-section {
+        page-break-inside: avoid;
+        margin-top: 0.75rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0;
+        position: relative;
+        z-index: 1;
+      }
+      .grand-total-section .totals__total-table th {
+        font-weight: bold;
+        font-size: 0.75rem;
+        color: var(--color-heading);
+        text-transform: none;
+      }
+      .grand-total-section .totals__total-table td {
+        font-weight: bold;
+      }
+
+      .grand-total-section:before {
+        content: '';
+        background-color: var(--color-light-bg);
+        position: absolute;
+        left: -0.5rem;
+        top: -0.25rem;
+        height: calc(100% + 0.625rem);
+        width: calc(100% + 1rem);
+        z-index: -1;
+      }
+    </style>
+  </head>
+  <body>
+    <document-page format="a4" ppi="72">
+      <page-background>
+      </page-background>
+
+      <page-header>
+        <div class="header-spacing"></div>
+
+        <section class="company-info" type="bill_from">
+          <img
+            src="https://placehold.co/350x200/3b6bff/84c7d0"
+            alt="generic company logo"
+            class="company-info__image"
+          />
+          <div class="company-info__name">Generic company ltd</div>
+          <div>Address line 1</div>
+          <div>Address line 2</div>
+          <div>Country</div>
+          <div>Tax ID: VAT</div>
+        </section>
+
+        <section class="header-title">
+          <h2>Proposal: A brand new proposal</h2>
+        </section>
+
+        <section>
+          <table class="horizontal-table">
+            <tr>
+              <th field="client">Client</th>
+              <th field="number">Proposal number</th>
+              <th field="owner">Owner</th>
+              <th field="date">Date</th>
+            </tr>
+            <tr>
+              <td field="client">
+                <div class="company-info__name">Generic company 2 ltd</div>
+                <div>Address line 1</div>
+                <div>Address line 2</div>
+                <div>Country</div>
+              </td>
+              <td field="number">007</td>
+              <td field="owner">John Doe</td>
+              <td field="date">11/5/2023</td>
+            </tr>
+          </table>
+        </section>
+      </page-header>
+
+      <page-body>
+        <section>
+          <h3 class="data-table-title">section 1</h3>
+
+          <table class="data-table">
+            <tr>
+              <th col="section-service" field="section_service">
+                <t-label key="service">Service</t-label>
+              </th>
+
+              <th col="section-billingtype" field="section_billingtype">
+                <t-label key="billing_type">Billing Type</t-label>
+              </th>
+
+              <th col="section-budgettotal" field="section_budgettotal">
+                <t-label key="budget_total">Budget Total</t-label>
+              </th>
+
+              <th col="section-budgetused" field="section_budgetused">
+                <t-label key="budget_used">Budget Used</t-label>
+              </th>
+
+              <th col="section-revenue" field="section_revenue">
+                <t-label key="billable_amount">Billable amount</t-label>
+              </th>
+            </tr>
+
+            <tr>
+              <td col="section-service" field="section_service">
+                <div class="data-table-service-name has-description">
+                  neki servis za recycle bin
+                </div>
+                <div class="data-table-service-description">
+                  <div>opis</div>
+                </div>
+              </td>
+
+              <td col="section-billingtype" field="section_billingtype">
+                Actual
+              </td>
+
+              <td col="section-budgettotal" field="section_budgettotal">
+                <format-money value="0" currency="CHF" />
+              </td>
+
+              <td col="section-budgetused" field="section_budgetused">
+                <format-money value="0" currency="CHF" />
+              </td>
+
+              <td col="section-revenue" field="section_revenue">
+                <format-money value="0" currency="CHF" />
+              </td>
+            </tr>
+
+            <tr>
+              <td col="section-service" field="section_service">
+                <div class="data-table-service-name">Price management</div>
+              </td>
+
+              <td col="section-billingtype" field="section_billingtype">
+                Fixed
+              </td>
+
+              <td col="section-budgettotal" field="section_budgettotal">
+                <format-money value="0" currency="CHF" />
+              </td>
+
+              <td col="section-budgetused" field="section_budgetused">
+                <format-money value="0" currency="CHF" />
+              </td>
+
+              <td col="section-revenue" field="section_revenue">
+                <format-money value="0" currency="CHF" />
+              </td>
+            </tr>
+
+            <tr>
+              <td col="section-service" field="section_service">
+                <div class="data-table-service-name">neki itemi</div>
+              </td>
+
+              <td col="section-billingtype" field="section_billingtype">
+                Fixed
+              </td>
+
+              <td col="section-budgettotal" field="section_budgettotal">
+                <format-money value="0" currency="CHF" />
+              </td>
+
+              <td col="section-budgetused" field="section_budgetused">
+                <format-money value="0" currency="CHF" />
+              </td>
+
+              <td col="section-revenue" field="section_revenue">
+                <format-money value="0" currency="CHF" />
+              </td>
+            </tr>
+
+            <tr>
+              <td col="section-service" field="section_service">
+                <div class="data-table-service-name has-description">
+                  some new things that are super nice
+                </div>
+                <div class="data-table-service-description">
+                  <div>here is some description</div>
+                </div>
+              </td>
+
+              <td col="section-billingtype" field="section_billingtype">
+                Actual
+              </td>
+
+              <td col="section-budgettotal" field="section_budgettotal">
+                <format-money value="13750000" currency="CHF" />
+              </td>
+
+              <td col="section-budgetused" field="section_budgetused">
+                <format-money value="0" currency="CHF" />
+              </td>
+
+              <td col="section-revenue" field="section_revenue">
+                <format-money value="0" currency="CHF" />
+              </td>
+            </tr>
+          </table>
+
+          <table-total section="sections.69" class="table-total">
+            <div class="totals">
+              <table>
+                <tbody>
+                  <tr field="subtotal">
+                    <th><t-label key="subtotal">Subtotal</t-label></th>
+                    <td>CHF 0.00</td>
+                  </tr>
+
+                  <tr>
+                    <th>pdv (20%)</th>
+                    <td>CHF 0.00</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="divider"></div>
+
+              <table class="totals__total-table">
+                <tbody>
+                  <tr>
+                    <th><t-label key="total">Total</t-label></th>
+
+                    <td>CHF 0.00</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </table-total>
+        </section>
+
+        <section>
+          <h3 class="data-table-title">section 2</h3>
+
+          <table class="data-table">
+            <tr>
+              <th col="section-service" field="section_service">
+                <t-label key="service">Service</t-label>
+              </th>
+
+              <th col="section-billingtype" field="section_billingtype">
+                <t-label key="billing_type">Billing Type</t-label>
+              </th>
+
+              <th col="section-budgettotal" field="section_budgettotal">
+                <t-label key="budget_total">Budget Total</t-label>
+              </th>
+
+              <th col="section-budgetused" field="section_budgetused">
+                <t-label key="budget_used">Budget Used</t-label>
+              </th>
+
+              <th col="section-revenue" field="section_revenue">
+                <t-label key="billable_amount">Billable amount</t-label>
+              </th>
+            </tr>
+
+            <tr>
+              <td col="section-service" field="section_service">
+                <div class="data-table-service-name has-description">
+                  Proba descriptiona
+                </div>
+                <div class="data-table-service-description">
+                  <div>something</div>
+                  <blockquote>new</blockquote>
+                  <div><strong>new</strong><br /><em>new</em><br />new</div>
+                </div>
+              </td>
+
+              <td col="section-billingtype" field="section_billingtype">
+                Actual
+              </td>
+
+              <td col="section-budgettotal" field="section_budgettotal">
+                <format-money value="0" currency="CHF" />
+              </td>
+
+              <td col="section-budgetused" field="section_budgetused">
+                <format-money value="0" currency="CHF" />
+              </td>
+
+              <td col="section-revenue" field="section_revenue">
+                <format-money value="0" currency="CHF" />
+              </td>
+            </tr>
+
+            <tr>
+              <td col="section-service" field="section_service">
+                <div class="data-table-service-name">test</div>
+              </td>
+
+              <td col="section-billingtype" field="section_billingtype">
+                Fixed
+              </td>
+
+              <td col="section-budgettotal" field="section_budgettotal">
+                <format-money value="0" currency="CHF" />
+              </td>
+
+              <td col="section-budgetused" field="section_budgetused">
+                <format-money value="0" currency="CHF" />
+              </td>
+
+              <td col="section-revenue" field="section_revenue">
+                <format-money value="0" currency="CHF" />
+              </td>
+            </tr>
+
+            <tr>
+              <td col="section-service" field="section_service">
+                <div class="data-table-service-name">Tipkanje u prazno</div>
+              </td>
+
+              <td col="section-billingtype" field="section_billingtype">
+                Actual
+              </td>
+
+              <td col="section-budgettotal" field="section_budgettotal">
+                <format-money value="2000000" currency="CHF" />
+              </td>
+
+              <td col="section-budgetused" field="section_budgetused">
+                <format-money value="0" currency="CHF" />
+              </td>
+
+              <td col="section-revenue" field="section_revenue">
+                <format-money value="0" currency="CHF" />
+              </td>
+            </tr>
+          </table>
+
+          <table-total section="sections.114" class="table-total">
+            <div class="totals">
+              <table>
+                <tbody>
+                  <tr field="subtotal">
+                    <th><t-label key="subtotal">Subtotal</t-label></th>
+                    <td>CHF 0.00</td>
+                  </tr>
+
+                  <tr>
+                    <th>pdv (20%)</th>
+                    <td>CHF 0.00</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="divider"></div>
+
+              <table class="totals__total-table">
+                <tbody>
+                  <tr>
+                    <th><t-label key="total">Total</t-label></th>
+
+                    <td>CHF 0.00</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </table-total>
+        </section>
+
+        <section>
+          <h3 class="data-table-title">section 3</h3>
+
+          <table class="data-table">
+            <tr>
+              <th col="section-service" field="section_service">
+                <t-label key="service">Service</t-label>
+              </th>
+
+              <th col="section-billingtype" field="section_billingtype">
+                <t-label key="billing_type">Billing Type</t-label>
+              </th>
+
+              <th col="section-budgettotal" field="section_budgettotal">
+                <t-label key="budget_total">Budget Total</t-label>
+              </th>
+
+              <th col="section-budgetused" field="section_budgetused">
+                <t-label key="budget_used">Budget Used</t-label>
+              </th>
+
+              <th col="section-revenue" field="section_revenue">
+                <t-label key="billable_amount">Billable amount</t-label>
+              </th>
+            </tr>
+
+            <tr>
+              <td col="section-service" field="section_service">
+                <div class="data-table-service-name has-description">magla</div>
+                <div class="data-table-service-description">
+                  <div>
+                    ovdje ide neki opis<br />ovdje ide neki opis<br />ovdje ide
+                    neki opis<br />ovdje ide neki opis<br />ovdje ide neki opis
+                  </div>
+                </div>
+              </td>
+
+              <td col="section-billingtype" field="section_billingtype">
+                Fixed
+              </td>
+
+              <td col="section-budgettotal" field="section_budgettotal">
+                <format-money value="1208790" currency="CHF" />
+              </td>
+
+              <td col="section-budgetused" field="section_budgetused">
+                <format-money value="879120" currency="CHF" />
+              </td>
+
+              <td col="section-revenue" field="section_revenue">
+                <format-money value="1208790" currency="CHF" />
+              </td>
+            </tr>
+
+            <tr>
+              <td col="section-service" field="section_service">
+                <div class="data-table-service-name has-description">
+                  magla 2
+                </div>
+                <div class="data-table-service-description">
+                  <div>
+                    ovdje ide neki opis<br />ovdje ide neki opis<br />ovdje ide
+                    neki opis<br />ovdje ide neki opis<br />ovdje ide neki opis
+                  </div>
+                </div>
+              </td>
+
+              <td col="section-billingtype" field="section_billingtype">
+                Fixed
+              </td>
+
+              <td col="section-budgettotal" field="section_budgettotal">
+                <format-money value="2175600" currency="CHF" />
+              </td>
+
+              <td col="section-budgetused" field="section_budgetused">
+                <format-money value="0" currency="CHF" />
+              </td>
+
+              <td col="section-revenue" field="section_revenue">
+                <format-money value="2175600" currency="CHF" />
+              </td>
+            </tr>
+          </table>
+
+          <table-total section="sections.140" class="table-total">
+            <div class="totals">
+              <table>
+                <tbody>
+                  <tr field="subtotal">
+                    <th><t-label key="subtotal">Subtotal</t-label></th>
+                    <td>CHF 33,843.90</td>
+                  </tr>
+
+                  <tr>
+                    <th>pdv (20%)</th>
+                    <td>CHF 6,768.78</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="divider"></div>
+
+              <table class="totals__total-table">
+                <tbody>
+                  <tr>
+                    <th><t-label key="total">Total</t-label></th>
+
+                    <td>CHF 40,612.68</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </table-total>
+        </section>
+
+        <section class="grand-total-section">
+          <table-total is-grand-total="true" class="table-total">
+            <div class="totals">
+              <table>
+                <tbody>
+                  <tr field="subtotal">
+                    <th><t-label key="subtotal">Subtotal</t-label></th>
+                    <td>CHF 33,843.90</td>
+                  </tr>
+
+                  <tr>
+                    <th>pdv (20%)</th>
+                    <td>CHF 6,768.78</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="divider"></div>
+
+              <table class="totals__total-table">
+                <tbody>
+                  <tr>
+                    <th><t-label key="grand_total">Grand total</t-label></th>
+
+                    <td>CHF 40,612.68</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </table-total>
+        </section>
+
+        <section>
+          <div class="divider"></div>
+        </section>
+
+        <section>
+          <table class="note-table">
+            <tr>
+              <th><t-label key="note">Note</t-label></th>
+            </tr>
+            <tr>
+              <td class="white-space-pre-line">
+                Dear Ladies and Gentlemen, here is the updated note for this
+                template
+              </td>
+            </tr>
+          </table>
+        </section>
+      </page-body>
+
+      <page-footer>
+        <div class="footer">Page <current-page-number>0</current-page-number> of <total-pages-number>0</total-pages-number></div>
+        <div class="footer-spacing"></div>
+      </page-footer>
+    </document-page>
+  </body>
+</html>
