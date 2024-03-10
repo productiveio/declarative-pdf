@@ -17,15 +17,17 @@ You can include any valid HTML content within these elements.
 
 > Body should have `margin: 0; padding: 0;` and this is set during the template normalization stage. Adding some whitespace to body will result in `<page-...>` sections inheriting that whitespace which is probably something that you don't want.
 
-> *TODO - body is given `class="pdf"` during normalization stage, explain why and how to use it.*
+> Body should have only `<document-page>` as child element(s) and every free element (other than `<script>` or `<style>`) will be wrapped in `<document-page>` during the template normalization stage.
 
-> Body should have only `<document-page>` as child element(s) and every free element (other than `<script>` or `<style>`) will be wrapped in `<document-page>` during the template normalization stage. Which is, again, probaly something that you don't want.
+> `<document-page>` must have `<page-body>` and should have only `<page-...>` elements as child element(s). During the normalization stage proper structure is enforced.
+
+> Body is given `class="pdf"` during normalization stage, so you can use it to style your PDF differently than your HTML. For example, you can use a bit of CSS (`body:not(.pdf) document-page { ... }`) to display border and sizing around the template, mimicking the PDF page size.
+
 </details>
 
 # Table of contents
+
 - [Template structure](#template-structure)
-- [PDF page size](#pdf-page-size)
-- [PDF page margins](#pdf-page-margins)
 - [Document page collection](#document-page-collection)
 - [Main section - page body](#main-section---page-body)
 - [Repeating sections](#repeating-sections)
@@ -39,17 +41,47 @@ You can include any valid HTML content within these elements.
 
 ## Template structure
 
-TODO: explain how we have to structure the template, which elements can exist, which can't, give some good examples and some bad ones.
+The template is a simple HTML document that uses custom tags to define the layout and content of the PDF document. The following is an example of a minimal template:
 
-## PDF page size
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <document-page>
+      <page-body>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Ea in
+        perferendis amet ipsam dignissimos. Rem, eum. Illo facere blanditiis
+        iste.
+      </page-body>
+    </document-page>
+  </body>
+</html>
+```
 
-TODO: explain how is sizing achieved, why you can't use cm as CSS unit (it's absolute, and we're modifiying ppi) and give some possible solutions as examples: calc() and CSS variables.
+Template is set as a content to the `Browser.Page` object, so it can be manipulated with JavaScript. Any string with valid HTML markup is accepted. The template is processed and normalized before it is used to generate the PDF document. During this process, the template is checked for errors and any necessary changes are made to ensure that it is valid and can be used to generate the PDF document.
 
-## PDF page margins
+Template should be structured as follows:
 
-Because every section of the template is evaluated individually, setting PDF margins is hard, m'kay?
+- `<body>` should have only `<document-page>` as child element(s)
+- `<document-page>` must have only one `<page-body>`:
+  - if there are more, they will be ignored
+  - if there are none, one will be added during normalization stage and all free elements will be wrapped in it
+  - if there is no `page-body` element and nothing to wrap, `<document-page>` will be ignored
+- `<document-page>` can have one of each `<page-background>`, `<page-header>` and `<page-footer>` (or none of them)... subsequent ones are ignored
+- `<physical-page>` can only be a child of `<page-background>`, `<page-header>` or `<page-footer>` sections
+  - sections can have up to four `<physical-page>` elements each, with different `select` attribute values
+  - `<physical-page select="...">` can be one of variants: `first`, `last`, `even`, `odd` or `default`, which will define on which page the content will be displayed
+- `<current-page-number>` and `<total-pages-number>` will be processed only in `<page-background>`, `<page-header>` and `<page-footer>`, and will be replaced with current page number and total number of pages, respectively
 
-TODO: explain on which elements to set margins and how, also why. Give some examples.
+Some good practices to avoid potential headaches:
+
+- it is a good practice to put any number into the `<current-page-number>` or `<total-pages-number>` tags, to avoid any potential issues with layout shifting
+- try to avoid using `margin` and `padding` on `<html>`, `<body>` or `<document-page>` as it can lead to unexpected results
 
 ## Document page collection
 
@@ -64,12 +96,22 @@ Document page is a container for other page sections. There should be no CSS def
 
 You can set page dimensions either by giving it a `format` attribute or by giving it a `size` attribute. If both are given, `format` takes precedence. Pixels per inch (`ppi`) attribute is 72 by default and matters only if `format` is given. It is used to calculate pixel width and height for every paper format (which are defined in mm).
 
-Default state, when no attributes are given, is `format="a4" ppi="72"`.
+Default state, when no attributes are given, is `format="a4" ppi="72"`. This is configurable when creating a new DeclarativePDF class.
 
 ```ts
 // supported formats
-type format = 'a0' | 'a1' | 'a2' | 'a3' | 'a4' | 'a5' | 'a6' |
-  'letter' | 'legal' | 'tabloid' | 'ledger';
+type format =
+  | 'a0'
+  | 'a1'
+  | 'a2'
+  | 'a3'
+  | 'a4'
+  | 'a5'
+  | 'a6'
+  | 'letter'
+  | 'legal'
+  | 'tabloid'
+  | 'ledger';
 
 // pixels per inch, used to calculate pixels from format
 type ppi = number;
@@ -94,7 +136,6 @@ The `<page-body>` element should be used as a direct child of the `<document-pag
 
 The `<page-body>` element is the main element in `<document-page>` and it can be used alone or in conjuction with other custom tags, such as `<page-header>` and `<page-footer>`, to define the layout of the page. The size of this element determines how many pages will there be in resulting PDF.
 
-
 ## Repeating sections
 
 All repeating sections can contain custom tags: `<physical-page>`, `<current-page-number>` and `<total-pages-number>`. They are available only in repeating section, `<page-body>` ignores them. More on these later.
@@ -104,6 +145,7 @@ There are three repeating section custom tags: `<page-background>`, `<page-heade
 All of these custom tags should be used as a direct child of the `<document-page>` element. The order in which you place them in the `<document-pages>` element does not matter, as they will be evaluated and prepared individually for placement on PDF page.
 
 Usage:
+
 ```html
 <document-page>
   <page-background>
@@ -114,7 +156,7 @@ Usage:
       <!-- header content for first physical PDF page goes here -->
     </physical-page>
     <physical-page>
-      <!-- header content for any but first page goes here -->
+      <!-- header content for other pages goes here -->
       <!-- ignored if only one page -->
     </physical-page>
   </page-header>
@@ -122,7 +164,8 @@ Usage:
     <!-- body content goes here -->
   </page-body>
   <page-footer>
-    <current-page-number></current-page-number> of <total-page-number></total-page-number>
+    <current-page-number></current-page-number> of
+    <total-page-number></total-page-number>
     <!-- footer content goes here -->
   </page-footer>
 </document-page>
@@ -137,6 +180,7 @@ Custom tag: `<page-background>`
 Purpose: The `<page-background>` custom tag is used to define the background color or image for a single page of a PDF document.
 
 Usage:
+
 ```html
 <document-page>
   <page-background>
@@ -157,6 +201,7 @@ Custom tag: `<page-header>`
 Purpose: The `<page-header>` custom tag is used to define the content that appears at the top of each page of a PDF document.
 
 Usage:
+
 ```html
 <document-page>
   <page-header>
@@ -177,6 +222,7 @@ Custom tag: `<page-footer>`
 Purpose: The `<page-footer>` custom tag is used to define the content that appears at the bottom of each page of a PDF document.
 
 Usage:
+
 ```html
 <document-page>
   <page-body>
@@ -201,6 +247,7 @@ Custom tag: `<physical-page>`
 Purpose: The `<physical-page>` custom tag is used within one of the repeating section custom tags to define content that should be displayed on a specific page of the resulting PDF document. This way you can have different footer for first page, different header for last or different page-background for even and odd pages. It is even possible to target specific page number.
 
 Usage:
+
 ```html
 <page-footer>
   <physical-page select="first">
@@ -212,10 +259,7 @@ Usage:
   <physical-page>
     <!-- Default footer content appearing -->
   </physical-page>
-  <div>
-    <!-- Footer content that appears on all pages, always -->
-  </div>
-<page-footer>
+</page-footer>
 ```
 
 ```ts
@@ -225,12 +269,12 @@ type select = 'first' | 'last' | 'even' | 'odd';
 
 The `<physical-page>` element can have a `select` attribute, which specifies the pages that the content should be displayed on. The `select` attribute can have the following values:
 
-- `first`: displays the content on the first page of the PDF document
-- `last`: displays the content on the last page of the PDF document
-- `even`: displays the content on even-numbered pages of the PDF document
-- `odd`: displays the content on odd-numbered pages of the PDF document
+- `first`: displays the content on the first page of `<document-page>` (even if it's not the first page of the PDF document)
+- `last`: displays the content on the last page of `<document-page>` (even if it's not the last page of the PDF document)
+- `even`: displays the content on even-numbered pages of the PDF document (respecting the numbering across all `<document-page>` elements)
+- `odd`: displays the content on odd-numbered pages of the PDF document (respecting the numbering across all `<document-page>` elements)
 
-If the `select` attribute is not present or if it has an invalid value, the content of the `<physical-page>` element will be treated as the default content for all pages.
+If the `select` attribute is not present or if it has an invalid value, it will be treated as `default`.
 
 If multiple `<physical-page>` elements are present, the content of the element, applicable for that page, with the highest priority will be displayed. The priority is as follows:
 
@@ -238,7 +282,7 @@ If multiple `<physical-page>` elements are present, the content of the element, 
 2. `last`
 3. `even`
 4. `odd`
-5. default (content of `<physical-page>` element without a `select` attribute)
+5. `default`
 6. blank
 
 For `<page-header>` and `<page-footer>` it is important to note that their height will be uniform (max height) across all pages within `<document-page>` set. Putting too much content in one specific physical page selector may lead to too much white space on all other pages.
@@ -250,20 +294,23 @@ Custom tags: `<current-page-number>`, `<total-pages-number>`
 Purpose: The `<current-page-number>` and `<total-pages-number>` custom tags are used to display the current page number and total number of pages, respectively, of the resulting PDF document.
 
 Usage:
+
 ```html
 <page-header>
-  Page <current-page-number>1</current-page-number> of <total-pages-number></total-pages-number>
+  Page <current-page-number>0</current-page-number> of <total-pages-number>0</total-pages-number>
 </page-header>
 ```
 
 The `<current-page-number>` and `<total-pages-number>` custom tags can be treated the same as `<span>` elements. For this purpose, you should style them as `display: inline;`. When the PDF document is generated, their innerHTML will be replaced with the current page number and total number of pages, respectively.
 
 Example:
+
 ```html
 <html>
   <head>
     <style>
-      current-page-number, total-pages-number {
+      current-page-number,
+      total-pages-number {
         display: inline;
       }
     </style>
@@ -271,22 +318,20 @@ Example:
   <body>
     <document-page>
       <page-body>
-        /* Imagine some long content here */
-        /* that produces a total of 5 pages */
+        <!-- Imagine some long content here that produces a total of 5 pages -->
       </page-body>
       <page-footer>
-        Page <current-page-number>1</current-page-number>
-        of <total-pages-number></total-pages-number>
+        Page <current-page-number>0</current-page-number> of <total-pages-number>0</total-pages-number>
       </page-footer>
     </document-page>
   </body>
 </html>
 ```
 
-So, on 4th page of 5 page document, page numbers would evaluate to:
+So, on 4th page of 5 page document, page numbers would be:
+
 ```html
-      ...
-        Page <current-page-number>4</current-page-number>
-        of <total-pages-number>5</total-pages-number>
-      ...
+<page-footer>
+  Page <current-page-number>4</current-page-number> of <total-pages-number>5</total-pages-number>
+</page-footer>
 ```

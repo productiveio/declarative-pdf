@@ -2,7 +2,7 @@
 
 A tool for generating PDF documents from HTML template that use declarative elements to control the layout and content of the PDF.
 
-> TODO: neki dobar vizualni example da netko iz prve moze to brzo skuzit
+> TODO: insert a visual representation of the template conversion to PDF
 
 |          Feature          |                                                                                     Description                                                                                     |
 | :------------------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -100,8 +100,7 @@ So if you send POST request to this endpoint, with `template` as a string, conta
 
 # API reference
 
-"declarative-pdf" exports a class. You need to create an instance of this class with a mandatory `puppeteer.Browser` instance as a parameter, and optional `options` second parameter. This instance is then used to generate PDF documents from HTML templates via
-the `generate` method, which accepts only one mandatory parameter, the HTML template string.
+"declarative-pdf" exports a class. To instantiate this class a `Browser` instance is needed as mandatory first parameter, and optional `options` second parameter. This instance is then used to generate PDF documents from HTML templates via the `generate` method, which accepts only one mandatory parameter, the HTML template string.
 
 ```js
 const PDF = require('declarative-pdf');
@@ -123,18 +122,20 @@ The options object is used to change the PDF page size defaults, for cases when 
 type Options =
   | {
       ppi: number; // a number of pixels per inch, ranging from 18 to 42_000, default is 72
-      format: 'a0' | 'a1' | 'a2' | 'a3' | 'a4' | 'a5' | 'a6' | 'letter' | 'legal' | 'tabloid' | 'ledger';
+      format: 'a0' | 'a1' | 'a2' | 'a3' | 'a4' | 'a5' | 'a6' | 'letter' | 'legal' | 'tabloid' | 'ledger'; // default is 'a4'
     }
   | {
       width: number; // a width of the page in pixels, ranging from 1 to 420_000, default is 595
-      height: number; // a height of the page in pixels, ranging from 1 to 420_000, default is 595
+      height: number; // a height of the page in pixels, ranging from 1 to 420_000, default is 842
     };
 ```
 
-- `ppi`: should be used in the conjunction with `format`, as `ppi` is a number only used to calculate the width and the height from the values defined by the `format`
+- `ppi`: a number only used to calculate the width and the height from the values defined by the `format`, ranging from 18 to 42_000
 - `format`: is one of the common paper formats... for custom formats, use `width` and `height` instead
 - `width`: is a number of pixels, ranging from 1 to 420_000
 - `height`: is a number of pixels, ranging from 1 to 420_000
+
+In case of invalid options, a default value will be used.
 
 ```js
 /**
@@ -180,12 +181,13 @@ Template example:
 
 In this template, the `<page-header>`, `<page-body>`, and `<page-footer>` elements are used to define the structure of the PDF, with the `<page-header>` and `<page-footer>` elements being used as the header and footer, respectively, for each page. The `<page-body>` element spans multiple pages if necessary. The `<page-background>` element can be used to specify a custom background for each page. The `<document-page>` element acts as a container for the other elements.
 
-Detailed explanation can be found here: [README-HTML-TEMPLATE.md](README-HTML-TEMPLATE.md)
-
+Detailed explanation can be found here: [template.md](docs/template.md).
 
 # Examples
 
-> TODO: this part needs some better examples...
+Included examples can be found in the `examples` folder. They are meant to be used as a starting point for your own projects. Detailed explanation can be found here: [examples.md](docs/examples.md).
+
+> TODO: move this part to the examples.md
 
 ```html
 <!-- file: ./template.html -->
@@ -198,7 +200,7 @@ Detailed explanation can be found here: [README-HTML-TEMPLATE.md](README-HTML-TE
     <title>My amazing template</title>
     <style>
       page-background {
-        background-image: url("https://via.placeholder.com/595x842");
+        background-image: url("https://placehold.co/595x842/b4cded/f0f4ef");
       }
     </style>
   </head>
