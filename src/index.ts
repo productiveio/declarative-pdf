@@ -7,13 +7,13 @@ import type { PAPER_SIZE } from '@app/consts/paper-size';
 import { DocumentPage } from '@app/models/document-page';
 import type { Browser } from 'puppeteer';
 
-// TODO: ppi can be in the width and height object
 type DeclarativePDFOpts =
   | {
       ppi?: number;
       format?: keyof typeof PAPER_SIZE;
     }
   | {
+      ppi?: number;
       width?: number;
       height?: number;
     };
@@ -39,6 +39,7 @@ export default class DeclarativePDF {
       });
     } else if (opts && ('width' in opts || 'height' in opts)) {
       this.defaults = new PaperDefaults({
+        ppi: opts?.ppi,
         width: opts?.width,
         height: opts?.height,
       });

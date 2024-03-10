@@ -52,6 +52,7 @@ type PaperOpts =
       format?: keyof typeof PAPER_SIZE;
     }
   | {
+      ppi?: number;
       width?: number;
       height?: number;
     };

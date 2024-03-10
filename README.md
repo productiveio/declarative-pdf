@@ -23,7 +23,7 @@ Layout is controlled using a set of custom HTML tags that define the structure o
 - [Usage](#usage)
 - [API reference](#api-reference)
 - [Template syntax](#template-syntax)
-- [Examples](#examples)
+- [Template examples](#template-examples)
 
 # Installation
 
@@ -125,6 +125,7 @@ type Options =
       format: 'a0' | 'a1' | 'a2' | 'a3' | 'a4' | 'a5' | 'a6' | 'letter' | 'legal' | 'tabloid' | 'ledger'; // default is 'a4'
     }
   | {
+      ppi: number; // a number of pixels per inch, ranging from 18 to 42_000, default is 72
       width: number; // a width of the page in pixels, ranging from 1 to 420_000, default is 595
       height: number; // a height of the page in pixels, ranging from 1 to 420_000, default is 842
     };
@@ -183,58 +184,6 @@ In this template, the `<page-header>`, `<page-body>`, and `<page-footer>` elemen
 
 Detailed explanation can be found here: [template.md](docs/template.md).
 
-# Examples
+# Template examples
 
-Included examples can be found in the `examples` folder. They are meant to be used as a starting point for your own projects. Detailed explanation can be found here: [examples.md](docs/examples.md).
-
-> TODO: move this part to the examples.md
-
-```html
-<!-- file: ./template.html -->
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My amazing template</title>
-    <style>
-      page-background {
-        background-image: url("https://placehold.co/595x842/b4cded/f0f4ef");
-      }
-    </style>
-  </head>
-  <body>
-    <document-page>
-      <page-background></page-background>
-
-      <page-header>
-        <div>A header that repeats on every page</div>
-      </page-header>
-
-      <page-body>
-        <div>Hello world!</div>
-      </page-body>
-
-      <page-footer>
-        <div>A footer that repeats on every page</div>
-      </page-footer>
-    </document-page>
-  </body>
-</html>
-```
-
-And then you pass html as a string into generator:
-
-```js
-// file: ./index.js
-const fs = require("fs");
-const pdf = require("declarative-html2pdf");
-const html = fs.readFileSync("./template.html");
-
-const pdfBuffer = pdf.generate(html, options);
-
-pdf.writeBuffer(pdfBuffer, "output.pdf");
-```
-
-Which generates a new file, `output.pdf`.
+Included template examples can be found in the `examples` folder. They are meant to be used as a starting point for your own projects. Detailed explanation can be found here: [examples.md](docs/examples.md).
