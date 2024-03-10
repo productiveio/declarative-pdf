@@ -15,8 +15,8 @@ const hasPpi = (obj: PaperOpts | undefined): obj is { ppi: number } =>
   'ppi' in obj &&
   typeof obj?.ppi === 'number' &&
   !isNaN(obj.ppi) &&
-  obj.ppi > 42 &&
-  obj.ppi < 1642;
+  obj.ppi > 18 &&
+  obj.ppi < 42_000;
 
 /** Asserts that obj.width is a valid width */
 const hasWidth = (obj: PaperOpts | undefined): obj is { width: number } =>
@@ -24,7 +24,7 @@ const hasWidth = (obj: PaperOpts | undefined): obj is { width: number } =>
   'width' in obj &&
   typeof obj?.width === 'number' &&
   !isNaN(obj.width) &&
-  obj.width > 0 &&
+  obj.width > 1 &&
   obj.width <= 420_000;
 
 /** Asserts that obj.height is a valid height */
@@ -33,7 +33,7 @@ const hasHeight = (obj: PaperOpts | undefined): obj is { height: number } =>
   'height' in obj &&
   typeof obj?.height === 'number' &&
   !isNaN(obj.height) &&
-  obj.height > 0 &&
+  obj.height > 1 &&
   obj.height <= 420_000;
 
 /**

@@ -65,12 +65,12 @@ describe('PaperDefaults', () => {
   });
 
   test('defaults to valid PPI when invalid PPI is too small', () => {
-    const paper = new PaperDefaults({ ppi: 42 });
+    const paper = new PaperDefaults({ ppi: 17 });
     expect(paper.ppi).toBe(72);
   });
 
   test('defaults to valid PPI when invalid PPI is too big', () => {
-    const paper = new PaperDefaults({ ppi: 1642 });
+    const paper = new PaperDefaults({ ppi: 42_001 });
     expect(paper.ppi).toBe(72);
   });
 });
