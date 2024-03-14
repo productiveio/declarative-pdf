@@ -3,6 +3,7 @@ import evalDocumentPageSettings from '@app/evaluators/document-page-settings';
 import evalPrepareSection from '@app/evaluators/prepare-section';
 import evalTemplateNormalize from '@app/evaluators/template-normalize';
 import evalTemplateSettings from '@app/evaluators/template-settings';
+import evalResetVisibility from '@app/evaluators/reset-visibility';
 
 import type { Browser, Page } from 'puppeteer';
 
@@ -73,6 +74,10 @@ export default class HTMLAdapter {
     totalPagesNumber?: number;
   }) {
     return this.page.evaluate(evalPrepareSection, opts);
+  }
+
+  resetVisibility() {
+    return this.page.evaluate(evalResetVisibility);
   }
 
   pdf(opts: { width: number; height: number; transparentBg?: boolean }) {
