@@ -7,8 +7,8 @@ import evalTemplateSettings from '@app/evaluators/template-settings';
 import type { Browser, Page } from 'puppeteer';
 
 export default class HTMLAdapter {
-  private declare _browser: Browser;
-  private declare _page: Page;
+  private declare _browser?: Browser;
+  private declare _page?: Page;
 
   constructor(browser: Browser) {
     this._browser = browser;
@@ -16,13 +16,18 @@ export default class HTMLAdapter {
 
   get browser(): Browser {
     if (!this._browser) throw new Error('Browser not set');
-    if (!this._browser.isConnected()) throw new Error('Browser not connected');
+    if ('connected' in this._browser) {
+      if (!this._browser.connected) throw new Error('Browser not connected');
+    } else {
+      // @ts-expect-error - handle old puppeteer versions
+      if (this._browser.isConnected()) throw new Error('Browser not connected');
+    }
 
     return this._browser;
   }
 
   get page(): Page {
-    if (!this.browser.isConnected()) throw new Error('Browser not connected');
+    if (!this.browser) throw new Error('Browser not set');
     if (!this._page) throw new Error('Page not set');
     if (this._page.isClosed()) throw new Error('Page is closed');
 
@@ -30,6 +35,8 @@ export default class HTMLAdapter {
   }
 
   async newPage() {
+    if (this._page) throw new Error('Page already set');
+
     this._page = await this.browser.newPage();
   }
 
@@ -78,6 +85,6 @@ export default class HTMLAdapter {
   }
 
   async close() {
-    return await this.page.close();
+    return await this._page?.close();
   }
 }

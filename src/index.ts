@@ -65,26 +65,34 @@ export default class DeclarativePDF {
     /** (re)set documentPages */
     this.documentPages = [];
 
-    /** open new tab in browser */
-    await this.html.newPage();
+    try {
+      /** open new tab in browser */
+      await this.html.newPage();
 
-    /** send template to tab and normalize it */
-    await this.html.setContent(template);
-    await this.html.normalize();
+      /** send template to tab and normalize it */
+      await this.html.setContent(template);
+      await this.html.normalize();
 
-    /** get from DOM index, width and height for every document-page element */
-    await this.createDocumentPageModels();
-    /** for every document page model, get from DOM what that document-page contains  */
-    await this.initializeDocumentPageModels();
+      /** get from DOM index, width and height for every document-page element */
+      await this.createDocumentPageModels();
+      /** for every document page model, get from DOM what that document-page contains  */
+      await this.initializeDocumentPageModels();
 
-    /** for every document page model, process any element they might have */
-    await this.processDocumentPageModels();
+      /** for every document page model, process any element they might have */
+      await this.processDocumentPageModels();
 
-    /** close the tab in browser */
-    await this.html.close();
+      /** close the tab in browser */
+      await this.html.close();
 
-    /** we should have everything, time to build pdf */
-    return await this.buildPDF();
+      /** we should have everything, time to build pdf */
+      return await this.buildPDF();
+    } catch (error) {
+      /** always close opened tab in the browser to avoid memory leaks */
+      await this.html.close();
+
+      /** rethrow the error */
+      throw error;
+    }
   }
 
   /**
