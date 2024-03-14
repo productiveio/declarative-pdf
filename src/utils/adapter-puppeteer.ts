@@ -90,6 +90,8 @@ export default class HTMLAdapter {
   }
 
   async close() {
-    return await this._page?.close();
+    if (this._page && !this._page.isClosed()) {
+      await this._page?.close();
+    }
   }
 }
