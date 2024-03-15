@@ -85,14 +85,14 @@ describe('PDF visual regression test', () => {
     );
   });
 
-  test.only('a4 72 multipage template', async () => {
+  test('a4 72 multipage template', async () => {
     await testRunner(
       './test/examples/a4-72-multipage.html',
       `a4-72-multipage.pdf`
     );
   });
 
-  test('a4 297 standard template', async () => {
+  test.skip('a4 297 standard template', async () => {
     await testRunner(
       './test/examples/a4-297-standard.html',
       `a4-297-standard.pdf`

@@ -45,6 +45,8 @@ export class DocumentPage {
     this.index = opts.index;
     this.width = opts.width;
     this.height = opts.height;
+    this.bodyMarginTop = opts.bodyMarginTop;
+    this.bodyMarginBottom = opts.bodyMarginBottom;
   }
 
   get viewPort() {
