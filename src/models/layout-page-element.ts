@@ -120,7 +120,7 @@ export class LayoutPageElement {
 
     // Until we figure out why is this happening, let's just log the error and not throw it
     const count = pdfDoc.getPageCount();
-    if (count !== 1 && this.type !== 'background') {
+    if (count !== 1) {
       console.error(
         `While generating ${this.type} section PDF with ${this.height} height, instead of a single page, we got ${count} instead`
       );
