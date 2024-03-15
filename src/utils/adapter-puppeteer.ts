@@ -80,10 +80,16 @@ export default class HTMLAdapter {
     return this.page.evaluate(evalResetVisibility);
   }
 
-  pdf(opts: { width: number; height: number; transparentBg?: boolean }) {
+  pdf(opts: {
+    width: number;
+    height: number;
+    margin?: { top?: number; right?: number; bottom?: number; left?: number };
+    transparentBg?: boolean;
+  }) {
     return this.page.pdf({
       width: opts.width,
       height: opts.height,
+      margin: opts.margin,
       omitBackground: opts.transparentBg,
       printBackground: true,
     });
