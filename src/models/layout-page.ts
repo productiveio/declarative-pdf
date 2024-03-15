@@ -98,6 +98,5 @@ export class LayoutPage {
     await this.background?.process();
     await this.header?.process();
     await this.footer?.process();
-    await this.body.process();
   }
 }

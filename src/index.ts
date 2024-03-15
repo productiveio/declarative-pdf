@@ -115,6 +115,12 @@ export default class DeclarativePDF {
     });
   }
 
+  get needsLayouting() {
+    if (!this.documentPages?.length) throw new Error('No document pages found');
+
+    return this.documentPages.some((doc) => doc.layout?.hasMeta);
+  }
+
   /**
    * Initializes the document page models.
    *

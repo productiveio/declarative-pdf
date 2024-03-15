@@ -28,6 +28,12 @@ export class LayoutPageElement {
     this.hasCurrentPageNumber = opts.hasCurrentPageNumber;
     this.hasTotalPagesNumber = opts.hasTotalPagesNumber;
     this.physicalPageIndex = opts.physicalPageIndex;
+
+    if (this.type === 'body') {
+      const index = this.layoutPage.pageIndex;
+      const pdf = this.layoutPage.layout.documentPage.body!.pdf;
+      this._pdfPage = pdf.getPage(index);
+    }
   }
 
   get isPhysicalPageVariant() {
@@ -75,13 +81,6 @@ export class LayoutPageElement {
    * Body is handled separately, because its pdf should already exist.
    */
   async process() {
-    if (this.type === 'body') {
-      const index = this.layoutPage.pageIndex;
-      const pdf = this.layoutPage.layout.documentPage.body!.pdf;
-      this._pdfPage = pdf.getPage(index);
-      return;
-    }
-
     const reusableElement = this.findResuableElement();
 
     if (reusableElement instanceof LayoutPageElement) {

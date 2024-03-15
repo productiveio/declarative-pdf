@@ -59,7 +59,7 @@ export class Layout {
     return this.documentPage.width;
   }
 
-  get needsLayoutPages() {
+  get hasMeta() {
     return (
       this.headersMeta.length ||
       this.footersMeta.length ||
@@ -105,7 +105,7 @@ export class Layout {
    */
   createLayoutPages() {
     // Do not create layout pages if there are no elements
-    if (!this.needsLayoutPages) return;
+    if (!this.documentPage.parent.needsLayouting) return;
 
     const count = this.documentPage.pageCount;
     if (typeof count !== 'number' || count < 1) {
