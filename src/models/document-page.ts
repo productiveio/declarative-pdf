@@ -11,6 +11,10 @@ type DocumentPageOpts = {
   width: number;
   /** whole page height in pixels */
   height: number;
+  /** top margin of the page-body element */
+  bodyMarginTop: number;
+  /** bottom margin of the page-body element */
+  bodyMarginBottom: number;
 };
 
 export type SectionMeta = {
@@ -30,6 +34,8 @@ export class DocumentPage {
   declare height: number;
   declare width: number;
   declare index: number;
+  declare bodyMarginTop: number;
+  declare bodyMarginBottom: number;
 
   declare layout?: Layout;
   declare body?: { buffer: Buffer; pdf: PDFDocument };
@@ -70,6 +76,10 @@ export class DocumentPage {
     const buffer = await this.html.pdf({
       width: this.width,
       height: this.layout.bodyHeight,
+      margin: {
+        top: this.bodyMarginTop,
+        bottom: this.bodyMarginBottom,
+      },
       transparentBg: this.layout.hasBackgroundElement,
     });
     const pdf = await PDFDocument.load(buffer);

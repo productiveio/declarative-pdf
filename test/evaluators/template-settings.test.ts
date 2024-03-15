@@ -32,10 +32,34 @@ describe('evalTemplateSettings', () => {
     const result = evalTemplateSettings(templateDefaults);
 
     expect(result).toEqual([
-      { index: 0, width: 612, height: 791 },
-      { index: 1, width: 2480, height: 3508 },
-      { index: 2, width: 600, height: 800 },
-      { index: 3, width: 595, height: 842 },
+      {
+        index: 0,
+        width: 612,
+        height: 791,
+        bodyMarginTop: 0,
+        bodyMarginBottom: 0,
+      },
+      {
+        index: 1,
+        width: 2480,
+        height: 3508,
+        bodyMarginTop: 0,
+        bodyMarginBottom: 0,
+      },
+      {
+        index: 2,
+        width: 600,
+        height: 800,
+        bodyMarginTop: 0,
+        bodyMarginBottom: 0,
+      },
+      {
+        index: 3,
+        width: 595,
+        height: 842,
+        bodyMarginTop: 0,
+        bodyMarginBottom: 0,
+      },
     ]);
   });
 
@@ -52,13 +76,55 @@ describe('evalTemplateSettings', () => {
     const result = evalTemplateSettings(templateDefaults);
 
     expect(result).toEqual([
-      { index: 0, width: 595, height: 842 },
-      { index: 1, width: 595, height: 842 },
-      { index: 2, width: 595, height: 842 },
-      { index: 3, width: 595, height: 842 },
-      { index: 4, width: 595, height: 842 },
-      { index: 5, width: 595, height: 842 },
-      { index: 6, width: 595, height: 842 },
+      {
+        index: 0,
+        width: 595,
+        height: 842,
+        bodyMarginTop: 0,
+        bodyMarginBottom: 0,
+      },
+      {
+        index: 1,
+        width: 595,
+        height: 842,
+        bodyMarginTop: 0,
+        bodyMarginBottom: 0,
+      },
+      {
+        index: 2,
+        width: 595,
+        height: 842,
+        bodyMarginTop: 0,
+        bodyMarginBottom: 0,
+      },
+      {
+        index: 3,
+        width: 595,
+        height: 842,
+        bodyMarginTop: 0,
+        bodyMarginBottom: 0,
+      },
+      {
+        index: 4,
+        width: 595,
+        height: 842,
+        bodyMarginTop: 0,
+        bodyMarginBottom: 0,
+      },
+      {
+        index: 5,
+        width: 595,
+        height: 842,
+        bodyMarginTop: 0,
+        bodyMarginBottom: 0,
+      },
+      {
+        index: 6,
+        width: 595,
+        height: 842,
+        bodyMarginTop: 0,
+        bodyMarginBottom: 0,
+      },
     ]);
   });
 
@@ -68,7 +134,15 @@ describe('evalTemplateSettings', () => {
     `;
     const result = evalTemplateSettings(templateDefaults);
 
-    expect(result).toEqual([{ index: 0, width: 595, height: 842 }]);
+    expect(result).toEqual([
+      {
+        index: 0,
+        width: 595,
+        height: 842,
+        bodyMarginTop: 0,
+        bodyMarginBottom: 0,
+      },
+    ]);
   });
 
   test('it defaults A4 height to width when height is invalid', () => {
@@ -77,7 +151,15 @@ describe('evalTemplateSettings', () => {
     `;
     const result = evalTemplateSettings(templateDefaults);
 
-    expect(result).toEqual([{ index: 0, width: 600, height: 600 }]);
+    expect(result).toEqual([
+      {
+        index: 0,
+        width: 600,
+        height: 600,
+        bodyMarginTop: 0,
+        bodyMarginBottom: 0,
+      },
+    ]);
   });
 
   test('it uses format and ppi before size', () => {
@@ -86,7 +168,15 @@ describe('evalTemplateSettings', () => {
     `;
     const result = evalTemplateSettings(templateDefaults);
 
-    expect(result).toEqual([{ index: 0, width: 612, height: 791 }]);
+    expect(result).toEqual([
+      {
+        index: 0,
+        width: 612,
+        height: 791,
+        bodyMarginTop: 0,
+        bodyMarginBottom: 0,
+      },
+    ]);
   });
 
   test('it fallbacks to size if format is invalid', () => {
@@ -95,6 +185,43 @@ describe('evalTemplateSettings', () => {
     `;
     const result = evalTemplateSettings(templateDefaults);
 
-    expect(result).toEqual([{ index: 0, width: 600, height: 800 }]);
+    expect(result).toEqual([
+      {
+        index: 0,
+        width: 600,
+        height: 800,
+        bodyMarginTop: 0,
+        bodyMarginBottom: 0,
+      },
+    ]);
+  });
+
+  test('it correctly reads page-body margins', () => {
+    document.body.innerHTML = `
+      <document-page>
+        <page-body style="margin-top: 10px; margin-bottom: 20px"> ... </page-body>
+      </document-page>
+      <document-page>
+        <page-body style="margin-top: 30px; margin-bottom: 40px"> ... </page-body>
+      </document-page>
+    `;
+    const result = evalTemplateSettings(templateDefaults);
+
+    expect(result).toEqual([
+      {
+        index: 0,
+        width: 595,
+        height: 842,
+        bodyMarginTop: 10,
+        bodyMarginBottom: 20,
+      },
+      {
+        index: 1,
+        width: 595,
+        height: 842,
+        bodyMarginTop: 30,
+        bodyMarginBottom: 40,
+      },
+    ]);
   });
 });
