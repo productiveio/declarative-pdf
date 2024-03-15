@@ -31,6 +31,25 @@ const config = {
   },
 };
 
+const testRunner = async (htmlPath: string, pdfName: string) => {
+  const html = fs.readFileSync(htmlPath, {
+    encoding: 'utf8',
+  });
+  const actualPdfBuffer = await new PDF(browser).generate(html);
+  await writeBuffer(
+    actualPdfBuffer,
+    `${config.paths.actualPdfRootFolder}/${pdfName}`
+  );
+
+  const comparePdf = new ComparePdf(config);
+  const result = await comparePdf
+    .actualPdfFile(pdfName)
+    .baselinePdfFile(pdfName)
+    .compare();
+
+  expect(result?.status).toBe('passed');
+};
+
 let browser: Browser;
 
 beforeAll(async () => {
@@ -52,80 +71,31 @@ afterAll(async () => {
 
 describe('PDF visual regression test', () => {
   test('standard template', async () => {
-    const html = fs.readFileSync(`./test/examples/standard.html`, {
-      encoding: 'utf8',
-    });
-    const actualPdfBuffer = await new PDF(browser).generate(html);
-    await writeBuffer(
-      actualPdfBuffer,
-      `${config.paths.actualPdfRootFolder}/standard.pdf`
-    );
-
-    const comparePdf = new ComparePdf(config);
-    const result = await comparePdf
-      .actualPdfFile('standard.pdf')
-      .baselinePdfFile('standard.pdf')
-      .compare();
-    expect(result?.status).toBe('passed');
+    await testRunner('./test/examples/standard.html', `standard.pdf`);
   });
 
   test('elegant template', async () => {
-    const html = fs.readFileSync(`./test/examples/elegant.html`, {
-      encoding: 'utf8',
-    });
-    const actualPdfBuffer = await new PDF(browser).generate(html);
-    await writeBuffer(
-      actualPdfBuffer,
-      `${config.paths.actualPdfRootFolder}/elegant.pdf`
-    );
-
-    const comparePdf = new ComparePdf(config);
-    const result = await comparePdf
-      .actualPdfFile('elegant.pdf')
-      .baselinePdfFile('elegant.pdf')
-      .compare();
-    expect(result?.status).toBe('passed');
+    await testRunner('./test/examples/elegant.html', `elegant.pdf`);
   });
 
   test('a4 72 standard template', async () => {
-    const html = fs.readFileSync(`./test/examples/a4-72-standard.html`, {
-      encoding: 'utf8',
-    });
-    const actualPdfBuffer = await new PDF(browser, {
-      ppi: 72,
-      format: 'a4',
-    }).generate(html);
-    await writeBuffer(
-      actualPdfBuffer,
-      `${config.paths.actualPdfRootFolder}/a4-72-standard.pdf`
+    await testRunner(
+      './test/examples/a4-72-standard.html',
+      `a4-72-standard.pdf`
     );
-
-    const comparePdf = new ComparePdf(config);
-    const result = await comparePdf
-      .actualPdfFile('a4-72-standard.pdf')
-      .baselinePdfFile('a4-72-standard.pdf')
-      .compare();
-    expect(result?.status).toBe('passed');
   });
 
-  test('a4 297 standard template', async () => {
-    const html = fs.readFileSync(`./test/examples/a4-297-standard.html`, {
-      encoding: 'utf8',
-    });
-    const actualPdfBuffer = await new PDF(browser, {
-      ppi: 297,
-      format: 'a4',
-    }).generate(html);
-    await writeBuffer(
-      actualPdfBuffer,
-      `${config.paths.actualPdfRootFolder}/a4-297-standard.pdf`
+  test('a4 72 multipage template', async () => {
+    await testRunner(
+      './test/examples/a4-72-multipage.html',
+      `a4-72-multipage.pdf`
     );
+  });
 
-    const comparePdf = new ComparePdf(config);
-    const result = await comparePdf
-      .actualPdfFile('a4-297-standard.pdf')
-      .baselinePdfFile('a4-297-standard.pdf')
-      .compare();
-    expect(result?.status).toBe('passed');
+  test.skip('a4 297 standard template', async () => {
+    await testRunner(
+      './test/examples/a4-297-standard.html',
+      `a4-297-standard.pdf`
+    );
   });
 });

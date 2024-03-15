@@ -73,6 +73,13 @@ export default function evalPrepareSection(opts: PrepareSection) {
   );
   if (!sectionEl) return false;
 
+  // if secType is body, we need to remove the body margin because
+  // they are already included in the pdf print options
+  if (secType === 'page-body') {
+    sectionEl.style.marginTop = '0px';
+    sectionEl.style.marginBottom = '0px';
+  }
+
   // end the flow if we don't need to isolate a physical page
   if (!opts.sectionType || opts.physicalPageIndex === undefined) {
     injectNumbers(sectionEl);

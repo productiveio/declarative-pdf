@@ -323,4 +323,16 @@ describe('evalPrepareSection', () => {
     );
     expect(pageNumber?.textContent).toBe('24');
   });
+
+  test('it removes page-body margins', () => {
+    document.body.innerHTML = `
+      <document-page>
+        <page-body> ... </page-body>
+      </document-page>
+    `;
+    evalPrepareSection({ documentPageIndex: 0 });
+    const body = document.querySelector<HTMLElement>('page-body');
+    expect(body?.style.marginTop).toBe('0px');
+    expect(body?.style.marginBottom).toBe('0px');
+  });
 });

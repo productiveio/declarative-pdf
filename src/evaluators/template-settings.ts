@@ -52,6 +52,16 @@ export default function evalTemplateSettings(opts: TemplateSettingOpts) {
 
     const ppi = attrPpi && attrPpi > 0 ? attrPpi : opts.default.ppi;
 
+    let bodyMarginBottom = 0;
+    let bodyMarginTop = 0;
+
+    const pageBodyEl = docPageEl.querySelector('page-body');
+    if (pageBodyEl) {
+      const pageBodyStyle = window.getComputedStyle(pageBodyEl);
+      bodyMarginTop = Math.ceil(parseFloat(pageBodyStyle.marginTop));
+      bodyMarginBottom = Math.ceil(parseFloat(pageBodyStyle.marginBottom));
+    }
+
     let width, height;
 
     if (isFormat(attrFormat)) {
@@ -66,7 +76,7 @@ export default function evalTemplateSettings(opts: TemplateSettingOpts) {
       height = opts.default.height;
     }
 
-    return { index, width, height };
+    return { index, width, height, bodyMarginTop, bodyMarginBottom };
   };
 
   const docPageEls = Array.from(

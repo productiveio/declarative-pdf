@@ -61,6 +61,8 @@ export const DEFAULT_FORMAT = 'a4';
 export const DEFAULT_PPI = 72;
 export const DEFAULT_WIDTH = 595;
 export const DEFAULT_HEIGHT = 842;
+export const DEFAULT_BODY_MARGIN_TOP = 0;
+export const DEFAULT_BODY_MARGIN_BOTTOM = 0;
 
 export class PaperDefaults {
   readonly ppi: number;

@@ -149,6 +149,52 @@ The `<page-body>` element should be used as a direct child of the `<document-pag
 
 The `<page-body>` element is the main element in `<document-page>` and it can be used alone or in conjuction with other custom tags, such as `<page-header>` and `<page-footer>`, to define the layout of the page. The size of this element determines how many pages will there be in resulting PDF.
 
+### Margins
+
+Margins can be added to the page body by using CSS. Let's take this example:
+
+```html
+<style>
+  .added-margin {
+    margin: 10px;
+  }
+</style>
+<document-page>
+  <page-body class="added-margin">
+    <!-- content goes here -->
+  </page-body>
+</document-page>
+```
+
+Let's consider that the page-body is spanning across multiple pages.
+
+Normally, those margins are applied to the page-body element, resulting in the printed content having whitespace at the top of the first page and at the bottom of the last page. We are countering this by removing the margins from the page-body and adding them to the margins of pdf printer. This way, margins will be applied on every page, not just the first and the last one.
+
+Left and right margins are not affected with multiple pages, they work as expected.
+
+### Padding
+
+Padding can be added to the page body by using CSS. Let's take this example:
+
+```html
+<style>
+  .added-padding {
+    padding: 10px;
+  }
+</style>
+<document-page>
+  <page-body class="added-padding">
+    <!-- content goes here -->
+  </page-body>
+</document-page>
+```
+
+Let's consider that the page-body is spanning across multiple pages.
+
+Padding is not being manipulated like margins, so it will be applied to the page-body element. This means that the content will be pushed away from the edges of the page, and the padding will be visible on the top of the first page and on the bottom of the last page.
+
+Left and right padding is not affected with multiple pages, it works as expected.
+
 ## Repeating sections
 
 All repeating sections can contain custom tags: `<physical-page>`, `<current-page-number>` and `<total-pages-number>`. They are available only in repeating section, `<page-body>` ignores them. More on these later.

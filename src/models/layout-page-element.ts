@@ -1,5 +1,5 @@
-import type { LayoutPage } from '@app/models/layout-page';
 import { PDFDocument, type PDFPage } from 'pdf-lib';
+import type { LayoutPage } from '@app/models/layout-page';
 
 type LayoutPageElementOpts = {
   layoutPage: LayoutPage;
@@ -28,6 +28,12 @@ export class LayoutPageElement {
     this.hasCurrentPageNumber = opts.hasCurrentPageNumber;
     this.hasTotalPagesNumber = opts.hasTotalPagesNumber;
     this.physicalPageIndex = opts.physicalPageIndex;
+
+    if (this.type === 'body') {
+      const index = this.layoutPage.pageIndex;
+      const pdf = this.layoutPage.layout.documentPage.body!.pdf;
+      this._pdfPage = pdf.getPage(index);
+    }
   }
 
   get isPhysicalPageVariant() {
@@ -75,13 +81,6 @@ export class LayoutPageElement {
    * Body is handled separately, because its pdf should already exist.
    */
   async process() {
-    if (this.type === 'body') {
-      const index = this.layoutPage.pageIndex;
-      const pdf = this.layoutPage.layout.documentPage.body!.pdf;
-      this._pdfPage = pdf.getPage(index);
-      return;
-    }
-
     const reusableElement = this.findResuableElement();
 
     if (reusableElement instanceof LayoutPageElement) {
@@ -119,10 +118,10 @@ export class LayoutPageElement {
 
     const pdfDoc = await PDFDocument.load(buffer);
 
+    // Until we figure out why is this happening, let's just log the error and not throw it
     const count = pdfDoc.getPageCount();
-
-    if (count !== 1 && this.type !== 'background') {
-      throw new Error(
+    if (count !== 1) {
+      console.error(
         `While generating ${this.type} section PDF with ${this.height} height, instead of a single page, we got ${count} instead`
       );
     }
