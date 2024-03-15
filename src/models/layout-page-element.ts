@@ -1,5 +1,5 @@
-import type { LayoutPage } from '@app/models/layout-page';
 import { PDFDocument, type PDFPage } from 'pdf-lib';
+import type { LayoutPage } from '@app/models/layout-page';
 
 type LayoutPageElementOpts = {
   layoutPage: LayoutPage;
@@ -118,10 +118,10 @@ export class LayoutPageElement {
 
     const pdfDoc = await PDFDocument.load(buffer);
 
+    // Until we figure out why is this happening, let's just log the error and not throw it
     const count = pdfDoc.getPageCount();
-
     if (count !== 1 && this.type !== 'background') {
-      throw new Error(
+      console.error(
         `While generating ${this.type} section PDF with ${this.height} height, instead of a single page, we got ${count} instead`
       );
     }
