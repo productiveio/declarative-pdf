@@ -42,8 +42,8 @@
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
-    "@typescript-eslint/eslint-plugin": "^7.1.1",
-    "@typescript-eslint/parser": "^7.1.1",
+    "@typescript-eslint/eslint-plugin": "^7.7.1",
+    "@typescript-eslint/parser": "^7.7.1",
     "compare-pdf": "^1.1.8",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
@@ -54,12 +54,12 @@
     "jest-ts-webcompat-resolver": "^1.0.0",
     "jsdom": "^24.0.0",
     "prettier": "^3.2.5",
-    "puppeteer": "^22.4.1",
+    "puppeteer": "^22.7.1",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "tsup": "^8.0.2",
-    "typescript": "^5.4.2"
+    "typescript": "^5.4.5"
   },
   "dependencies": {
     "pdf-lib": "^1.17.1"
