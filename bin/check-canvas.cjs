@@ -14,6 +14,8 @@ try {
       'Canvas is compiled against a different Node.js version. Rebuilding...'
     );
     execSync('npm rebuild canvas', { stdio: 'inherit' });
+  } else if (error.message.includes('Cannot find module')) {
+    console.log('Skipping canvas check. Module not found.');
   } else {
     throw error;
   }
