@@ -808,11 +808,22 @@
       </page-body>
 
       <page-footer>
-        <div class="footer">
-          Page <current-page-number>0</current-page-number> of
-          <total-pages-number>0</total-pages-number>
-        </div>
-        <div class="footer-spacing"></div>
+        <physical-page select="last">
+          <h1>LAST</h1>
+          <div class="footer">
+            Page <current-page-number>0</current-page-number> of
+            <total-pages-number>0</total-pages-number>
+          </div>
+          <div class="footer-spacing"></div>
+        </physical-page>
+        <physical-page>
+          <h1>DEFAULT</h1>
+          <div class="footer">
+            Page <current-page-number>0</current-page-number> of
+            <total-pages-number>0</total-pages-number>
+          </div>
+          <div class="footer-spacing"></div>
+        </physical-page>
       </page-footer>
     </document-page>
 

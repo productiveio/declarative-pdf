@@ -9,13 +9,14 @@ const getMaxHeight = (els: NonNullable<LayoutPageMeta>[]) => {
 
 const pickMeta = (
   collection: NonNullable<LayoutPageMeta>[],
+  index: number,
   offset: number,
   count: number
 ): LayoutPageMeta => {
   if (!collection.length) return undefined;
 
   if (areSectionVariants(collection)) {
-    return selectVariant(collection, 0, offset, count);
+    return selectVariant(collection, index, offset, count);
   }
 
   if (collection.length > 1) {
@@ -132,9 +133,9 @@ export class Layout {
         pageIndex: i,
         currentPageNumber: i + 1 + offset,
         totalPagesNumber: total,
-        headerMeta: pickMeta(this.headersMeta, offset, count),
-        footerMeta: pickMeta(this.footersMeta, offset, count),
-        backgroundMeta: pickMeta(this.backgroundsMeta, offset, count),
+        headerMeta: pickMeta(this.headersMeta, i, offset, count),
+        footerMeta: pickMeta(this.footersMeta, i, offset, count),
+        backgroundMeta: pickMeta(this.backgroundsMeta, i, offset, count),
       });
     });
   }

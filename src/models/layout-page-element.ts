@@ -1,6 +1,8 @@
 import { PDFDocument, type PDFPage } from 'pdf-lib';
 import type { LayoutPage } from '@app/models/layout-page';
 
+type TPhysicalPageType = 'first' | 'last' | 'even' | 'odd' | 'default';
+
 type LayoutPageElementOpts = {
   layoutPage: LayoutPage;
   sectionHeight: number;
@@ -8,6 +10,7 @@ type LayoutPageElementOpts = {
   hasCurrentPageNumber: boolean;
   hasTotalPagesNumber: boolean;
   physicalPageIndex?: number;
+  physicalPageType?: TPhysicalPageType;
 };
 
 export class LayoutPageElement {
@@ -20,6 +23,7 @@ export class LayoutPageElement {
   declare readonly hasCurrentPageNumber: boolean;
   declare readonly hasTotalPagesNumber: boolean;
   declare readonly physicalPageIndex?: number;
+  declare readonly physicalPageType?: TPhysicalPageType;
 
   constructor(opts: LayoutPageElementOpts) {
     this.layoutPage = opts.layoutPage;
@@ -28,6 +32,7 @@ export class LayoutPageElement {
     this.hasCurrentPageNumber = opts.hasCurrentPageNumber;
     this.hasTotalPagesNumber = opts.hasTotalPagesNumber;
     this.physicalPageIndex = opts.physicalPageIndex;
+    this.physicalPageType = opts.physicalPageType;
 
     if (this.type === 'body') {
       const index = this.layoutPage.pageIndex;
@@ -137,6 +142,7 @@ export class LayoutPageElement {
         p[this.type] !== undefined &&
         p[this.type]!.isReusable &&
         p[this.type]!.physicalPageIndex === this.physicalPageIndex &&
+        p[this.type]!.physicalPageType === this.physicalPageType &&
         p[this.type]!.pdfPage
     );
 
