@@ -224,7 +224,7 @@ Usage:
   </page-body>
   <page-footer>
     <current-page-number></current-page-number> of
-    <total-page-number></total-page-number>
+    <total-pages-number></total-pages-number>
     <!-- footer content goes here -->
   </page-footer>
 </document-page>
