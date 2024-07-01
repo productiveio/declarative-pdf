@@ -1,11 +1,10 @@
 import { PDFDocument } from 'pdf-lib';
 import { normalizeSetting } from '@app/utils/normalize-setting';
 import { PaperDefaults } from '@app/utils/paper-defaults';
-import HTMLAdapter from '@app/utils/adapter-puppeteer';
+import HTMLAdapter, { type MinimumBrowser } from '@app/utils/adapter-puppeteer';
 
 import type { PAPER_SIZE } from '@app/consts/paper-size';
 import { DocumentPage } from '@app/models/document-page';
-import type { Browser } from 'puppeteer';
 
 type DeclarativePDFOpts =
   | {
@@ -29,7 +28,7 @@ export default class DeclarativePDF {
    * @param browser A puupeteer browser instance, prepared for use
    * @param opts Various options for the PDF generator
    */
-  constructor(browser: Browser, opts?: DeclarativePDFOpts) {
+  constructor(browser: MinimumBrowser, opts?: DeclarativePDFOpts) {
     this.html = new HTMLAdapter(browser);
 
     if (opts && 'format' in opts) {

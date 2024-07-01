@@ -7,15 +7,17 @@ import evalResetVisibility from '@app/evaluators/reset-visibility';
 
 import type { Browser, Page } from 'puppeteer';
 
+export type MinimumBrowser = Pick<Browser, 'newPage' | 'connected'>;
+
 export default class HTMLAdapter {
-  private declare _browser?: Browser;
+  private declare _browser?: MinimumBrowser;
   private declare _page?: Page;
 
-  constructor(browser: Browser) {
+  constructor(browser: MinimumBrowser) {
     this._browser = browser;
   }
 
-  get browser(): Browser {
+  get browser(): MinimumBrowser {
     if (!this._browser) throw new Error('Browser not set');
     if ('connected' in this._browser) {
       if (!this._browser.connected) throw new Error('Browser not connected');
