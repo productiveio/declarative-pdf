@@ -75,7 +75,7 @@ export class DocumentPage {
     this.layout = new Layout(this, meta);
 
     await this.html.prepareSection({ documentPageIndex: this.index });
-    const buffer = await this.html.pdf({
+    const uint8Array = await this.html.pdf({
       width: this.width,
       height: this.layout.bodyHeight,
       margin: {
@@ -84,6 +84,7 @@ export class DocumentPage {
       },
       transparentBg: this.layout.hasBackgroundElement,
     });
+    const buffer = Buffer.from(uint8Array);
     const pdf = await PDFDocument.load(buffer);
     await this.html.resetVisibility();
 
