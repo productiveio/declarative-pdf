@@ -12,6 +12,7 @@ export default function evalTemplateNormalize() {
   document.body.classList.add('pdf');
   document.body.style.margin = '0';
   document.body.style.padding = '0';
+  document.body.style.backgroundColor = 'transparent';
 
   // Body should only contain document-page and script/style elements
   // everything else is considered a free element

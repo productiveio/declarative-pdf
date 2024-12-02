@@ -85,7 +85,7 @@ export class DocumentPage {
       transparentBg: this.layout.hasBackgroundElement,
     });
     const buffer = Buffer.from(uint8Array);
-    const pdf = await PDFDocument.load(buffer);
+    const pdf = await PDFDocument.load(uint8Array);
     await this.html.resetVisibility();
 
     this.body = { pdf, buffer };

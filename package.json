@@ -1,6 +1,6 @@
 {
   "name": "declarative-pdf",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A tool for generating PDF documents from declarative HTML templates",
   "keywords": [
     "pdf",
@@ -16,9 +16,9 @@
   "type": "module",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "require": "./dist/index.wrapper.cjs",
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "import": "./dist/index.js"
     }
   },
   "files": [
@@ -42,11 +42,12 @@
     "test": "node ./bin/check-canvas.cjs && jest"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.13",
-    "@typescript-eslint/eslint-plugin": "^7.12.0",
-    "@typescript-eslint/parser": "^7.12.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.10.1",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
     "compare-pdf": "1.1.1",
-    "eslint": "^8.57.0",
+    "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.1",
@@ -54,13 +55,13 @@
     "jest-environment-jsdom": "^29.7.0",
     "jest-ts-webcompat-resolver": "^1.0.0",
     "jsdom": "^25.0.1",
-    "prettier": "^3.3.3",
-    "puppeteer": "^23.6.0",
+    "prettier": "^3.4.1",
+    "puppeteer": "^23.9.0",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "tsup": "^8.3.0",
-    "typescript": "^5.4.5"
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2"
   },
   "dependencies": {
     "pdf-lib": "^1.17.1"

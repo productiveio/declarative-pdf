@@ -16,7 +16,7 @@ type LayoutPageElementOpts = {
 export class LayoutPageElement {
   declare layoutPage: LayoutPage;
 
-  private declare _pdfPage?: PDFPage;
+  declare private _pdfPage?: PDFPage;
 
   declare readonly height: number;
   declare readonly type: 'header' | 'footer' | 'background' | 'body';

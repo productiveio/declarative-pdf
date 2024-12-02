@@ -10,8 +10,8 @@ import type { Browser, Page } from 'puppeteer';
 export type MinimumBrowser = Pick<Browser, 'newPage' | 'connected'>;
 
 export default class HTMLAdapter {
-  private declare _browser?: MinimumBrowser;
-  private declare _page?: Page;
+  declare private _browser?: MinimumBrowser;
+  declare private _page?: Page;
 
   constructor(browser: MinimumBrowser) {
     this._browser = browser;
