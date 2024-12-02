@@ -65,7 +65,9 @@ export default function evalTemplateNormalize() {
 
     // Remove empty elements
     Array.from(
-      doc.querySelectorAll('page-body, page-header, page-footer')
+      doc.querySelectorAll(
+        'page-body, page-header, page-footer, page-background'
+      )
     ).forEach((el) => {
       if (!el.childNodes.length) {
         el.remove();
