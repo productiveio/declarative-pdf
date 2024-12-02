@@ -1,6 +1,6 @@
 {
   "name": "declarative-pdf",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A tool for generating PDF documents from declarative HTML templates",
   "keywords": [
     "pdf",
