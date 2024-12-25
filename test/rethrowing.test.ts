@@ -21,13 +21,12 @@ describe('DeclarativePDF', () => {
       newPage: jest.fn().mockRejectedValue(new Error('Test error')),
       setContent: jest.fn(),
       normalize: jest.fn(),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
     // Act
     try {
       await pdf.generate('<html></html>');
-    } catch (error) {
+    } catch (_err) {
       // Ignore the error
     }
 
