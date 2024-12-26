@@ -4,7 +4,7 @@
 import puppeteer, { type Browser } from 'puppeteer';
 import PDF from '@app/index';
 import fs from 'fs';
-import writeBuffer from '@app/utils/writeBuffer.js';
+import writeBuffer from '@app/utils/write-buffer';
 import ComparePdf from 'compare-pdf';
 
 jest.useRealTimers();
