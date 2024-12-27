@@ -73,4 +73,17 @@ describe('PaperDefaults', () => {
     const paper = new PaperDefaults({ ppi: 42_001 });
     expect(paper.ppi).toBe(72);
   });
+
+  test('user provides all options, format takes precedence', () => {
+    const paper = new PaperDefaults({
+      ppi: 96,
+      format: 'a4',
+      width: 600,
+      height: 800,
+    });
+    expect(paper.ppi).toBe(96);
+    expect(paper.format).toBe('a4');
+    expect(paper.width).toBe(794);
+    expect(paper.height).toBe(1123);
+  });
 });

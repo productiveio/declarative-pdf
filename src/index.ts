@@ -1,25 +1,20 @@
 import { PDFDocument } from 'pdf-lib';
+import { DocumentPage } from '@app/models/document-page';
 import { normalizeSetting } from '@app/utils/normalize-setting';
-import { PaperDefaults } from '@app/utils/paper-defaults';
+import { PaperDefaults, type PaperOpts } from '@app/utils/paper-defaults';
 import HTMLAdapter, { type MinimumBrowser } from '@app/utils/adapter-puppeteer';
 
-import type { PAPER_SIZE } from '@app/consts/paper-size';
-import { DocumentPage } from '@app/models/document-page';
-
-type DeclarativePDFOpts =
-  | {
-      ppi?: number;
-      format?: keyof typeof PAPER_SIZE;
-    }
-  | {
-      ppi?: number;
-      width?: number;
-      height?: number;
-    };
+interface DeclarativePDFOpts {
+  /** Override for paper defaults (A4 / 72ppi) */
+  defaults?: PaperOpts;
+  /** Enable debug mode (attaches parts, logs timings) */
+  debug?: boolean;
+}
 
 export default class DeclarativePDF {
   declare html: HTMLAdapter;
   declare defaults: PaperDefaults;
+  declare debug: boolean;
 
   documentPages: DocumentPage[] = [];
 
@@ -30,21 +25,8 @@ export default class DeclarativePDF {
    */
   constructor(browser: MinimumBrowser, opts?: DeclarativePDFOpts) {
     this.html = new HTMLAdapter(browser);
-
-    if (opts && 'format' in opts) {
-      this.defaults = new PaperDefaults({
-        ppi: opts?.ppi,
-        format: opts?.format,
-      });
-    } else if (opts && ('width' in opts || 'height' in opts)) {
-      this.defaults = new PaperDefaults({
-        ppi: opts?.ppi,
-        width: opts?.width,
-        height: opts?.height,
-      });
-    } else {
-      this.defaults = new PaperDefaults();
-    }
+    this.defaults = new PaperDefaults(opts?.defaults);
+    this.debug = !!opts?.debug;
   }
 
   get totalPagesNumber() {
