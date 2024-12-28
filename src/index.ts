@@ -5,17 +5,26 @@ import { PaperDefaults, type PaperOpts } from '@app/utils/paper-defaults';
 import HTMLAdapter, { type MinimumBrowser } from '@app/utils/adapter-puppeteer';
 import logger from '@app/models/debug-time-log';
 
+interface DebugOptions {
+  /** Do we want to log debug information */
+  log?: boolean;
+  /** Do we want to aggregate logs */
+  aggregated?: boolean;
+  /** Which filename to use for PDF */
+  pdfName?: string;
+}
+
 interface DeclarativePDFOpts {
   /** Override for paper defaults (A4 / 72ppi) */
   defaults?: PaperOpts;
-  /** Enable debug mode (attaches parts, logs timings) */
-  debug?: boolean;
+  /** Debug options (attaches parts, logs timings) */
+  debug?: DebugOptions;
 }
 
 export default class DeclarativePDF {
   declare html: HTMLAdapter;
   declare defaults: PaperDefaults;
-  declare debug: boolean;
+  declare debug: DebugOptions;
 
   documentPages: DocumentPage[] = [];
 
@@ -27,8 +36,12 @@ export default class DeclarativePDF {
   constructor(browser: MinimumBrowser, opts?: DeclarativePDFOpts) {
     this.html = new HTMLAdapter(browser);
     this.defaults = new PaperDefaults(opts?.defaults);
-    this.debug = !!opts?.debug;
-    logger.setOptions({ aggregated: true, active: this.debug });
+    this.debug = opts?.debug ?? {};
+
+    logger.setOptions({
+      aggregated: !!this.debug.aggregated,
+      active: !!this.debug.log,
+    });
   }
 
   get totalPagesNumber() {
@@ -45,9 +58,9 @@ export default class DeclarativePDF {
    * @param template A string containing valid HTML document
    */
   async generate(template: string) {
-    const JOB0 = '=== TOTAL PDF Generating ===';
+    const JOB0 = `[Σ] Total time for ${this.debug.pdfName ?? 'PDF'}`;
     const JOB1 = '[1] Opening new tab';
-    const JOB2 = '[2] Setting content';
+    const JOB2 = '[2] Setting content and loading html';
     const JOB3 = '[3] Normalizing content';
     const JOB4 = '[4] Creating document page models';
     const JOB5 = '[5] Initializing document page models';

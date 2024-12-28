@@ -35,7 +35,12 @@ const testRunner = async (htmlPath: string, pdfName: string) => {
   const html = fs.readFileSync(htmlPath, {
     encoding: 'utf8',
   });
-  const actualPdfBuffer = await new PDF(browser).generate(html);
+  const debug = {
+    log: true,
+    aggregated: true,
+    pdfName,
+  };
+  const actualPdfBuffer = await new PDF(browser, { debug }).generate(html);
   await writeBuffer(
     actualPdfBuffer,
     `${config.paths.actualPdfRootFolder}/${pdfName}`
