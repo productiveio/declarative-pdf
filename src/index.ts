@@ -74,7 +74,6 @@ export default class DeclarativePDF {
       await this.html.normalize();
       logger.end(JOB3);
 
-
       /** get from DOM index, width and height for every document-page element */
       logger.add(JOB4);
       await this.createDocumentPageModels();
