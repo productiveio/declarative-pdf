@@ -82,6 +82,16 @@ export default class HTMLAdapter {
     return this.page.evaluate(evalResetVisibility);
   }
 
+  /**
+   * There is some bug in the PDF generation process, where the height and
+   * the width of the resulting PDF page get smaller by approximate factor
+   * of 0.75. During this process, some rounding issues occur and sometimes,
+   * we end up with 2 pages instead of 1. Also, backgrounds sometimes get
+   * a narrow white line at the bottom.
+   *
+   * To mitigate this, we scale up the width and height by 0.75, as well as
+   * the scale, to keep the same appearance.
+   */
   pdf(opts: {
     width: number;
     height: number;
@@ -89,8 +99,9 @@ export default class HTMLAdapter {
     transparentBg?: boolean;
   }) {
     return this.page.pdf({
-      width: opts.width,
-      height: opts.height,
+      width: opts.width / 0.75,
+      height: opts.height / 0.75,
+      scale: 1 / 0.75,
       margin: opts.margin,
       omitBackground: opts.transparentBg,
       printBackground: true,

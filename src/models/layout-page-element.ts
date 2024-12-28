@@ -107,16 +107,9 @@ export class LayoutPageElement {
       totalPagesNumber: this.totalPagesNumber,
     });
 
-    /**
-     * There is some bug in the PDF generation process, where the height and
-     * the width of the resulting PDF page get smaller by approximate factor
-     * of 0.75. During this process, some rounding issues occur and we end
-     * up with 2 pages instead of 1. To mitigate this, we add 1 to the height
-     * for the elements that are expected to have only 1 page.
-     */
     const buffer = await this.html.pdf({
       width: this.width,
-      height: this.height + (this.type === 'background' ? 0 : 1),
+      height: this.height,
       transparentBg:
         this.layoutPage.hasBackgroundElement && this.type !== 'background',
     });

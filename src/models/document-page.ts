@@ -69,7 +69,7 @@ export class DocumentPage {
    * At this point, layout knows only of heights and what
    * page elements exist. To finish the layouting, we need
    * number of pages for this doc and total number of pages
-   * across all documentPage models
+   * across all documentPage models.
    */
   async createLayoutAndBody(meta: (SectionMeta | SectionVariantMeta)[]) {
     this.layout = new Layout(this, meta);

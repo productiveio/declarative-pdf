@@ -91,7 +91,7 @@ export default class DeclarativePDF {
       logger.add(JOB4);
       await this.createDocumentPageModels();
       logger.end(JOB4);
-      /** for every document page model, get from DOM what that document-page contains  */
+      /** for every document page model, get from DOM what that document-page contains */
       logger.add(JOB5);
       await this.initializeDocumentPageModels();
       logger.end(JOB5);
