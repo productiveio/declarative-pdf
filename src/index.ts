@@ -3,6 +3,7 @@ import { DocumentPage } from '@app/models/document-page';
 import { normalizeSetting } from '@app/utils/normalize-setting';
 import { PaperDefaults, type PaperOpts } from '@app/utils/paper-defaults';
 import HTMLAdapter, { type MinimumBrowser } from '@app/utils/adapter-puppeteer';
+import logger from '@app/models/debug-time-log';
 
 interface DeclarativePDFOpts {
   /** Override for paper defaults (A4 / 72ppi) */
@@ -27,6 +28,7 @@ export default class DeclarativePDF {
     this.html = new HTMLAdapter(browser);
     this.defaults = new PaperDefaults(opts?.defaults);
     this.debug = !!opts?.debug;
+    logger.setOptions({ aggregated: true, active: this.debug });
   }
 
   get totalPagesNumber() {
@@ -43,34 +45,71 @@ export default class DeclarativePDF {
    * @param template A string containing valid HTML document
    */
   async generate(template: string) {
+    const JOB0 = '=== TOTAL PDF Generating ===';
+    const JOB1 = '[1] Opening new tab';
+    const JOB2 = '[2] Setting content';
+    const JOB3 = '[3] Normalizing content';
+    const JOB4 = '[4] Creating document page models';
+    const JOB5 = '[5] Initializing document page models';
+    const JOB6 = '[6] Processing document page models';
+    const JOB7 = '[7] Closing tab';
+    const JOB8 = '[8] Building PDF';
+    const JOBx = '[x] Closing tab after error';
+
+    logger.startSession(JOB0);
     /** (re)set documentPages */
     this.documentPages = [];
 
     try {
       /** open new tab in browser */
+      logger.add(JOB1);
       await this.html.newPage();
+      logger.end(JOB1);
 
       /** send template to tab and normalize it */
+      logger.add(JOB2);
       await this.html.setContent(template);
+      logger.end(JOB2);
+      logger.add(JOB3);
       await this.html.normalize();
+      logger.end(JOB3);
+
 
       /** get from DOM index, width and height for every document-page element */
+      logger.add(JOB4);
       await this.createDocumentPageModels();
+      logger.end(JOB4);
       /** for every document page model, get from DOM what that document-page contains  */
+      logger.add(JOB5);
       await this.initializeDocumentPageModels();
+      logger.end(JOB5);
 
       /** for every document page model, process any element they might have */
+      logger.add(JOB6);
       await this.processDocumentPageModels();
+      logger.end(JOB6);
 
       /** close the tab in browser */
+      logger.add(JOB7);
       await this.html.close();
+      logger.end(JOB7);
 
       /** we should have everything, time to build pdf */
-      return await this.buildPDF();
+      logger.add(JOB8);
+      const result = await this.buildPDF();
+      logger.end(JOB8);
+
+      logger.end(JOB0);
+      logger.endSession();
+      return result;
     } catch (error) {
       /** always close opened tab in the browser to avoid memory leaks */
+      logger.add(JOBx);
       await this.html.close();
+      logger.end(JOBx);
 
+      logger.end(JOB0);
+      logger.endSession();
       /** rethrow the error */
       throw error;
     }
