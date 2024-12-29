@@ -8,9 +8,9 @@ export type LayoutPageOpts = {
   pageIndex: number;
   currentPageNumber: number;
   totalPagesNumber: number;
-  headerMeta: SectionSetting | undefined;
-  footerMeta: SectionSetting | undefined;
-  backgroundMeta: SectionSetting | undefined;
+  headerSettings: SectionSetting | undefined;
+  footerSettings: SectionSetting | undefined;
+  backgroundSettings: SectionSetting | undefined;
 };
 
 /**
@@ -39,27 +39,27 @@ export class LayoutPage {
     this.currentPageNumber = opts.currentPageNumber;
     this.totalPagesNumber = opts.totalPagesNumber;
 
-    if (opts.headerMeta) {
+    if (opts.headerSettings) {
       this.header = new LayoutPageElement({
         layoutPage: this,
         type: 'header',
-        ...opts.headerMeta,
+        ...opts.headerSettings,
       });
     }
 
-    if (opts.footerMeta) {
+    if (opts.footerSettings) {
       this.footer = new LayoutPageElement({
         layoutPage: this,
         type: 'footer',
-        ...opts.footerMeta,
+        ...opts.footerSettings,
       });
     }
 
-    if (opts.backgroundMeta) {
+    if (opts.backgroundSettings) {
       this.background = new LayoutPageElement({
         layoutPage: this,
         type: 'background',
-        ...opts.backgroundMeta,
+        ...opts.backgroundSettings,
       });
     }
 

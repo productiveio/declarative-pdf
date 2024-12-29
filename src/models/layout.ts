@@ -11,27 +11,27 @@ const getMaxHeight = (els: SectionSetting[]) => {
   return els.reduce((x, s) => Math.max(x, s.height), 0);
 };
 
-const pickMeta = (
-  ss: SectionSetting[],
+const pickSettings = (
+  sectionSettings: SectionSetting[],
   index: number,
   offset: number,
   count: number
 ): SectionSetting | undefined => {
-  if (!ss.length) return undefined;
+  if (!sectionSettings.length) return undefined;
 
-  if (ss[0].physicalPageIndex !== undefined) {
-    return selectSection(ss, index, offset, count);
+  if (sectionSettings[0].physicalPageIndex !== undefined) {
+    return selectSection(sectionSettings, index, offset, count);
   }
 
-  return ss[0];
+  return sectionSettings[0];
 };
 
 export class Layout {
   declare documentPage: DocumentPage;
 
-  declare headersMeta: SectionSetting[];
-  declare footersMeta: SectionSetting[];
-  declare backgroundsMeta: SectionSetting[];
+  declare headerSettings: SectionSetting[];
+  declare footerSettings: SectionSetting[];
+  declare backgroundSettings: SectionSetting[];
 
   declare headerHeight: number;
   declare footerHeight: number;
@@ -44,11 +44,11 @@ export class Layout {
 
   declare pages?: LayoutPage[];
 
-  constructor(documentPage: DocumentPage, ss: SectionSettings) {
+  constructor(documentPage: DocumentPage, sectionSettings: SectionSettings) {
     this.documentPage = documentPage;
-    this.headersMeta = ss.headers;
-    this.footersMeta = ss.footers;
-    this.backgroundsMeta = ss.backgrounds;
+    this.headerSettings = sectionSettings.headers;
+    this.footerSettings = sectionSettings.footers;
+    this.backgroundSettings = sectionSettings.backgrounds;
     this.setHeights();
   }
 
@@ -62,9 +62,9 @@ export class Layout {
 
   get hasMeta() {
     return (
-      this.headersMeta.length ||
-      this.footersMeta.length ||
-      this.backgroundsMeta.length
+      this.headerSettings.length ||
+      this.footerSettings.length ||
+      this.backgroundSettings.length
     );
   }
 
@@ -81,8 +81,8 @@ export class Layout {
   }
 
   private setHeights() {
-    this.headerHeight = getMaxHeight(this.headersMeta);
-    this.footerHeight = getMaxHeight(this.footersMeta);
+    this.headerHeight = getMaxHeight(this.headerSettings);
+    this.footerHeight = getMaxHeight(this.footerSettings);
     this.bodyHeight = this.pageHeight - this.headerHeight - this.footerHeight;
     this.backgroundHeight = this.pageHeight;
     this.headerY = this.pageHeight - this.headerHeight;
@@ -134,9 +134,14 @@ export class Layout {
         pageIndex: i,
         currentPageNumber: i + 1 + offset,
         totalPagesNumber: total,
-        headerMeta: pickMeta(this.headersMeta, i, offset, count),
-        footerMeta: pickMeta(this.footersMeta, i, offset, count),
-        backgroundMeta: pickMeta(this.backgroundsMeta, i, offset, count),
+        headerSettings: pickSettings(this.headerSettings, i, offset, count),
+        footerSettings: pickSettings(this.footerSettings, i, offset, count),
+        backgroundSettings: pickSettings(
+          this.backgroundSettings,
+          i,
+          offset,
+          count
+        ),
       });
     });
   }
