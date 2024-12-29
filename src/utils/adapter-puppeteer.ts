@@ -1,5 +1,5 @@
 import { PAPER_SIZE } from '@app/consts/paper-size';
-import evalDocumentPageSettings from '@app/evaluators/document-page-settings';
+import evalSectionSettings from '@app/evaluators/section-settings';
 import evalPrepareSection from '@app/evaluators/prepare-section';
 import evalTemplateNormalize from '@app/evaluators/template-normalize';
 import evalTemplateSettings from '@app/evaluators/template-settings';
@@ -65,8 +65,8 @@ export default class HTMLAdapter {
     });
   }
 
-  getDocumentPageSettings(opts: { index: number }) {
-    return this.page.evaluate(evalDocumentPageSettings, opts.index);
+  getSectionSettings(opts: { index: number }) {
+    return this.page.evaluate(evalSectionSettings, opts.index);
   }
 
   prepareSection(opts: PrepareSection) {

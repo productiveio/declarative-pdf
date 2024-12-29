@@ -169,7 +169,7 @@ export default class DeclarativePDF {
 
     for (const [index, doc] of this.documentPages.entries()) {
       await this.html.setViewport(doc.viewPort);
-      const settings = await this.html.getDocumentPageSettings({ index });
+      const settings = await this.html.getSectionSettings({ index });
       await doc.createLayoutAndBody(settings);
     }
   }

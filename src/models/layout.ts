@@ -1,37 +1,37 @@
-import { areSectionVariants, selectVariant } from '@app/utils/physical-pages';
-import { LayoutPage, type LayoutPageMeta } from '@app/models/layout-page';
+import { selectSection } from '@app/utils/select-section';
+import { LayoutPage } from '@app/models/layout-page';
 
 import type { DocumentPage } from '@app/models/document-page';
+import type {
+  SectionSetting,
+  SectionSettings,
+} from '@app/evaluators/section-settings';
 
-const getMaxHeight = (els: NonNullable<LayoutPageMeta>[]) => {
-  return els.reduce((x, s) => Math.max(x, s.sectionHeight), 0);
+const getMaxHeight = (els: SectionSetting[]) => {
+  return els.reduce((x, s) => Math.max(x, s.height), 0);
 };
 
 const pickMeta = (
-  collection: NonNullable<LayoutPageMeta>[],
+  ss: SectionSetting[],
   index: number,
   offset: number,
   count: number
-): LayoutPageMeta => {
-  if (!collection.length) return undefined;
+): SectionSetting | undefined => {
+  if (!ss.length) return undefined;
 
-  if (areSectionVariants(collection)) {
-    return selectVariant(collection, index, offset, count);
+  if (ss[0].physicalPageIndex !== undefined) {
+    return selectSection(ss, index, offset, count);
   }
 
-  if (collection.length > 1) {
-    throw new Error('More than one setting for a regular section');
-  }
-
-  return collection[0];
+  return ss[0];
 };
 
 export class Layout {
   declare documentPage: DocumentPage;
 
-  declare headersMeta: NonNullable<LayoutPageMeta>[];
-  declare footersMeta: NonNullable<LayoutPageMeta>[];
-  declare backgroundsMeta: NonNullable<LayoutPageMeta>[];
+  declare headersMeta: SectionSetting[];
+  declare footersMeta: SectionSetting[];
+  declare backgroundsMeta: SectionSetting[];
 
   declare headerHeight: number;
   declare footerHeight: number;
@@ -44,11 +44,11 @@ export class Layout {
 
   declare pages?: LayoutPage[];
 
-  constructor(documentPage: DocumentPage, meta: NonNullable<LayoutPageMeta>[]) {
+  constructor(documentPage: DocumentPage, ss: SectionSettings) {
     this.documentPage = documentPage;
-    this.headersMeta = meta.filter((s) => s.sectionType === 'header');
-    this.footersMeta = meta.filter((s) => s.sectionType === 'footer');
-    this.backgroundsMeta = meta.filter((s) => s.sectionType === 'background');
+    this.headersMeta = ss.headers;
+    this.footersMeta = ss.footers;
+    this.backgroundsMeta = ss.backgrounds;
     this.setHeights();
   }
 

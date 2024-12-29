@@ -2,6 +2,7 @@ import { PDFDocument } from 'pdf-lib';
 import { Layout } from '@app/models/layout';
 
 import type DeclarativePDF from '@app/index';
+import type { SectionSettings } from '@app/evaluators/section-settings';
 
 type DocumentPageOpts = {
   parent: DeclarativePDF;
@@ -16,18 +17,6 @@ type DocumentPageOpts = {
   /** bottom margin of the page-body element */
   bodyMarginBottom: number;
 };
-
-export type SectionMeta = {
-  sectionHeight: number;
-  sectionType: 'header' | 'footer' | 'background';
-  hasCurrentPageNumber: boolean;
-  hasTotalPagesNumber: boolean;
-};
-
-export type SectionVariantMeta = {
-  physicalPageIndex: number;
-  physicalPageType: 'first' | 'last' | 'even' | 'odd' | 'default';
-} & SectionMeta;
 
 export class DocumentPage {
   declare parent: DeclarativePDF;
@@ -71,8 +60,8 @@ export class DocumentPage {
    * number of pages for this doc and total number of pages
    * across all documentPage models.
    */
-  async createLayoutAndBody(meta: (SectionMeta | SectionVariantMeta)[]) {
-    this.layout = new Layout(this, meta);
+  async createLayoutAndBody(sectionSettings: SectionSettings) {
+    this.layout = new Layout(this, sectionSettings);
 
     await this.html.prepareSection({ documentPageIndex: this.index });
     const uint8Array = await this.html.pdf({

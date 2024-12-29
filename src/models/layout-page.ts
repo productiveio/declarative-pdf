@@ -1,21 +1,16 @@
 import { LayoutPageElement } from '@app/models/layout-page-element';
 
-import type {
-  SectionMeta,
-  SectionVariantMeta,
-} from '@app/models/document-page';
 import { Layout } from '@app/models/layout';
-
-export type LayoutPageMeta = SectionMeta | SectionVariantMeta | undefined;
+import type { SectionSetting } from '@app/evaluators/section-settings';
 
 export type LayoutPageOpts = {
   layout: Layout;
   pageIndex: number;
   currentPageNumber: number;
   totalPagesNumber: number;
-  headerMeta: LayoutPageMeta;
-  footerMeta: LayoutPageMeta;
-  backgroundMeta: LayoutPageMeta;
+  headerMeta: SectionSetting | undefined;
+  footerMeta: SectionSetting | undefined;
+  backgroundMeta: SectionSetting | undefined;
 };
 
 /**
@@ -47,6 +42,7 @@ export class LayoutPage {
     if (opts.headerMeta) {
       this.header = new LayoutPageElement({
         layoutPage: this,
+        type: 'header',
         ...opts.headerMeta,
       });
     }
@@ -54,6 +50,7 @@ export class LayoutPage {
     if (opts.footerMeta) {
       this.footer = new LayoutPageElement({
         layoutPage: this,
+        type: 'footer',
         ...opts.footerMeta,
       });
     }
@@ -61,14 +58,15 @@ export class LayoutPage {
     if (opts.backgroundMeta) {
       this.background = new LayoutPageElement({
         layoutPage: this,
+        type: 'background',
         ...opts.backgroundMeta,
       });
     }
 
     this.body = new LayoutPageElement({
       layoutPage: this,
-      sectionHeight: this.layout.bodyHeight,
-      sectionType: 'body',
+      height: this.layout.bodyHeight,
+      type: 'body',
       hasCurrentPageNumber: false,
       hasTotalPagesNumber: false,
     });

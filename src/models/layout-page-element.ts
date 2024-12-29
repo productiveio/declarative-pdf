@@ -1,17 +1,14 @@
 import { PDFDocument, type PDFPage } from 'pdf-lib';
 import type { LayoutPage } from '@app/models/layout-page';
 
+import type { SectionSetting } from '@app/evaluators/section-settings';
+
 type TPhysicalPageType = 'first' | 'last' | 'even' | 'odd' | 'default';
 
 type LayoutPageElementOpts = {
   layoutPage: LayoutPage;
-  sectionHeight: number;
-  sectionType: 'header' | 'footer' | 'background' | 'body';
-  hasCurrentPageNumber: boolean;
-  hasTotalPagesNumber: boolean;
-  physicalPageIndex?: number;
-  physicalPageType?: TPhysicalPageType;
-};
+  type: 'header' | 'footer' | 'background' | 'body';
+} & SectionSetting;
 
 export class LayoutPageElement {
   declare layoutPage: LayoutPage;
@@ -27,8 +24,8 @@ export class LayoutPageElement {
 
   constructor(opts: LayoutPageElementOpts) {
     this.layoutPage = opts.layoutPage;
-    this.height = opts.sectionHeight;
-    this.type = opts.sectionType;
+    this.height = opts.height;
+    this.type = opts.type;
     this.hasCurrentPageNumber = opts.hasCurrentPageNumber;
     this.hasTotalPagesNumber = opts.hasTotalPagesNumber;
     this.physicalPageIndex = opts.physicalPageIndex;
