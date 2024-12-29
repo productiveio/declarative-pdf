@@ -6,6 +6,7 @@ import evalTemplateSettings from '@app/evaluators/template-settings';
 import evalResetVisibility from '@app/evaluators/reset-visibility';
 
 import type { Browser, Page } from 'puppeteer';
+import type { PrepareSection } from '@app/evaluators/prepare-section';
 
 export type MinimumBrowser = Pick<Browser, 'newPage' | 'connected'>;
 
@@ -68,13 +69,7 @@ export default class HTMLAdapter {
     return this.page.evaluate(evalDocumentPageSettings, opts.index);
   }
 
-  prepareSection(opts: {
-    documentPageIndex: number;
-    sectionType?: 'header' | 'footer' | 'background';
-    physicalPageIndex?: number;
-    currentPageNumber?: number;
-    totalPagesNumber?: number;
-  }) {
+  prepareSection(opts: PrepareSection) {
     return this.page.evaluate(evalPrepareSection, opts);
   }
 
@@ -97,7 +92,7 @@ export default class HTMLAdapter {
     height: number;
     margin?: { top?: number; right?: number; bottom?: number; left?: number };
     transparentBg?: boolean;
-  }) {
+  }): Promise<Uint8Array> {
     return this.page.pdf({
       width: opts.width / 0.75,
       height: opts.height / 0.75,

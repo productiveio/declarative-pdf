@@ -1,4 +1,4 @@
-type PrepareSection = {
+export type PrepareSection = {
   documentPageIndex: number;
   sectionType?: 'background' | 'header' | 'footer';
   physicalPageIndex?: number;
