@@ -14,7 +14,10 @@ interface DebugOptions {
   pdfName?: string;
 }
 
+// TODO: add more normalization options (maybe we want to do a part of standard normalization)
 interface DeclarativePDFOpts {
+  /** Should we normalize the content (remove excess elements, wrap content to tags) */
+  normalize?: boolean;
   /** Override for paper defaults (A4 / 72ppi) */
   defaults?: PaperOpts;
   /** Debug options (attaches parts, logs timings) */
@@ -50,6 +53,7 @@ export default class DeclarativePDF {
 
   /**
    * Generates a pdf buffer from string containing html template.
+   * TODO: add another method that creates pdf from puppeteer page (already loaded content)
    *
    * When calling this method, it is expected that:
    * - the browser is initialized and ready
