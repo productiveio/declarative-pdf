@@ -73,6 +73,7 @@ export default function evalPrepareSection(opts: PrepareSection) {
   );
   if (!sectionEl) return false;
 
+  // TODO: check if this margin handling is correct (it might be messing up the heights)
   // if secType is body, we need to remove the body margin because
   // they are already included in the pdf print options
   if (secType === 'page-body') {
