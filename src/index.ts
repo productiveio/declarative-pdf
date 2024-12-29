@@ -134,7 +134,7 @@ export default class DeclarativePDF {
    * document page model for each setting parsed from the HTML template.
    */
   private async createDocumentPageModels() {
-    const documentPageSettings = await this.html.templateSettings({
+    const documentPageSettings = await this.html.getTemplateSettings({
       width: this.defaults.width,
       height: this.defaults.height,
       ppi: this.defaults.ppi,
@@ -165,7 +165,7 @@ export default class DeclarativePDF {
 
     for (const [index, doc] of this.documentPages.entries()) {
       await this.html.setViewport(doc.viewPort);
-      const settings = await this.html.documentPageSettings({ index });
+      const settings = await this.html.getDocumentPageSettings({ index });
       await doc.createLayoutAndBody(settings);
     }
   }

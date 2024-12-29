@@ -57,14 +57,14 @@ export default class HTMLAdapter {
     return this.page.evaluate(evalTemplateNormalize);
   }
 
-  templateSettings(opts: { width: number; height: number; ppi: number }) {
+  getTemplateSettings(opts: { width: number; height: number; ppi: number }) {
     return this.page.evaluate(evalTemplateSettings, {
       default: opts,
       size: PAPER_SIZE,
     });
   }
 
-  documentPageSettings(opts: { index: number }) {
+  getDocumentPageSettings(opts: { index: number }) {
     return this.page.evaluate(evalDocumentPageSettings, opts.index);
   }
 
