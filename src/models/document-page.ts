@@ -117,6 +117,7 @@ export class DocumentPage {
 
   async process() {
     if (!this.layout) throw new Error('Layout is not initialized');
+    // TODO: rename this method - we are processing layout and sections, not document pages
     this.layout.createLayoutPages();
 
     // there is nothing to process, so bail out

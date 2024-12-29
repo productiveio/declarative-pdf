@@ -106,6 +106,7 @@ export class Layout {
    */
   createLayoutPages() {
     // Do not create layout pages if there are no elements
+    // TODO: simplify this, layout should know if it needs to create pages
     if (!this.documentPage.parent.needsLayouting) return;
 
     const count = this.documentPage.pageCount;
