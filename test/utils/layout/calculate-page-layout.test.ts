@@ -26,6 +26,15 @@ describe('getMaxHeight', () => {
     ] as SectionSetting[];
     expect(getMaxHeight(els)).toBe(200);
   });
+
+  test('returns max height from multiple elements with malformed heights', () => {
+    const els: SectionSetting[] = [
+      { height: 50 },
+      {},
+      { height: undefined },
+    ] as SectionSetting[];
+    expect(getMaxHeight(els)).toBe(50);
+  });
 });
 
 describe('calculatePageLayout', () => {
