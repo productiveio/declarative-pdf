@@ -1,4 +1,8 @@
-import hasPageNumbers from '@app/utils/layout/has-page-numbers';
+import {
+  hasPageNumbers,
+  hasSectionPageNumbers,
+} from '@app/utils/layout/has-page-numbers';
+
 import type {
   SectionSettings,
   SectionSetting,
@@ -116,5 +120,71 @@ describe('hasPageNumbers', () => {
 
   test('returns false when settings is undefined', () => {
     expect(hasPageNumbers(undefined as unknown as SectionSettings)).toBe(false);
+  });
+});
+
+describe('hasSectionPageNumbers', () => {
+  test('returns false for empty section settings', () => {
+    const settings: SectionSetting[] = [];
+    expect(hasSectionPageNumbers(settings)).toBe(false);
+  });
+
+  test('returns false when no page numbers present', () => {
+    const settings = [
+      {
+        height: 0,
+        hasCurrentPageNumber: false,
+        hasTotalPagesNumber: false,
+      },
+    ];
+    expect(hasSectionPageNumbers(settings)).toBe(false);
+  });
+
+  test('returns true when current page number present', () => {
+    const settings = [
+      {
+        height: 0,
+        hasCurrentPageNumber: true,
+        hasTotalPagesNumber: false,
+      },
+    ];
+    expect(hasSectionPageNumbers(settings)).toBe(true);
+  });
+
+  test('returns true when total pages number present', () => {
+    const settings = [
+      {
+        height: 0,
+        hasCurrentPageNumber: false,
+        hasTotalPagesNumber: true,
+      },
+    ];
+    expect(hasSectionPageNumbers(settings)).toBe(true);
+  });
+
+  test('returns true when both number types present', () => {
+    const settings = [
+      {
+        height: 0,
+        hasCurrentPageNumber: true,
+        hasTotalPagesNumber: true,
+      },
+    ];
+    expect(hasSectionPageNumbers(settings)).toBe(true);
+  });
+
+  test('returns false when settings is malformed', () => {
+    const settings = [{}, {}, {}] as unknown as SectionSetting[];
+    expect(hasSectionPageNumbers(settings)).toBe(false);
+  });
+
+  test('returns false when settings is missing', () => {
+    expect(hasSectionPageNumbers([])).toBe(false);
+  });
+
+  test('returns false when settings is undefined', () => {
+    expect(
+      hasSectionPageNumbers(undefined as unknown as SectionSetting[])
+    ).toBe(false);
   });
 });
