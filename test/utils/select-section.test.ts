@@ -15,6 +15,16 @@ const makeSetting = (opts: Partial<SectionSetting>) => {
   return setting;
 };
 
+const makeMinimumSetting = (opts: Partial<SectionSetting>) => {
+  const setting: SectionSetting = {
+    height: 20,
+    hasCurrentPageNumber: false,
+    hasTotalPagesNumber: false,
+    ...opts,
+  };
+  return setting;
+};
+
 describe('selectSection', () => {
   test('returns correct variant from filled set', () => {
     const variants1 = [
@@ -216,5 +226,20 @@ describe('selectSection', () => {
     expect(
       selectSection(variants4, 4, 15, 5)?.physicalPageIndex
     ).toBeUndefined();
+  });
+
+  test('returns first setting from minimum settings set', () => {
+    const settings1 = [makeMinimumSetting({}), makeMinimumSetting({})];
+
+    expect(selectSection(settings1, 0, 0, 2)).toBe(settings1[0]);
+    expect(selectSection(settings1, 1, 0, 2)).toBe(settings1[0]);
+    expect(selectSection(settings1, 0, 1, 2)).toBe(settings1[0]);
+    expect(selectSection(settings1, 1, 1, 2)).toBe(settings1[0]);
+  });
+
+  test('returns undefined from empty set', () => {
+    const settings1: SectionSetting[] = [];
+
+    expect(selectSection(settings1, 1, 2, 6)).toBeUndefined();
   });
 });

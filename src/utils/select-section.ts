@@ -2,9 +2,17 @@ import Variant from '@app/consts/physical-page';
 
 import { SectionSetting } from '@app/evaluators/section-settings';
 
-const findVariant = (variants: SectionSetting[], condition: Variant) => {
+function containVariants(sectionSettings: SectionSetting[]) {
+  return sectionSettings.some(
+    (section) =>
+      section.physicalPageType !== undefined ||
+      section.physicalPageIndex !== undefined
+  );
+}
+
+function findVariant(variants: SectionSetting[], condition: Variant) {
   return variants.find((variant) => variant.physicalPageType === condition);
-};
+}
 
 /**
  * Selects a variant for a given page in the layout.
@@ -16,13 +24,14 @@ const findVariant = (variants: SectionSetting[], condition: Variant) => {
  * @param offset A sum of page counts from previous document-pages
  * @param count A count of pages this document-page have
  */
-export const selectSection = (
+export function selectSection(
   sectionSettings: SectionSetting[],
   pageIndex: number,
   offset: number,
   count: number
-) => {
+) {
   if (!sectionSettings.length) return;
+  if (!containVariants(sectionSettings)) return sectionSettings[0];
 
   const isFirst = pageIndex === 0;
   const isLast = pageIndex === count - 1;
@@ -35,4 +44,4 @@ export const selectSection = (
     findVariant(sectionSettings, isOdd ? Variant.ODD : Variant.EVEN) ||
     findVariant(sectionSettings, Variant.DEFAULT)
   );
-};
+}
