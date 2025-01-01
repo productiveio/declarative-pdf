@@ -52,14 +52,21 @@ export default function evalTemplateSettings(opts: TemplateSettingOpts) {
 
     const ppi = attrPpi && attrPpi > 0 ? attrPpi : opts.default.ppi;
 
+    const hasSections = !!docPageEl.querySelector(
+      'page-header, page-footer, page-background'
+    );
+
     let bodyMarginBottom = 0;
     let bodyMarginTop = 0;
 
     const pageBodyEl = docPageEl.querySelector('page-body');
     if (pageBodyEl) {
       const pageBodyStyle = window.getComputedStyle(pageBodyEl);
-      bodyMarginTop = Math.ceil(parseFloat(pageBodyStyle.marginTop));
-      bodyMarginBottom = Math.ceil(parseFloat(pageBodyStyle.marginBottom));
+      const marginTop = parseFloat(pageBodyStyle.marginTop);
+      const marginBottom = parseFloat(pageBodyStyle.marginBottom);
+      // empty string will be parsed to NaN
+      bodyMarginTop = isNaN(marginTop) ? 0 : Math.ceil(marginTop);
+      bodyMarginBottom = isNaN(marginBottom) ? 0 : Math.ceil(marginBottom);
     }
 
     let width, height;
@@ -76,7 +83,14 @@ export default function evalTemplateSettings(opts: TemplateSettingOpts) {
       height = opts.default.height;
     }
 
-    return { index, width, height, bodyMarginTop, bodyMarginBottom };
+    return {
+      index,
+      width,
+      height,
+      bodyMarginTop,
+      bodyMarginBottom,
+      hasSections,
+    };
   };
 
   const docPageEls = Array.from(
