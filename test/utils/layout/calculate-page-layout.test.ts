@@ -1,3 +1,6 @@
+/**
+ * @jest-environment node
+ */
 import calculatePageLayout, {
   getMaxHeight,
 } from '@app/utils/layout/calculate-page-layout';
