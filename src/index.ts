@@ -66,8 +66,8 @@ export default class DeclarativePDF {
     const JOB1 = '[1] Opening new tab';
     const JOB2 = '[2] Setting content and loading html';
     const JOB3 = '[3] Normalizing content';
-    const JOB4 = '[4] Creating document page models';
-    const JOB5 = '[5] Initializing document page models';
+    const JOB4 = '[4] Getting document page settings from DOM';
+    const JOB5 = '[5] Build layout for every document page model';
     const JOB6 = '[6] Processing document page models';
     const JOB7 = '[7] Closing tab';
     const JOB8 = '[8] Building PDF';
@@ -93,41 +93,47 @@ export default class DeclarativePDF {
 
       /** get from DOM index, width and height for every document-page element */
       logger.add(JOB4);
-      await this.createDocumentPageModels();
+      await this.getDocumentPageSettings();
       logger.end(JOB4);
       /** for every document page model, get from DOM what that document-page contains */
       logger.add(JOB5);
-      await this.initializeDocumentPageModels();
+      await this.buildLayoutForEachDocumentPage();
       logger.end(JOB5);
+
+      // TODO: add a check if we can return early (no layouting needed, just return body buffer)
 
       /** for every document page model, process any element they might have */
       logger.add(JOB6);
       await this.processDocumentPageModels();
       logger.end(JOB6);
 
-      /** close the tab in browser */
-      logger.add(JOB7);
-      await this.html.close();
-      logger.end(JOB7);
-
       /** we should have everything, time to build pdf */
       logger.add(JOB8);
       const result = await this.buildPDF();
       logger.end(JOB8);
 
-      logger.end(JOB0);
-      logger.endSession();
       return result;
     } catch (error) {
-      /** always close opened tab in the browser to avoid memory leaks */
+      /** cleanup - always close opened tab in the browser to avoid memory leaks */
       logger.add(JOBx);
       await this.html.close();
       logger.end(JOBx);
 
+      /** cleanup - always close the logger session */
       logger.end(JOB0);
       logger.endSession();
-      /** rethrow the error */
+
+      /** rethrow the error (this will skip the finally block) */
       throw error;
+    } finally {
+      /** cleanup - close the tab in browser */
+      logger.add(JOB7);
+      await this.html.close();
+      logger.end(JOB7);
+
+      /** cleanup - close the logger session */
+      logger.end(JOB0);
+      logger.endSession();
     }
   }
 
@@ -137,7 +143,7 @@ export default class DeclarativePDF {
    * This method will evaluate the template settings and create a new
    * document page model for each setting parsed from the HTML template.
    */
-  private async createDocumentPageModels() {
+  private async getDocumentPageSettings() {
     const documentPageSettings = await this.html.getTemplateSettings({
       width: this.defaults.width,
       height: this.defaults.height,
@@ -161,10 +167,12 @@ export default class DeclarativePDF {
    * Initializes the document page models.
    *
    * For every created document page model, this method sets desired
-   * viewport and evaluates document page settings from which it
-   * initializes that document page model.
+   * viewport and gets section settings from the DOM to create layout
+   * (heights and positions). It then convert to pdf the body element
+   * from which we get the number of pages and finally have all the
+   * information needed to build the final PDF.
    */
-  private async initializeDocumentPageModels() {
+  private async buildLayoutForEachDocumentPage() {
     if (!this.documentPages?.length) throw new Error('No document pages found');
 
     for (const [index, doc] of this.documentPages.entries()) {
