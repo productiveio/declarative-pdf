@@ -1,10 +1,15 @@
 import { PDFDocument } from 'pdf-lib';
-import { Layout } from '@app/models/layout';
+import { BodyElement } from '@app/models/element';
+import {
+  createPageLayoutSettings,
+  type PageLayout,
+} from '@app/utils/layout/create-page-layout';
 
 import type DeclarativePDF from '@app/index';
 import type { SectionSettings } from '@app/evaluators/section-settings';
+import type { SectionElement } from '@app/models/element';
 
-type DocumentPageOpts = {
+export type DocumentPageOpts = {
   parent: DeclarativePDF;
   /** index of document-page element in DOM */
   index: number;
@@ -16,6 +21,8 @@ type DocumentPageOpts = {
   bodyMarginTop: number;
   /** bottom margin of the page-body element */
   bodyMarginBottom: number;
+  /** do we have any sections other than page-body */
+  hasSections: boolean;
 };
 
 export class DocumentPage {
@@ -25,9 +32,13 @@ export class DocumentPage {
   declare index: number;
   declare bodyMarginTop: number;
   declare bodyMarginBottom: number;
+  declare hasSections: boolean;
 
-  declare layout?: Layout;
-  declare body?: { buffer: Buffer; pdf: PDFDocument };
+  /** These two will exist after createLayoutAndBody() method */
+  declare layout?: PageLayout;
+  declare body?: BodyElement;
+
+  sectionElements: SectionElement[] = [];
 
   constructor(opts: DocumentPageOpts) {
     this.parent = opts.parent;
@@ -36,6 +47,7 @@ export class DocumentPage {
     this.height = opts.height;
     this.bodyMarginTop = opts.bodyMarginTop;
     this.bodyMarginBottom = opts.bodyMarginBottom;
+    this.hasSections = opts.hasSections;
   }
 
   get viewPort() {
@@ -52,32 +64,46 @@ export class DocumentPage {
   /**
    * Create the layout and body element.
    *
-   * This method creates the body PDF and sets the number
-   * of pages for this document-page.
+   * This method will figure out heights and positions of
+   * all existing elements on this page and create a body
+   * element which will, in turn, give us a total page
+   * count for this document page.
    *
-   * At this point, layout knows only of heights and what
-   * page elements exist. To finish the layouting, we need
-   * number of pages for this doc and total number of pages
-   * across all documentPage models.
+   * We need to know the number of pages to be able to
+   * construct other elements that might need to display
+   * current page / total page number.
    */
-  async createLayoutAndBody(sectionSettings: SectionSettings) {
-    this.layout = new Layout(this, sectionSettings);
+  async createLayoutAndBody(sectionSettings?: SectionSettings) {
+    this.layout = createPageLayoutSettings(
+      sectionSettings,
+      this.height,
+      this.width
+    );
 
     await this.html.prepareSection({ documentPageIndex: this.index });
     const uint8Array = await this.html.pdf({
-      width: this.width,
-      height: this.layout.bodyHeight,
+      width: this.layout.width,
+      height: this.layout.body.height,
       margin: {
         top: this.bodyMarginTop,
         bottom: this.bodyMarginBottom,
       },
-      transparentBg: this.layout.hasBackgroundElement,
+      transparentBg: this.layout.body.transparentBg,
     });
     const buffer = Buffer.from(uint8Array);
     const pdf = await PDFDocument.load(uint8Array);
     await this.html.resetVisibility();
 
-    this.body = { pdf, buffer };
+    this.layout.pageCount = pdf.getPageCount();
+    this.body = new BodyElement({ buffer, pdf });
+  }
+
+  get hasPageNumbers() {
+    return !!this.layout?.hasPageNumbers;
+  }
+
+  get isLayoutingNeeded() {
+    return this.layout?.hasAnySection;
   }
 
   get previousDocumentPages() {
@@ -85,17 +111,16 @@ export class DocumentPage {
   }
 
   get pageCount() {
-    const count = this.body!.pdf.getPageCount();
-
-    if (count < 1) {
+    if (!this.layout?.pageCount) {
       throw new Error(
         `Body generated for document page ${this.index} has no pages`
       );
     }
 
-    return count;
+    return this.layout.pageCount;
   }
 
+  // TODO: push this to layout somehow
   get pageCountOffset() {
     const offset = this.previousDocumentPages.reduce(
       (acc, doc) => acc + doc.pageCount,
@@ -118,14 +143,14 @@ export class DocumentPage {
   async process() {
     if (!this.layout) throw new Error('Layout is not initialized');
     // TODO: rename this method - we are processing layout and sections, not document pages
-    this.layout.createLayoutPages();
+    // this.layout.createLayoutPages();
 
     // there is nothing to process, so bail out
-    if (!this.layout.needsProcessing) return;
+    // if (!this.layout.needsProcessing) return;
 
     // process every page that needs processing in sequence
-    for (const page of this.layout.pagesForProcessing) {
-      await page.process();
-    }
+    // for (const page of this.layout.pagesForProcessing) {
+    //   await page.process();
+    // }
   }
 }
