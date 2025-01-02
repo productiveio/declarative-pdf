@@ -2,14 +2,12 @@
  * @jest-environment node
  */
 import { buildPages } from '@app/utils/layout/build-pages';
-import { DocumentPage } from '@app/models/document-page';
-import { SectionElement } from '@app/models/element';
 import { createPageLayoutSettings } from '@app/utils/layout/create-page-layout';
 
-import type { DocumentPageOpts } from '@app/models/document-page';
-
 import type { SectionSetting } from '@app/evaluators/section-settings';
-import type DeclarativePDF from '@app/index';
+import type { BodyElement } from '@app/models/element';
+import type HTMLAdapter from '@app/utils/adapter-puppeteer';
+import { PDFDocument } from 'pdf-lib';
 
 /**
  * We are mocking the pdf Buffer in the test, so PDFDocument.load()
@@ -22,188 +20,164 @@ jest.mock('pdf-lib', () => ({
       getPageCount: () => 1,
       getPage: () => ({}),
     }),
+    create: jest.fn().mockResolvedValue({
+      getPageCount: () => 1,
+      getPage: () => ({}),
+    }),
   },
 }));
 
-// parent
-// - .html -> html adapter
-// - .documentPages -> an array of all document pages
-// - .totalPagesNumber -> a number
+type MockSectionSettingOpts = Partial<SectionSetting>;
 
-interface MockDocumentPageOpts {
-  parent: DeclarativePDF;
-  doc?: Partial<DocumentPageOpts>;
+interface MockLayoutOpts {
   settings?: {
     headers?: SectionSetting[];
     footers?: SectionSetting[];
     backgrounds?: SectionSetting[];
   };
+  height?: number;
+  width?: number;
   pageCount?: number;
 }
 
+interface MockBuildPagesOpts {
+  documentPageIndex?: number;
+  pageCountOffset?: number;
+  totalPagesNumber?: number;
+  layout?: MockLayoutOpts;
+}
+
 describe('buildPages', () => {
-  const mockParent = () =>
+  const mockHTML = () =>
     ({
-      html: {
-        prepareSection: jest.fn(),
-        pdf: jest.fn().mockResolvedValue(new Uint8Array()),
-        resetVisibility: jest.fn(),
-      },
-      documentPages: [],
-      totalPagesNumber: 0,
-    }) as unknown as DeclarativePDF;
+      prepareSection: jest.fn(),
+      pdf: jest.fn().mockResolvedValue(new Uint8Array()),
+      resetVisibility: jest.fn(),
+    }) as unknown as HTMLAdapter;
 
-  const mockSectionSetting = (
-    opts?: Partial<SectionSetting>
-  ): SectionSetting => ({
-    height: 100,
-    hasCurrentPageNumber: false,
-    hasTotalPagesNumber: false,
-    ...opts,
-  });
+  const mockSectionSetting = (opts?: MockSectionSettingOpts) =>
+    ({
+      height: 50,
+      hasCurrentPageNumber: false,
+      hasTotalPagesNumber: false,
+      ...opts,
+    }) as SectionSetting;
 
-  const mockDocumentPage = (opts: MockDocumentPageOpts) => {
-    const doc = new DocumentPage({
-      parent: opts.parent,
-      index: opts.parent.documentPages.length,
-      width: 0,
-      height: 0,
-      bodyMarginTop: 0,
-      bodyMarginBottom: 0,
-      hasSections: false,
-      ...opts.doc,
-    });
-    const settings = {
-      headers: opts.settings?.headers ?? [],
-      footers: opts.settings?.footers ?? [],
-      backgrounds: opts.settings?.backgrounds ?? [],
-    };
+  const mockBodyElement = async () =>
+    ({
+      buffer: Buffer.from(''),
+      pdf: await PDFDocument.create(),
+    }) as BodyElement;
+
+  const mockLayout = (opts?: MockLayoutOpts) => {
     const layout = createPageLayoutSettings(
-      settings,
-      opts.doc?.height ?? 0,
-      opts.doc?.width ?? 0
-    );
-    doc.layout = layout;
-    doc.layout.pageCount = opts.pageCount ?? 0;
-
-    opts.parent.documentPages.push(doc);
-    // @ts-expect-error - we are mocking this property
-    opts.parent.totalPagesNumber += layout.pageCount;
-
-    return doc;
-  };
-
-  test('throws error when document page has no pages', async () => {
-    const parent = mockParent();
-    const doc = mockDocumentPage({ parent });
-
-    await expect(buildPages(doc)).rejects.toThrow('Document page has no pages');
-  });
-
-  test('creates correct number of pages', async () => {
-    const parent = mockParent();
-    const doc = mockDocumentPage({
-      parent,
-      doc: { width: 200, height: 200 },
-      pageCount: 2,
-    });
-    const pages = await buildPages(doc);
-    expect(pages).toHaveLength(2);
-    expect(pages[0].pageIndex).toBe(0);
-    expect(pages[1].pageIndex).toBe(1);
-  });
-
-  test('calculates correct page numbers with offset', async () => {
-    const parent = mockParent();
-    const doc1 = mockDocumentPage({
-      parent,
-      doc: { width: 200, height: 200 },
-      pageCount: 2,
-    });
-    const doc2 = mockDocumentPage({
-      parent,
-      doc: { width: 200, height: 200 },
-      pageCount: 2,
-    });
-
-    const pages1 = await buildPages(doc1);
-    expect(pages1[0].currentPageNumber).toBe(1);
-    expect(pages1[1].currentPageNumber).toBe(2);
-    const pages2 = await buildPages(doc2);
-    expect(pages2[0].currentPageNumber).toBe(3);
-    expect(pages2[1].currentPageNumber).toBe(4);
-  });
-
-  test('reuses existing section elements', async () => {
-    const parent = mockParent();
-    const setting = mockSectionSetting();
-    const doc = mockDocumentPage({
-      parent,
-      doc: { width: 200, height: 400 },
-      settings: {
-        headers: [setting],
-        footers: [],
-        backgrounds: [],
-      },
-      pageCount: 2,
-    });
-    const existingElement = new SectionElement({
-      setting,
-      buffer: Buffer.from([]),
-      pdf: {} as any,
-    });
-
-    doc.sectionElements = [existingElement];
-
-    const pages = await buildPages(doc);
-    expect(pages[0].header).toBe(existingElement);
-    expect(pages[1].header).toBe(existingElement);
-  });
-
-  test('creates new section elements when needed', async () => {
-    const parent = mockParent();
-    const setting = mockSectionSetting({ hasCurrentPageNumber: true });
-    const doc = mockDocumentPage({
-      parent,
-      doc: { width: 200, height: 400 },
-      settings: {
-        headers: [setting],
-        footers: [setting],
-        backgrounds: [setting],
-      },
-      pageCount: 2,
-    });
-
-    const pages = await buildPages(doc);
-
-    expect(doc.html.prepareSection).toHaveBeenCalledTimes(6); // 2 pages * 3 sections
-    expect(doc.html.pdf).toHaveBeenCalledTimes(6);
-
-    expect(pages[0].header).toBeDefined();
-    expect(pages[0].footer).toBeDefined();
-    expect(pages[0].background).toBeDefined();
-
-    expect(pages[1].header).toBeDefined();
-    expect(pages[1].footer).toBeDefined();
-    expect(pages[1].background).toBeDefined();
-  });
-
-  test('returns undefined for sections without settings', async () => {
-    const parent = mockParent();
-    const doc = mockDocumentPage({
-      parent,
-      doc: { width: 200, height: 200 },
-      settings: {
+      {
         headers: [],
         footers: [],
         backgrounds: [],
+        ...opts?.settings,
       },
-      pageCount: 1,
+      opts?.height ?? 200,
+      opts?.width ?? 200
+    );
+    if (opts?.pageCount) layout.pageCount = opts.pageCount;
+    return layout;
+  };
+
+  const mockBuildPagesOpts = async (opts?: MockBuildPagesOpts) => {
+    const html = mockHTML();
+    const target = await PDFDocument.create();
+    const body = await mockBodyElement();
+    const layout = mockLayout(opts?.layout);
+
+    return {
+      documentPageIndex: opts?.documentPageIndex ?? 0,
+      pageCountOffset: opts?.pageCountOffset ?? 0,
+      totalPagesNumber: opts?.totalPagesNumber ?? 0,
+      layout,
+      body,
+      target,
+      html,
+    };
+  };
+
+  test('throws error when document page has no pages', async () => {
+    const opts = await mockBuildPagesOpts();
+
+    await expect(buildPages(opts)).rejects.toThrow(
+      'Document page has no pages'
+    );
+  });
+
+  test('creates correct number of pages without settings', async () => {
+    const opts = await mockBuildPagesOpts({
+      totalPagesNumber: 2,
+      layout: { pageCount: 2 },
     });
 
-    const pages = await buildPages(doc);
-    expect(pages[0].header).toBeUndefined();
-    expect(pages[0].footer).toBeUndefined();
-    expect(pages[0].background).toBeUndefined();
+    const { pages, elements } = await buildPages(opts);
+    expect(pages).toHaveLength(2);
+    expect(elements).toHaveLength(0);
+    expect(pages[0]).toEqual({
+      pageIndex: 0,
+      currentPageNumber: 1,
+      header: undefined,
+      footer: undefined,
+      background: undefined,
+    });
+    expect(pages[1]).toEqual({
+      pageIndex: 1,
+      currentPageNumber: 2,
+      header: undefined,
+      footer: undefined,
+      background: undefined,
+    });
+  });
+
+  test('calculates correct page numbers with offset', async () => {
+    const opts = await mockBuildPagesOpts({
+      documentPageIndex: 1,
+      pageCountOffset: 2,
+      totalPagesNumber: 4,
+      layout: { pageCount: 2 },
+    });
+
+    const { pages } = await buildPages(opts);
+    expect(pages[0].currentPageNumber).toBe(3);
+    expect(pages[1].currentPageNumber).toBe(4);
+  });
+
+  test('reuses existing section elements when possible', async () => {
+    const header = mockSectionSetting();
+    const footer = mockSectionSetting({ hasCurrentPageNumber: true });
+    const background = mockSectionSetting();
+
+    const opts = await mockBuildPagesOpts({
+      layout: {
+        settings: {
+          headers: [header],
+          footers: [footer],
+          backgrounds: [background],
+        },
+        pageCount: 2,
+      },
+      documentPageIndex: 1,
+      pageCountOffset: 2,
+      totalPagesNumber: 4,
+    });
+
+    const { pages, elements } = await buildPages(opts);
+
+    expect(elements).toHaveLength(4);
+    expect(pages[0].header).toBe(elements[0]);
+    expect(pages[0].footer).toBe(elements[1]);
+    expect(pages[0].background).toBe(elements[2]);
+    expect(pages[1].header).toBe(elements[0]);
+    expect(pages[1].footer).toBe(elements[3]);
+    expect(pages[1].background).toBe(elements[2]);
+
+    expect(PDFDocument.load).toHaveBeenCalledTimes(4);
+    expect(opts.html.prepareSection).toHaveBeenCalledTimes(4);
+    expect(opts.html.pdf).toHaveBeenCalledTimes(4);
   });
 });

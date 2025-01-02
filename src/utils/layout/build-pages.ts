@@ -1,39 +1,51 @@
-import type { DocumentPage } from '@app/models/document-page';
+import { PDFDocument } from 'pdf-lib';
 import { selectSection } from '@app/utils/select-section';
-import type { SectionSetting } from '@app/evaluators/section-settings';
 import { SectionElement } from '@app/models/element';
 
-import { PDFDocument } from 'pdf-lib';
+import type { PageLayout } from '@app/utils/layout/create-page-layout';
+import type { SectionSetting } from '@app/evaluators/section-settings';
+import type { BodyElement } from '@app/models/element';
+import type HTMLAdapter from '@app/utils/adapter-puppeteer';
 
-interface SectionOpts {
-  documentPage: DocumentPage;
+type SectionType = 'header' | 'footer' | 'background';
+
+interface SectionElementOpts {
+  documentPageIndex: number;
   pageIndex: number;
   pageCountOffset: number;
-  pageCount: number;
-  totalPagesNumber: number;
   currentPageNumber: number;
+  totalPagesNumber: number;
+  elements: SectionElement[];
+  layout: PageLayout;
+  html: HTMLAdapter;
 }
 
 async function createSectionElement(
-  section: 'header' | 'footer' | 'background',
+  sectionType: SectionType,
   setting: SectionSetting,
-  opts: SectionOpts
+  opts: SectionElementOpts
 ) {
-  const doc = opts.documentPage;
-  const html = doc.html;
+  const {
+    documentPageIndex,
+    currentPageNumber,
+    totalPagesNumber,
+    html,
+    layout,
+  } = opts;
+  const { physicalPageIndex } = setting;
 
   html.prepareSection({
-    documentPageIndex: doc.index,
-    sectionType: section,
-    physicalPageIndex: setting.physicalPageIndex,
-    currentPageNumber: opts.currentPageNumber,
-    totalPagesNumber: opts.totalPagesNumber,
+    documentPageIndex,
+    sectionType,
+    physicalPageIndex,
+    currentPageNumber,
+    totalPagesNumber,
   });
 
   const uint8Array = await html.pdf({
-    width: doc.width,
+    width: layout.width,
     height: setting.height,
-    transparentBg: doc.layout?.[section]?.transparentBg,
+    transparentBg: !!layout?.[sectionType]?.transparentBg,
   });
   const buffer = Buffer.from(uint8Array);
   const pdf = await PDFDocument.load(buffer);
@@ -46,51 +58,79 @@ async function createSectionElement(
 }
 
 async function resolveSectionElement(
-  section: 'header' | 'footer' | 'background',
-  opts: SectionOpts
+  sectionType: SectionType,
+  opts: SectionElementOpts
 ) {
   const setting = selectSection(
-    opts.documentPage.layout?.[section]?.settings ?? [],
+    opts.layout?.[sectionType]?.settings ?? [],
     opts.pageIndex,
     opts.pageCountOffset,
-    opts.pageCount
+    opts.layout.pageCount
   );
 
   if (!setting) return undefined;
 
-  const element = opts.documentPage.sectionElements.find(
-    (el) => el.setting === setting
+  const element = opts.elements.find(
+    (el) =>
+      el.setting === setting &&
+      !el.setting.hasCurrentPageNumber &&
+      !el.setting.hasTotalPagesNumber
   );
   if (element) return element;
 
-  return createSectionElement(section, setting, opts);
+  const newElement = await createSectionElement(sectionType, setting, opts);
+  opts.elements.push(newElement);
+  return newElement;
 }
 
-export async function buildPages(doc: DocumentPage) {
-  if (!doc.layout?.pageCount) throw new Error('Document page has no pages');
+interface BuildPagesOpts {
+  documentPageIndex: number;
+  pageCountOffset: number;
+  totalPagesNumber: number;
+  layout: PageLayout;
+  body: BodyElement;
+  target: PDFDocument;
+  html: HTMLAdapter;
+}
 
-  const count = doc.layout.pageCount;
-  const offset = doc.pageCountOffset;
-  const total = doc.totalPagesNumber;
+export async function buildPages(opts: BuildPagesOpts) {
+  const {
+    documentPageIndex,
+    pageCountOffset,
+    totalPagesNumber,
+    target,
+    layout,
+    html,
+  } = opts;
+  const { pageCount } = layout;
 
-  const pageIndices = Array.from({ length: count }, (_, i) => i);
+  if (!pageCount) throw new Error('Document page has no pages');
+  if (!target) throw new Error('No target PDF document provided');
+
+  const pageIndices = Array.from({ length: pageCount }, (_, i) => i);
   const pages = [];
+  const elements: SectionElement[] = [];
 
   for (const pageIndex of pageIndices) {
-    const currentPageNumber = pageIndex + 1 + offset;
+    const currentPageNumber = pageIndex + 1 + pageCountOffset;
 
     const opts = {
-      documentPage: doc,
+      documentPageIndex,
       pageIndex,
-      pageCountOffset: offset,
-      pageCount: count,
-      totalPagesNumber: total,
+      pageCountOffset,
       currentPageNumber,
+      totalPagesNumber,
+      elements,
+      layout,
+      html,
     };
 
     const header = await resolveSectionElement('header', opts);
     const footer = await resolveSectionElement('footer', opts);
     const background = await resolveSectionElement('background', opts);
+
+    // TODO: do something with the target? embed? append?
+    // we might need the body element as well
 
     pages.push({
       pageIndex,
@@ -101,5 +141,5 @@ export async function buildPages(doc: DocumentPage) {
     });
   }
 
-  return pages;
+  return { pages, elements };
 }
