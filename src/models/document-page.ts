@@ -1,13 +1,11 @@
 import { PDFDocument } from 'pdf-lib';
 import { BodyElement } from '@app/models/element';
-import {
-  createPageLayoutSettings,
-  type PageLayout,
-} from '@app/utils/layout/create-page-layout';
+import { createPageLayoutSettings } from '@app/utils/layout/create-page-layout';
 
 import type DeclarativePDF from '@app/index';
 import type { SectionSettings } from '@app/evaluators/section-settings';
 import type { SectionElement } from '@app/models/element';
+import type { PageLayout } from '@app/utils/layout/create-page-layout';
 
 export type DocumentPageOpts = {
   parent: DeclarativePDF;
@@ -95,15 +93,12 @@ export class DocumentPage {
     await this.html.resetVisibility();
 
     this.layout.pageCount = pdf.getPageCount();
-    this.body = new BodyElement({ buffer, pdf });
-  }
-
-  get hasPageNumbers() {
-    return !!this.layout?.hasPageNumbers;
-  }
-
-  get isLayoutingNeeded() {
-    return this.layout?.hasAnySection;
+    // TODO: make sure we use layout everywhere (and transpared bg too)
+    this.body = new BodyElement({
+      buffer,
+      pdf,
+      layout: this.layout.body,
+    });
   }
 
   get previousDocumentPages() {
@@ -120,7 +115,6 @@ export class DocumentPage {
     return this.layout.pageCount;
   }
 
-  // TODO: push this to layout somehow
   get pageCountOffset() {
     const offset = this.previousDocumentPages.reduce(
       (acc, doc) => acc + doc.pageCount,
@@ -138,19 +132,5 @@ export class DocumentPage {
 
   get totalPagesNumber() {
     return this.parent.totalPagesNumber;
-  }
-
-  async process() {
-    if (!this.layout) throw new Error('Layout is not initialized');
-    // TODO: rename this method - we are processing layout and sections, not document pages
-    // this.layout.createLayoutPages();
-
-    // there is nothing to process, so bail out
-    // if (!this.layout.needsProcessing) return;
-
-    // process every page that needs processing in sequence
-    // for (const page of this.layout.pagesForProcessing) {
-    //   await page.process();
-    // }
   }
 }
