@@ -1,25 +1,34 @@
 import { PDFDocument } from 'pdf-lib';
-import { normalizeSetting } from '@app/utils/normalize-setting';
-import { PaperDefaults } from '@app/utils/paper-defaults';
-import HTMLAdapter, { type MinimumBrowser } from '@app/utils/adapter-puppeteer';
-
-import type { PAPER_SIZE } from '@app/consts/paper-size';
 import { DocumentPage } from '@app/models/document-page';
+import { normalizeSetting } from '@app/utils/normalize-setting';
+import { PaperDefaults, type PaperOpts } from '@app/utils/paper-defaults';
+import HTMLAdapter, { type MinimumBrowser } from '@app/utils/adapter-puppeteer';
+import logger from '@app/models/debug-time-log';
+import { buildPages } from '@app/utils/layout/build-pages';
 
-type DeclarativePDFOpts =
-  | {
-      ppi?: number;
-      format?: keyof typeof PAPER_SIZE;
-    }
-  | {
-      ppi?: number;
-      width?: number;
-      height?: number;
-    };
+interface DebugOptions {
+  /** Do we want to log debug information */
+  log?: boolean;
+  /** Do we want to aggregate logs */
+  aggregated?: boolean;
+  /** Which filename to use for PDF */
+  pdfName?: string;
+}
+
+// TODO: add more normalization options (maybe we want to do a part of standard normalization)
+interface DeclarativePDFOpts {
+  /** Should we normalize the content (remove excess elements, wrap content to tags) */
+  normalize?: boolean;
+  /** Override for paper defaults (A4 / 72ppi) */
+  defaults?: PaperOpts;
+  /** Debug options (attaches parts, logs timings) */
+  debug?: DebugOptions;
+}
 
 export default class DeclarativePDF {
   declare html: HTMLAdapter;
   declare defaults: PaperDefaults;
+  declare debug: DebugOptions;
 
   documentPages: DocumentPage[] = [];
 
@@ -30,21 +39,13 @@ export default class DeclarativePDF {
    */
   constructor(browser: MinimumBrowser, opts?: DeclarativePDFOpts) {
     this.html = new HTMLAdapter(browser);
+    this.defaults = new PaperDefaults(opts?.defaults);
+    this.debug = opts?.debug ?? {};
 
-    if (opts && 'format' in opts) {
-      this.defaults = new PaperDefaults({
-        ppi: opts?.ppi,
-        format: opts?.format,
-      });
-    } else if (opts && ('width' in opts || 'height' in opts)) {
-      this.defaults = new PaperDefaults({
-        ppi: opts?.ppi,
-        width: opts?.width,
-        height: opts?.height,
-      });
-    } else {
-      this.defaults = new PaperDefaults();
-    }
+    logger.setOptions({
+      aggregated: !!this.debug.aggregated,
+      active: !!this.debug.log,
+    });
   }
 
   get totalPagesNumber() {
@@ -53,6 +54,7 @@ export default class DeclarativePDF {
 
   /**
    * Generates a pdf buffer from string containing html template.
+   * TODO: add another method that creates pdf from puppeteer page (already loaded content)
    *
    * When calling this method, it is expected that:
    * - the browser is initialized and ready
@@ -61,36 +63,86 @@ export default class DeclarativePDF {
    * @param template A string containing valid HTML document
    */
   async generate(template: string) {
+    const JOB0 = `[Σ] Total time for ${this.debug.pdfName ?? 'PDF'}`;
+    logger.startSession(JOB0);
     /** (re)set documentPages */
     this.documentPages = [];
 
     try {
-      /** open new tab in browser */
+      /** open a new tab in the browser */
+      const JOB1 = '[1] Opening new tab';
+      logger.add(JOB1);
       await this.html.newPage();
+      logger.end(JOB1);
 
-      /** send template to tab and normalize it */
+      /** send the template to the tab and normalize it */
+      const JOB2 = '[2] Setting content and loading html';
+      logger.add(JOB2);
       await this.html.setContent(template);
+      logger.end(JOB2);
+      const JOB3 = '[3] Normalizing content';
+      logger.add(JOB3);
       await this.html.normalize();
+      logger.end(JOB3);
 
       /** get from DOM index, width and height for every document-page element */
-      await this.createDocumentPageModels();
-      /** for every document page model, get from DOM what that document-page contains  */
-      await this.initializeDocumentPageModels();
+      const JOB4 = '[4] Getting document page settings from DOM';
+      logger.add(JOB4);
+      await this.getDocumentPageSettings();
+      logger.end(JOB4);
+      /** for every document page model, get from DOM what that document-page contains */
+      const JOB5 = '[5] Build page layout and body';
+      logger.add(JOB5);
+      await this.buildLayoutForEachDocumentPage();
+      logger.end(JOB5);
 
-      /** for every document page model, process any element they might have */
-      await this.processDocumentPageModels();
+      /**
+       * Return early for only one document page with only a body element.
+       *
+       * This is a special case where we can return the body buffer directly
+       * because there are no headers, footers or sections to process. So,
+       * resulting PDF will be the same as the body buffer.
+       */
+      if (
+        this.documentPages.length === 1 &&
+        !this.documentPages[0].hasSections
+      ) {
+        return this.documentPages[0].body!.buffer;
+      }
 
-      /** close the tab in browser */
-      await this.html.close();
+      /**
+       * We either have multiple document pages or some section elements,
+       * so we need to process them to build the final PDF.
+       */
+      const JOB6 = '[6] Process sections and build final PDF';
+      logger.add(JOB6);
+      const result = await this.buildPDF();
+      logger.end(JOB6);
 
-      /** we should have everything, time to build pdf */
-      return await this.buildPDF();
+      return result;
     } catch (error) {
-      /** always close opened tab in the browser to avoid memory leaks */
+      /** cleanup - always close opened tab in the browser to avoid memory leaks */
+      const JOBx = '[x] Closing tab after error';
+      logger.add(JOBx);
       await this.html.close();
+      logger.end(JOBx);
 
-      /** rethrow the error */
+      /** cleanup - always close the logger session */
+      logger.end(JOB0);
+      logger.endSession();
+
+      /** rethrow the error (this will skip the finally block) */
       throw error;
+    } finally {
+      /** cleanup - close the tab in browser */
+      const JOB7 = '[7] Closing tab';
+      logger.add(JOB7);
+      await this.html.close();
+      logger.end(JOB7);
+
+      /** cleanup - close the logger session */
+      logger.end(JOB0);
+      logger.endSession();
     }
   }
 
@@ -100,8 +152,8 @@ export default class DeclarativePDF {
    * This method will evaluate the template settings and create a new
    * document page model for each setting parsed from the HTML template.
    */
-  private async createDocumentPageModels() {
-    const documentPageSettings = await this.html.templateSettings({
+  private async getDocumentPageSettings() {
+    const documentPageSettings = await this.html.getTemplateSettings({
       width: this.defaults.width,
       height: this.defaults.height,
       ppi: this.defaults.ppi,
@@ -114,103 +166,54 @@ export default class DeclarativePDF {
     });
   }
 
+  // TODO: remove this getter
   get needsLayouting() {
-    if (!this.documentPages?.length) throw new Error('No document pages found');
+    if (!this.documentPages.length) throw new Error('No document pages found');
 
-    return this.documentPages.some((doc) => doc.layout?.hasMeta);
+    return this.documentPages.some((doc) => doc.hasSections);
   }
 
   /**
    * Initializes the document page models.
    *
    * For every created document page model, this method sets desired
-   * viewport and evaluates document page settings from which it
-   * initializes that document page model.
+   * viewport and gets section settings from the DOM to create layout
+   * (heights and positions). It then convert to pdf the body element
+   * from which we get the number of pages and finally have all the
+   * information needed to build the final PDF.
    */
-  private async initializeDocumentPageModels() {
-    if (!this.documentPages?.length) throw new Error('No document pages found');
+  private async buildLayoutForEachDocumentPage() {
+    if (!this.documentPages.length) throw new Error('No document pages found');
 
     for (const [index, doc] of this.documentPages.entries()) {
       await this.html.setViewport(doc.viewPort);
-      const settings = await this.html.documentPageSettings({ index });
+
+      let settings;
+      if (doc.hasSections) {
+        settings = await this.html.getSectionSettings({ index });
+      }
+
       await doc.createLayoutAndBody(settings);
-    }
-  }
-
-  private async processDocumentPageModels() {
-    if (!this.documentPages?.length) throw new Error('No document pages found');
-
-    for (const doc of this.documentPages) {
-      await doc.process();
     }
   }
 
   private async buildPDF() {
     if (!this.documentPages?.length) throw new Error('No document pages found');
 
-    if (
-      this.documentPages.length === 1 &&
-      !this.documentPages[0].layout!.pages?.length
-    ) {
-      // flow 1: nemamo headere i footere, imamo samo jedan body
-      // - vracamo vec postojeci buffer i izlazimo iz funkcije
-      return this.documentPages[0].body!.buffer;
-    } else {
-      // flow 2: imamo headere i/ili footere, imamo jedan body ili vise njih
-      // - kreiramo bazni doc, embedamo elemente, placeamo na stranice, vracamo buffer
-      const outputPDF = await PDFDocument.create();
+    const outputPDF = await PDFDocument.create();
 
-      for (const doc of this.documentPages) {
-        if (!doc.layout!.pages?.length) {
-          // case 1 - we only have a body, we can copy pages
-          const copiedPages = await outputPDF.copyPages(
-            doc.body!.pdf,
-            doc.body!.pdf.getPageIndices()
-          );
-          copiedPages.forEach((page) => outputPDF.addPage(page));
-        } else {
-          // case 2 - we have sections, need to place them on pages
-          for (const page of doc.layout!.pages!) {
-            const currentOutputPage = outputPDF.addPage([
-              doc.width,
-              doc.height,
-            ]);
-
-            for (const section of [
-              'background',
-              'header',
-              'footer',
-              'body',
-            ] as const) {
-              const el = page[section];
-              if (!el) continue;
-
-              const sectionPage = el.pdfPage;
-              if (!sectionPage) {
-                throw new Error(
-                  `No PDF page found for section ${section} on document page ${doc.index}`
-                );
-              }
-
-              const embeddedPage = await outputPDF.embedPage(sectionPage);
-              if (!embeddedPage) {
-                throw new Error(
-                  `Failed to embed PDF page for section ${section} on document page ${doc.index}`
-                );
-              }
-
-              currentOutputPage.drawPage(embeddedPage, {
-                width: el.width,
-                height: el.height,
-                x: el.x,
-                y: el.y,
-              });
-            }
-          }
-        }
-      }
-
-      return outputPDF.save();
+    for (const doc of this.documentPages) {
+      await buildPages({
+        documentPageIndex: doc.index,
+        pageCountOffset: doc.pageCountOffset,
+        totalPagesNumber: this.totalPagesNumber,
+        layout: doc.layout!,
+        body: doc.body!,
+        target: outputPDF,
+        html: this.html,
+      });
     }
+
+    return outputPDF.save();
   }
 }

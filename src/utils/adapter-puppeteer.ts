@@ -1,11 +1,12 @@
 import { PAPER_SIZE } from '@app/consts/paper-size';
-import evalDocumentPageSettings from '@app/evaluators/document-page-settings';
+import evalSectionSettings from '@app/evaluators/section-settings';
 import evalPrepareSection from '@app/evaluators/prepare-section';
 import evalTemplateNormalize from '@app/evaluators/template-normalize';
 import evalTemplateSettings from '@app/evaluators/template-settings';
 import evalResetVisibility from '@app/evaluators/reset-visibility';
 
 import type { Browser, Page } from 'puppeteer';
+import type { PrepareSection } from '@app/evaluators/prepare-section';
 
 export type MinimumBrowser = Pick<Browser, 'newPage' | 'connected'>;
 
@@ -57,24 +58,18 @@ export default class HTMLAdapter {
     return this.page.evaluate(evalTemplateNormalize);
   }
 
-  templateSettings(opts: { width: number; height: number; ppi: number }) {
+  getTemplateSettings(opts: { width: number; height: number; ppi: number }) {
     return this.page.evaluate(evalTemplateSettings, {
       default: opts,
       size: PAPER_SIZE,
     });
   }
 
-  documentPageSettings(opts: { index: number }) {
-    return this.page.evaluate(evalDocumentPageSettings, opts.index);
+  getSectionSettings(opts: { index: number }) {
+    return this.page.evaluate(evalSectionSettings, opts.index);
   }
 
-  prepareSection(opts: {
-    documentPageIndex: number;
-    sectionType?: 'header' | 'footer' | 'background';
-    physicalPageIndex?: number;
-    currentPageNumber?: number;
-    totalPagesNumber?: number;
-  }) {
+  prepareSection(opts: PrepareSection) {
     return this.page.evaluate(evalPrepareSection, opts);
   }
 
@@ -82,15 +77,26 @@ export default class HTMLAdapter {
     return this.page.evaluate(evalResetVisibility);
   }
 
+  /**
+   * There is some bug in the PDF generation process, where the height and
+   * the width of the resulting PDF page get smaller by approximate factor
+   * of 0.75. During this process, some rounding issues occur and sometimes,
+   * we end up with 2 pages instead of 1. Also, backgrounds sometimes get
+   * a narrow white line at the bottom.
+   *
+   * To mitigate this, we scale up the width and height by 0.75, as well as
+   * the scale, to keep the same appearance.
+   */
   pdf(opts: {
     width: number;
     height: number;
     margin?: { top?: number; right?: number; bottom?: number; left?: number };
     transparentBg?: boolean;
-  }) {
+  }): Promise<Uint8Array> {
     return this.page.pdf({
-      width: opts.width,
-      height: opts.height,
+      width: opts.width / 0.75,
+      height: opts.height / 0.75,
+      scale: 1 / 0.75,
       margin: opts.margin,
       omitBackground: opts.transparentBg,
       printBackground: true,

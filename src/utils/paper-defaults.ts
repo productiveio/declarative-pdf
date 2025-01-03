@@ -46,16 +46,12 @@ const hasHeight = (obj: PaperOpts | undefined): obj is { height: number } =>
 const convertMmToPx = (mm: number, ppi: number) =>
   Math.round(mm * (ppi / 25.4));
 
-type PaperOpts =
-  | {
-      ppi?: number;
-      format?: keyof typeof PAPER_SIZE;
-    }
-  | {
-      ppi?: number;
-      width?: number;
-      height?: number;
-    };
+export interface PaperOpts {
+  ppi?: number;
+  format?: keyof typeof PAPER_SIZE;
+  width?: number;
+  height?: number;
+}
 
 export const DEFAULT_FORMAT = 'a4';
 export const DEFAULT_PPI = 72;

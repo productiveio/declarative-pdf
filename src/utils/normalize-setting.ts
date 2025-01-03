@@ -11,6 +11,7 @@ type TemplateSetting = {
   height?: number;
   bodyMarginTop?: number;
   bodyMarginBottom?: number;
+  hasSections?: boolean;
 };
 
 const capNumber = (num: unknown, min: number, max: number, base: number) => {
@@ -35,5 +36,6 @@ export function normalizeSetting(setting: TemplateSetting) {
       420_000,
       DEFAULT_BODY_MARGIN_BOTTOM
     ),
+    hasSections: setting.hasSections || false,
   };
 }
