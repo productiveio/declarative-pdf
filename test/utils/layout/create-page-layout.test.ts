@@ -34,7 +34,9 @@ describe('createPageLayoutSettings', () => {
       hasAnySection: false,
       pageCount: 0,
       body: {
+        width: 500,
         height: 1000,
+        x: 0,
         y: 1,
         transparentBg: false,
       },
@@ -60,14 +62,18 @@ describe('createPageLayoutSettings', () => {
       hasAnySection: true,
       pageCount: 0,
       body: {
+        width: 500,
         height: 1000,
+        x: 0,
         y: 1,
         transparentBg: true,
       },
       header: undefined,
       footer: undefined,
       background: {
+        width: 500,
         height: 1000,
+        x: 0,
         y: 0,
         transparentBg: false,
         hasPageNumbers: false,
@@ -157,7 +163,9 @@ describe('createPageLayoutSettings', () => {
       hasAnySection: false,
       pageCount: 0,
       body: {
+        width: 0,
         height: 0,
+        x: 0,
         y: 1,
         transparentBg: false,
       },

@@ -11,7 +11,8 @@ export const getMaxHeight = (els: SectionSetting[]) => {
 // TODO: Check if we need to add +1 to bodyY?
 export default function calculatePageLayout(
   sectionSettings?: SectionSettings,
-  pageHeight: number = 0
+  pageHeight: number = 0,
+  pageWidth: number = 0
 ) {
   const headerHeight = getMaxHeight(sectionSettings?.headers ?? []);
   const footerHeight = getMaxHeight(sectionSettings?.footers ?? []);
@@ -30,19 +31,27 @@ export default function calculatePageLayout(
 
   return {
     header: {
+      width: pageWidth,
       height: headerHeight,
+      x: 0,
       y: headerY,
     },
     footer: {
+      width: pageWidth,
       height: footerHeight,
+      x: 0,
       y: footerY,
     },
     body: {
+      width: pageWidth,
       height: bodyHeight,
+      x: 0,
       y: bodyY,
     },
     background: {
+      width: pageWidth,
       height: backgroundHeight,
+      x: 0,
       y: backgroundY,
     },
   };

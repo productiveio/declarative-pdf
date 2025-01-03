@@ -48,13 +48,14 @@ describe('calculatePageLayout', () => {
       backgrounds: [{ height: 500 }] as SectionSetting[],
     };
     const pageHeight = 1000;
+    const pageWidth = 800;
 
-    const result = calculatePageLayout(settings, pageHeight);
+    const result = calculatePageLayout(settings, pageHeight, pageWidth);
     expect(result).toEqual({
-      header: { height: 200, y: 800 },
-      footer: { height: 150, y: 0 },
-      body: { height: 650, y: 151 },
-      background: { height: 1000, y: 0 },
+      header: { width: 800, height: 200, x: 0, y: 800 },
+      footer: { width: 800, height: 150, x: 0, y: 0 },
+      body: { width: 800, height: 650, x: 0, y: 151 },
+      background: { width: 800, height: 1000, x: 0, y: 0 },
     });
   });
 
@@ -78,13 +79,14 @@ describe('calculatePageLayout', () => {
       backgrounds: [{ height: 0 }] as SectionSetting[],
     };
     const pageHeight = 1000;
+    const pageWidth = 800;
 
-    const result = calculatePageLayout(settings, pageHeight);
+    const result = calculatePageLayout(settings, pageHeight, pageWidth);
     expect(result).toEqual({
-      header: { height: 0, y: 1000 },
-      footer: { height: 0, y: 0 },
-      body: { height: 1000, y: 1 },
-      background: { height: 1000, y: 0 },
+      header: { width: 800, height: 0, x: 0, y: 1000 },
+      footer: { width: 800, height: 0, x: 0, y: 0 },
+      body: { width: 800, height: 1000, x: 0, y: 1 },
+      background: { width: 800, height: 1000, x: 0, y: 0 },
     });
   });
 });

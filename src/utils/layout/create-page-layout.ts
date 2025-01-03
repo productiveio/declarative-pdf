@@ -9,18 +9,17 @@ import type {
   SectionSetting,
 } from '@app/evaluators/section-settings';
 
-export interface SectionLayout {
+export interface BodyLayout {
+  width: number;
   height: number;
+  x: number;
   y: number;
   transparentBg: boolean;
-  hasPageNumbers: boolean;
-  settings: SectionSetting[];
 }
 
-export interface BodyLayout {
-  height: number;
-  y: number;
-  transparentBg: boolean;
+export interface SectionLayout extends BodyLayout {
+  hasPageNumbers: boolean;
+  settings: SectionSetting[];
 }
 
 export interface PageLayout {
@@ -35,28 +34,16 @@ export interface PageLayout {
   background?: SectionLayout;
 }
 
-function createSection(opts: {
-  elements?: SectionSetting[];
-  layout: { height: number; y: number };
-  transparentBg: boolean;
-}) {
-  if (!opts.elements?.length) return undefined;
-
-  return {
-    height: opts.layout.height,
-    y: opts.layout.y,
-    transparentBg: opts.transparentBg,
-    hasPageNumbers: hasSectionPageNumbers(opts.elements),
-    settings: opts.elements,
-  };
-}
-
 export function createPageLayoutSettings(
   sectionSettings?: SectionSettings,
   pageHeight: number = 0,
   pageWidth: number = 0
 ): PageLayout {
-  const pageLayout = calculatePageLayout(sectionSettings, pageHeight);
+  const pageLayout = calculatePageLayout(
+    sectionSettings,
+    pageHeight,
+    pageWidth
+  );
   const transparentBg = !!sectionSettings?.backgrounds.length;
 
   const {
@@ -78,24 +65,32 @@ export function createPageLayoutSettings(
     hasAnySection,
     pageCount: 0,
     body: {
-      height: pageLayout.body.height,
-      y: pageLayout.body.y,
+      ...pageLayout.body,
       transparentBg,
     },
-    header: createSection({
-      elements: headers,
-      layout: pageLayout.header,
-      transparentBg,
-    }),
-    footer: createSection({
-      elements: footers,
-      layout: pageLayout.footer,
-      transparentBg,
-    }),
-    background: createSection({
-      elements: backgrounds,
-      layout: pageLayout.background,
-      transparentBg: false,
-    }),
+    header: headers.length
+      ? {
+          ...pageLayout.header,
+          transparentBg,
+          hasPageNumbers: hasSectionPageNumbers(headers),
+          settings: headers,
+        }
+      : undefined,
+    footer: footers.length
+      ? {
+          ...pageLayout.footer,
+          transparentBg,
+          hasPageNumbers: hasSectionPageNumbers(footers),
+          settings: footers,
+        }
+      : undefined,
+    background: backgrounds.length
+      ? {
+          ...pageLayout.background,
+          transparentBg: false,
+          hasPageNumbers: hasSectionPageNumbers(backgrounds),
+          settings: backgrounds,
+        }
+      : undefined,
   };
 }
