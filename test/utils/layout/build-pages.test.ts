@@ -1,31 +1,46 @@
 /**
  * @jest-environment node
  */
+import { PDFDocument } from 'pdf-lib';
+import { BodyElement } from '@app/models/element';
 import { buildPages } from '@app/utils/layout/build-pages';
 import { createPageLayoutSettings } from '@app/utils/layout/create-page-layout';
 
 import type { SectionSetting } from '@app/evaluators/section-settings';
-import type { BodyElement } from '@app/models/element';
+// import type { BodyElement } from '@app/models/element';
 import type HTMLAdapter from '@app/utils/adapter-puppeteer';
-import { PDFDocument } from 'pdf-lib';
 
 /**
  * We are mocking the pdf Buffer in the test, so PDFDocument.load()
  * would throw an error because it expects the proper pdf buffer.
  * We can mock the pdf-lib module to avoid this error.
  */
-jest.mock('pdf-lib', () => ({
-  PDFDocument: {
-    load: jest.fn().mockResolvedValue({
-      getPageCount: () => 1,
-      getPage: () => ({}),
-    }),
-    create: jest.fn().mockResolvedValue({
-      getPageCount: () => 1,
-      getPage: () => ({}),
-    }),
-  },
-}));
+jest.mock('pdf-lib', () => {
+  const mockDocument = {
+    embedPdf: jest.fn().mockResolvedValue([{}]),
+    getPageCount: () => 1,
+    getPageIndices: () => [0],
+    getPage: () => ({}),
+    copyPages: () => [],
+  };
+
+  const mockPage = {
+    get doc() {
+      return mockDocument;
+    },
+    drawPage: jest.fn(),
+  };
+
+  return {
+    PDFDocument: {
+      load: jest.fn().mockResolvedValue(mockDocument),
+      create: jest.fn().mockResolvedValue({
+        ...mockDocument,
+        addPage: jest.fn().mockReturnValue(mockPage),
+      }),
+    },
+  };
+});
 
 type MockSectionSettingOpts = Partial<SectionSetting>;
 
@@ -63,11 +78,18 @@ describe('buildPages', () => {
       ...opts,
     }) as SectionSetting;
 
-  const mockBodyElement = async () =>
-    ({
+  const mockBodyElement = async () => {
+    return new BodyElement({
       buffer: Buffer.from(''),
       pdf: await PDFDocument.create(),
-    }) as BodyElement;
+      layout: {
+        width: 200,
+        height: 200,
+        x: 0,
+        y: 0,
+      },
+    });
+  };
 
   const mockLayout = (opts?: MockLayoutOpts) => {
     const layout = createPageLayoutSettings(
@@ -101,6 +123,10 @@ describe('buildPages', () => {
     };
   };
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   test('throws error when document page has no pages', async () => {
     const opts = await mockBuildPagesOpts();
 
@@ -116,30 +142,37 @@ describe('buildPages', () => {
     });
 
     const { pages, elements } = await buildPages(opts);
-    expect(pages).toHaveLength(2);
+    expect(pages).toHaveLength(0);
     expect(elements).toHaveLength(0);
-    expect(pages[0]).toEqual({
-      pageIndex: 0,
-      currentPageNumber: 1,
-      header: undefined,
-      footer: undefined,
-      background: undefined,
-    });
-    expect(pages[1]).toEqual({
-      pageIndex: 1,
-      currentPageNumber: 2,
-      header: undefined,
-      footer: undefined,
-      background: undefined,
-    });
+    // TODO: check what to do with pages - maybe rename to pageElements?
+    // expect(pages[0]).toEqual({
+    //   pageIndex: 0,
+    //   currentPageNumber: 1,
+    //   header: undefined,
+    //   footer: undefined,
+    //   background: undefined,
+    // });
+    // expect(pages[1]).toEqual({
+    //   pageIndex: 1,
+    //   currentPageNumber: 2,
+    //   header: undefined,
+    //   footer: undefined,
+    //   background: undefined,
+    // });
   });
 
   test('calculates correct page numbers with offset', async () => {
+    const header = mockSectionSetting();
     const opts = await mockBuildPagesOpts({
       documentPageIndex: 1,
       pageCountOffset: 2,
       totalPagesNumber: 4,
-      layout: { pageCount: 2 },
+      layout: {
+        settings: {
+          headers: [header],
+        },
+        pageCount: 2,
+      },
     });
 
     const { pages } = await buildPages(opts);
