@@ -54,7 +54,7 @@ describe('calculatePageLayout', () => {
     expect(result).toEqual({
       header: { width: 800, height: 200, x: 0, y: 800 },
       footer: { width: 800, height: 150, x: 0, y: 0 },
-      body: { width: 800, height: 650, x: 0, y: 151 },
+      body: { width: 800, height: 650, x: 0, y: 150 },
       background: { width: 800, height: 1000, x: 0, y: 0 },
     });
   });
@@ -85,7 +85,7 @@ describe('calculatePageLayout', () => {
     expect(result).toEqual({
       header: { width: 800, height: 0, x: 0, y: 1000 },
       footer: { width: 800, height: 0, x: 0, y: 0 },
-      body: { width: 800, height: 1000, x: 0, y: 1 },
+      body: { width: 800, height: 1000, x: 0, y: 0 },
       background: { width: 800, height: 1000, x: 0, y: 0 },
     });
   });

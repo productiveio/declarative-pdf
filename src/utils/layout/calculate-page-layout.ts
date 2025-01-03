@@ -8,7 +8,6 @@ export const getMaxHeight = (els: SectionSetting[]) => {
 };
 
 // TODO: Check if we need to force background height?
-// TODO: Check if we need to add +1 to bodyY?
 export default function calculatePageLayout(
   sectionSettings?: SectionSettings,
   pageHeight: number = 0,
@@ -20,7 +19,7 @@ export default function calculatePageLayout(
   const backgroundHeight = pageHeight;
   const headerY = pageHeight - headerHeight;
   const footerY = 0;
-  const bodyY = footerHeight + 1;
+  const bodyY = footerHeight;
   const backgroundY = 0;
 
   if (bodyHeight < pageHeight / 3) {
