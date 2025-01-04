@@ -3,7 +3,7 @@ import { DocumentPage } from '@app/models/document-page';
 import { normalizeSetting } from '@app/utils/normalize-setting';
 import { PaperDefaults, type PaperOpts } from '@app/utils/paper-defaults';
 import HTMLAdapter, { type MinimumBrowser } from '@app/utils/adapter-puppeteer';
-import logger from '@app/models/debug-time-log';
+import TimeLogger from '@app/models/debug-time-log';
 import { buildPages } from '@app/utils/layout/build-pages';
 
 interface DebugOptions {
@@ -41,11 +41,6 @@ export default class DeclarativePDF {
     this.html = new HTMLAdapter(browser);
     this.defaults = new PaperDefaults(opts?.defaults);
     this.debug = opts?.debug ?? {};
-
-    logger.setOptions({
-      aggregated: !!this.debug.aggregated,
-      active: !!this.debug.log,
-    });
   }
 
   get totalPagesNumber() {
@@ -63,38 +58,42 @@ export default class DeclarativePDF {
    * @param template A string containing valid HTML document
    */
   async generate(template: string) {
+    const logger = this.debug.log
+      ? new TimeLogger({ aggregated: this.debug.aggregated })
+      : undefined;
+
     const JOB0 = `[Σ] Total time for ${this.debug.pdfName ?? 'PDF'}`;
-    logger.startSession(JOB0);
+    logger?.startSession(JOB0);
     /** (re)set documentPages */
     this.documentPages = [];
 
     try {
       /** open a new tab in the browser */
       const JOB1 = '[1] Opening new tab';
-      logger.add(JOB1);
+      logger?.add(JOB1);
       await this.html.newPage();
-      logger.end(JOB1);
+      logger?.end(JOB1);
 
       /** send the template to the tab and normalize it */
       const JOB2 = '[2] Setting content and loading html';
-      logger.add(JOB2);
+      logger?.add(JOB2);
       await this.html.setContent(template);
-      logger.end(JOB2);
+      logger?.end(JOB2);
       const JOB3 = '[3] Normalizing content';
-      logger.add(JOB3);
+      logger?.add(JOB3);
       await this.html.normalize();
-      logger.end(JOB3);
+      logger?.end(JOB3);
 
       /** get from DOM index, width and height for every document-page element */
       const JOB4 = '[4] Getting document page settings from DOM';
-      logger.add(JOB4);
+      logger?.add(JOB4);
       await this.getDocumentPageSettings();
-      logger.end(JOB4);
+      logger?.end(JOB4);
       /** for every document page model, get from DOM what that document-page contains */
       const JOB5 = '[5] Build page layout and body';
-      logger.add(JOB5);
+      logger?.add(JOB5);
       await this.buildLayoutForEachDocumentPage();
-      logger.end(JOB5);
+      logger?.end(JOB5);
 
       /**
        * Return early for only one document page with only a body element.
@@ -115,34 +114,34 @@ export default class DeclarativePDF {
        * so we need to process them to build the final PDF.
        */
       const JOB6 = '[6] Process sections and build final PDF';
-      logger.add(JOB6);
+      logger?.add(JOB6);
       const result = await this.buildPDF();
-      logger.end(JOB6);
+      logger?.end(JOB6);
 
       return result;
     } catch (error) {
       /** cleanup - always close opened tab in the browser to avoid memory leaks */
       const JOBx = '[x] Closing tab after error';
-      logger.add(JOBx);
+      logger?.add(JOBx);
       await this.html.close();
-      logger.end(JOBx);
+      logger?.end(JOBx);
 
       /** cleanup - always close the logger session */
-      logger.end(JOB0);
-      logger.endSession();
+      logger?.end(JOB0);
+      logger?.endSession();
 
       /** rethrow the error (this will skip the finally block) */
       throw error;
     } finally {
       /** cleanup - close the tab in browser */
       const JOB7 = '[7] Closing tab';
-      logger.add(JOB7);
+      logger?.add(JOB7);
       await this.html.close();
-      logger.end(JOB7);
+      logger?.end(JOB7);
 
       /** cleanup - close the logger session */
-      logger.end(JOB0);
-      logger.endSession();
+      logger?.end(JOB0);
+      logger?.endSession();
     }
   }
 

@@ -1,33 +1,22 @@
-class TimeLogger {
+export default class TimeLogger {
   declare timeLogs: Map<string, number>;
   declare reports: Map<string, number>;
   declare isAggregated: boolean;
-  declare isActive: boolean;
   declare session: { name: string; time: number };
 
-  constructor() {
+  constructor(opts: { aggregated?: boolean } = {}) {
     this.timeLogs = new Map();
     this.reports = new Map();
-    this.isAggregated = false;
-    this.isActive = false;
-  }
-
-  setOptions(opts: { aggregated?: boolean; active?: boolean }) {
-    this.isAggregated = opts.aggregated ?? this.isAggregated;
-    this.isActive = opts.active ?? this.isActive;
+    this.isAggregated = opts.aggregated ?? true;
   }
 
   startSession(desc: string) {
-    if (!this.isActive) return;
-
     this.timeLogs.clear();
     this.reports.clear();
     this.session = { name: desc, time: Date.now() };
   }
 
   endSession() {
-    if (!this.isActive) return;
-
     this.timeLogs.forEach((_val, key, _map) => {
       this.end(key);
     });
@@ -61,8 +50,6 @@ class TimeLogger {
   }
 
   add(desc: string) {
-    if (!this.isActive) return;
-
     const now = Date.now();
     const log = this.timeLogs.get(desc);
     if (log) {
@@ -73,8 +60,6 @@ class TimeLogger {
   }
 
   end(desc: string) {
-    if (!this.isActive) return;
-
     const now = Date.now();
     const log = this.timeLogs.get(desc);
     if (log) {
@@ -84,8 +69,6 @@ class TimeLogger {
   }
 
   private handleLog(desc: string, duration: number) {
-    if (!this.isActive) return;
-
     if (this.isAggregated) {
       this.reports.set(desc, duration);
     } else {
@@ -93,5 +76,3 @@ class TimeLogger {
     }
   }
 }
-
-export default new TimeLogger();
