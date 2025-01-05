@@ -18,6 +18,13 @@ jest.mock('puppeteer');
 jest.mock('jsdom');
 
 describe('evalTemplateSettings', () => {
+  test('it returns empty array when no document-page elements are found', () => {
+    document.body.innerHTML = '';
+    const result = evalTemplateSettings(templateDefaults);
+
+    expect(result).toEqual([]);
+  });
+
   test('it works with valid document-page elements', () => {
     document.body.innerHTML = `
       <document-page format="letter"> ... </document-page>

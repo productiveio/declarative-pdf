@@ -80,6 +80,13 @@ export default class DeclarativePDF {
       logger?.level1().start('[4] Getting document page settings from DOM');
       await this.getDocumentPageSettings();
 
+      /**
+       * At this point we should have all the document page settings.
+       * If the template is malformed or doesn't contain any document-page
+       * elements, we throw an error.
+       */
+      if (!this.documentPages.length) throw new Error('No document pages found');
+
       /** for every document page model, get from DOM what that document-page contains */
       logger?.level1().start('[5] Build page layout and body');
       await this.buildLayoutForEachDocumentPage(logger);
@@ -160,8 +167,6 @@ export default class DeclarativePDF {
    * information needed to build the final PDF.
    */
   private async buildLayoutForEachDocumentPage(logger?: TimeLogger) {
-    if (!this.documentPages.length) throw new Error('No document pages found');
-
     for (const [index, doc] of this.documentPages.entries()) {
       logger?.level2().start('[5.1] Set viewport');
       await this.html.setViewport(doc.viewPort);
@@ -181,8 +186,6 @@ export default class DeclarativePDF {
   }
 
   private async buildPDF(logger?: TimeLogger) {
-    if (!this.documentPages?.length) throw new Error('No document pages found');
-
     const outputPDF = await PDFDocument.create();
 
     for (const doc of this.documentPages) {
