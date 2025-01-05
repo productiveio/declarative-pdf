@@ -56,7 +56,6 @@ interface SectionElementOpts {
   };
 }
 
-// TODO: figure out page embedding
 export class SectionElement {
   declare buffer: Buffer;
   declare pdf: PDFDocument;

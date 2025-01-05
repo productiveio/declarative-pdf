@@ -98,7 +98,6 @@ export class DocumentPage {
     await this.html.resetVisibility();
 
     this.layout.pageCount = pdf.getPageCount();
-    // TODO: make sure we use layout everywhere (and transpared bg too)
     this.body = new BodyElement({
       buffer,
       pdf,
