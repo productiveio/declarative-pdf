@@ -66,24 +66,24 @@ export default class DeclarativePDF {
 
     try {
       /** open a new tab in the browser */
-      logger?.group().start('[1] Opening new tab');
+      logger?.level1().start('[1] Opening new tab');
       await this.html.newPage();
 
       /** send the template to the tab and normalize it */
-      logger?.group().start('[2] Setting content and loading html');
+      logger?.level1().start('[2] Setting content and loading html');
       await this.html.setContent(template);
 
-      logger?.group().start('[3] Normalizing content');
+      logger?.level1().start('[3] Normalizing content');
       await this.html.normalize();
 
       /** get from DOM index, width and height for every document-page element */
-      logger?.group().start('[4] Getting document page settings from DOM');
+      logger?.level1().start('[4] Getting document page settings from DOM');
       await this.getDocumentPageSettings();
 
       /** for every document page model, get from DOM what that document-page contains */
-      logger?.group().start('[5] Build page layout and body');
+      logger?.level1().start('[5] Build page layout and body');
       await this.buildLayoutForEachDocumentPage(logger);
-      logger?.group().end();
+      logger?.level1().end();
 
       /**
        * Return early for only one document page with only a body element.
@@ -100,14 +100,14 @@ export default class DeclarativePDF {
        * We either have multiple document pages or some section elements,
        * so we need to process them to build the final PDF.
        */
-      logger?.group().start('[6] Process sections and build final PDF');
+      logger?.level1().start('[6] Process sections and build final PDF');
       const result = await this.buildPDF(logger);
-      logger?.group().end();
+      logger?.level1().end();
 
       return result;
     } catch (error) {
       /** cleanup - always close opened tab in the browser to avoid memory leaks */
-      logger?.group().start('[x] Closing tab after error');
+      logger?.level1().start('[x] Closing tab after error');
       await this.html.close();
 
       /** cleanup - always close the logger session */
@@ -122,7 +122,7 @@ export default class DeclarativePDF {
       throw error;
     } finally {
       /** cleanup - close the tab in browser */
-      logger?.group().start('[7] Closing tab');
+      logger?.level1().start('[7] Closing tab');
       await this.html.close();
 
       /** cleanup - close the logger session */
@@ -170,20 +170,20 @@ export default class DeclarativePDF {
     if (!this.documentPages.length) throw new Error('No document pages found');
 
     for (const [index, doc] of this.documentPages.entries()) {
-      logger?.subgroup().start('[5.1] Set viewport');
+      logger?.level2().start('[5.1] Set viewport');
       await this.html.setViewport(doc.viewPort);
-      logger?.subgroup().end();
+      logger?.level2().end();
 
       let settings;
       if (doc.hasSections) {
-        logger?.subgroup().start('[5.2] Get section settings');
+        logger?.level2().start('[5.2] Get section settings');
         settings = await this.html.getSectionSettings({index});
-        logger?.subgroup().end();
+        logger?.level2().end();
       }
 
-      logger?.subgroup().start('[5.3] Create layout and body');
+      logger?.level2().start('[5.3] Create layout and body');
       await doc.createLayoutAndBody(settings, logger);
-      logger?.subgroup().end();
+      logger?.level2().end();
     }
   }
 

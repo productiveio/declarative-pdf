@@ -26,9 +26,9 @@ export default class TimeLogger {
 
   constructor() {
     this.setupNode('session');
-    this.setupNode('group', 'session');
-    this.setupNode('subgroup', 'group');
-    this.setupNode('item', 'subgroup');
+    this.setupNode('level 1', 'session');
+    this.setupNode('level 2', 'level 1');
+    this.setupNode('level 3', 'level 2');
   }
 
   private setupNode(key: string, parentKey?: string) {
@@ -88,14 +88,14 @@ export default class TimeLogger {
   session() {
     return this.handleNode('session');
   }
-  group() {
-    return this.handleNode('group');
+  level1() {
+    return this.handleNode('level 1');
   }
-  subgroup() {
-    return this.handleNode('subgroup');
+  level2() {
+    return this.handleNode('level 2');
   }
-  item() {
-    return this.handleNode('item');
+  level3() {
+    return this.handleNode('level 3');
   }
 
   private resetTimeObject(timeObj: TimeObject) {

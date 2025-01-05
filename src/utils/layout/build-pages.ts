@@ -35,13 +35,13 @@ async function createSectionElement(sectionType: SectionType, setting: SectionSe
     totalPagesNumber,
   });
 
-  logger?.item().start(`[6.1.1] Rendering ${sectionType} section`);
+  logger?.level3().start(`[6.1.1] Rendering ${sectionType} section`);
   const uint8Array = await html.pdf({
     width: layout.width,
     height: setting.height,
     transparentBg: !!layout?.[sectionType]?.transparentBg,
   });
-  logger?.item().end();
+  logger?.level3().end();
 
   const buffer = Buffer.from(uint8Array);
 
@@ -114,10 +114,10 @@ export async function buildPages(opts: BuildPagesOpts) {
    * This is the simplest case and we can exit early.
    */
   if (!layout.hasAnySection) {
-    logger?.subgroup().start('[6.3] Copy pages');
+    logger?.level2().start('[6.3] Copy pages');
     const copiedPages = await target.copyPages(body.pdf, body.pdf.getPageIndices());
     copiedPages.forEach((page) => target.addPage(page));
-    logger?.subgroup().end();
+    logger?.level2().end();
     return {pages, elements};
   }
 
@@ -143,22 +143,22 @@ export async function buildPages(opts: BuildPagesOpts) {
       logger,
     };
 
-    logger?.subgroup().start(`[6.1] Resolve page ${pageIndex} section elements`);
+    logger?.level2().start(`[6.1] Resolve page ${pageIndex} section elements`);
     const header = await resolveSectionElement('header', opts);
     const footer = await resolveSectionElement('footer', opts);
     const background = await resolveSectionElement('background', opts);
-    logger?.subgroup().end();
+    logger?.level2().end();
 
     // TODO: do something with the target? embed? append?
     // we might need the body element as well
 
-    logger?.subgroup().start(`[6.2] Embed and place page ${pageIndex} sections`);
+    logger?.level2().start(`[6.2] Embed and place page ${pageIndex} sections`);
     const targetPage = target.addPage([layout.width, layout.height]);
     await embedAndPlaceSection(targetPage, background);
     await embedAndPlaceSection(targetPage, header);
     await embedAndPlaceSection(targetPage, footer);
     await embedAndPlaceBody(targetPage, body, pageIndex);
-    logger?.subgroup().end();
+    logger?.level2().end();
 
     pages.push({
       pageIndex,

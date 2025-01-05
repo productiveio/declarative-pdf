@@ -18,26 +18,26 @@ describe('TimeLogger', () => {
 
     logger.session().start('Test Session');
 
-    logger.group().start('Solo Group');
+    logger.level1().start('Solo Group');
     jest.advanceTimersByTime(30);
-    logger.group().end();
+    logger.level1().end();
 
-    logger.subgroup().start('Subgroup without group 1');
+    logger.level2().start('Subgroup without group 1');
     jest.advanceTimersByTime(10);
-    logger.subgroup().start('Subgroup without group 2');
+    logger.level2().start('Subgroup without group 2');
     jest.advanceTimersByTime(10);
-    logger.group().end();
+    logger.level1().end();
 
-    logger.item().start('Item without stuff 1');
+    logger.level3().start('Item without stuff 1');
     jest.advanceTimersByTime(10);
-    logger.item().start('Item without stuff 2');
+    logger.level3().start('Item without stuff 2');
     jest.advanceTimersByTime(10);
-    logger.group().end();
+    logger.level1().end();
 
-    logger.item().start('Solo item without stuff');
+    logger.level3().start('Solo item without stuff');
     jest.advanceTimersByTime(10);
-    logger.item().end();
-    logger.subgroup().end();
+    logger.level3().end();
+    logger.level2().end();
     jest.advanceTimersByTime(20);
 
     logger.session().end();
@@ -48,15 +48,15 @@ describe('TimeLogger', () => {
         '100ms | Test Session',
         '====================',
         ' 30ms | 30.0% | Solo Group',
-        ' 20ms | 20.0% | Group',
+        ' 20ms | 20.0% | Level 1',
         ' 10ms | 10.0% |   Subgroup without group 1',
         ' 10ms | 10.0% |   Subgroup without group 2',
-        ' 20ms | 20.0% | Group',
-        ' 20ms | 20.0% |   Subgroup',
+        ' 20ms | 20.0% | Level 1',
+        ' 20ms | 20.0% |   Level 2',
         ' 10ms | 10.0% |     Item without stuff 1',
         ' 10ms | 10.0% |     Item without stuff 2',
-        ' 30ms | 30.0% | Group',
-        ' 10ms | 10.0% |   Subgroup',
+        ' 30ms | 30.0% | Level 1',
+        ' 10ms | 10.0% |   Level 2',
         ' 10ms | 10.0% |     Solo item without stuff',
       ].join('\n')
     );
@@ -74,10 +74,10 @@ describe('TimeLogger', () => {
   test('should handle nested empty phases', () => {
     const logger = new TimeLogger();
     logger.session().start('Nested Empty');
-    logger.group().start('Empty Group');
-    logger.subgroup().start('Empty Subgroup');
-    logger.subgroup().end();
-    logger.group().end();
+    logger.level1().start('Empty Group');
+    logger.level2().start('Empty Subgroup');
+    logger.level2().end();
+    logger.level1().end();
     logger.session().end();
 
     const report = logger.getReport();
@@ -91,9 +91,9 @@ describe('TimeLogger', () => {
   test('should handle out of order ends', () => {
     const logger = new TimeLogger();
     logger.session().start('Out Of Order');
-    logger.group().start('Group 1');
-    logger.subgroup().start('Subgroup 1');
-    logger.item().start('Item 1');
+    logger.level1().start('Group 1');
+    logger.level2().start('Subgroup 1');
+    logger.level3().start('Item 1');
 
     // End session without properly ending other nodes
     logger.session().end();
@@ -114,12 +114,12 @@ describe('TimeLogger', () => {
     const logger = new TimeLogger();
     logger.session().start('Restart Test');
 
-    logger.group().start('Group 1');
+    logger.level1().start('Group 1');
     jest.advanceTimersByTime(10);
     // Restart group without ending
-    logger.group().start('Group 2');
+    logger.level1().start('Group 2');
     jest.advanceTimersByTime(10);
-    logger.group().end();
+    logger.level1().end();
 
     logger.session().end();
 
@@ -132,16 +132,16 @@ describe('TimeLogger', () => {
   test('should handle undefined names', () => {
     const logger = new TimeLogger();
     logger.session().start('');
-    logger.group().start('');
-    logger.subgroup().start('');
+    logger.level1().start('');
+    logger.level2().start('');
     jest.advanceTimersByTime(10);
-    logger.subgroup().end();
-    logger.group().end();
+    logger.level2().end();
+    logger.level1().end();
     logger.session().end();
 
     const report = logger.getReport();
     expect(report).toBe(
-      ['10ms | Session', '==============', '10ms |  100% | Group', '10ms |  100% |   Subgroup'].join('\n')
+      ['10ms | Session', '==============', '10ms |  100% | Level 1', '10ms |  100% |   Level 2'].join('\n')
     );
   });
 });
