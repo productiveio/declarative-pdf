@@ -177,18 +177,18 @@ export default class DeclarativePDF {
     if (!this.documentPages.length) throw new Error('No document pages found');
 
     for (const [index, doc] of this.documentPages.entries()) {
-      logger?.subgroup().start('set viewport');
+      logger?.subgroup().start('[5.1] Set viewport');
       await this.html.setViewport(doc.viewPort);
       logger?.subgroup().end();
 
       let settings;
       if (doc.hasSections) {
-        logger?.subgroup().start('get section settings');
+        logger?.subgroup().start('[5.2] Get section settings');
         settings = await this.html.getSectionSettings({ index });
         logger?.subgroup().end();
       }
 
-      logger?.subgroup().start('create layout and body');
+      logger?.subgroup().start('[5.3] Create layout and body');
       await doc.createLayoutAndBody(settings, logger);
       logger?.subgroup().end();
     }

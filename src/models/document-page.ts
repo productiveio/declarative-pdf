@@ -84,7 +84,7 @@ export class DocumentPage {
 
     await this.html.prepareSection({ documentPageIndex: this.index });
 
-    logger?.item().start('print body to pdf buffer');
+    logger?.item().start('[5.3.1] Print body to pdf buffer');
     const uint8Array = await this.html.pdf({
       width: this.layout.width,
       height: this.layout.body.height,
@@ -98,7 +98,7 @@ export class DocumentPage {
 
     const buffer = Buffer.from(uint8Array);
 
-    logger?.item().start('load body pdf as PDFDocument');
+    logger?.item().start('[5.3.2] Load body pdf as PDFDocument');
     const pdf = await PDFDocument.load(uint8Array);
     logger?.item().end();
 
