@@ -45,21 +45,19 @@ describe('TimeLogger', () => {
     const report = logger.getReport();
     expect(report).toBe(
       [
-        'Time log report:',
-        '================',
-        '   30ms |  30.00% | Solo Group',
-        '   20ms |  20.00% | Group',
-        '       10ms (50%) |   Subgroup without group 1',
-        '       10ms (50%) |   Subgroup without group 2',
-        '   20ms |  20.00% | Group',
-        '      20ms (100%) |   Subgroup',
-        '             10ms |     Item without stuff 1',
-        '             10ms |     Item without stuff 2',
-        '   30ms |  30.00% | Group',
-        '       10ms (33%) |   Subgroup',
-        '             10ms |     Solo item without stuff',
-        '  =============================================',
-        '            100ms | Test Session',
+        '100ms | Test Session',
+        '====================',
+        ' 30ms | 30.0% | Solo Group',
+        ' 20ms | 20.0% | Group',
+        ' 10ms | 10.0% |   Subgroup without group 1',
+        ' 10ms | 10.0% |   Subgroup without group 2',
+        ' 20ms | 20.0% | Group',
+        ' 20ms | 20.0% |   Subgroup',
+        ' 10ms | 10.0% |     Item without stuff 1',
+        ' 10ms | 10.0% |     Item without stuff 2',
+        ' 30ms | 30.0% | Group',
+        ' 10ms | 10.0% |   Subgroup',
+        ' 10ms | 10.0% |     Solo item without stuff',
       ].join('\n')
     );
   });
@@ -71,12 +69,7 @@ describe('TimeLogger', () => {
 
     const report = logger.getReport();
     expect(report).toBe(
-      [
-        'Time log report:',
-        '================',
-        '  ==============',
-        '            0ms | Empty Session',
-      ].join('\n')
+      ['0ms | Empty Session', '==================='].join('\n')
     );
   });
 
@@ -92,12 +85,10 @@ describe('TimeLogger', () => {
     const report = logger.getReport();
     expect(report).toBe(
       [
-        'Time log report:',
-        '================',
-        '  0ms |   0.00% | Empty Group',
-        '       0ms (0%) |   Empty Subgroup',
-        '  ================================',
-        '            0ms | Nested Empty',
+        '0ms | Nested Empty',
+        '==================',
+        '0ms |  0.0% | Empty Group',
+        '0ms |  0.0% |   Empty Subgroup',
       ].join('\n')
     );
   });
@@ -115,13 +106,11 @@ describe('TimeLogger', () => {
     const report = logger.getReport();
     expect(report).toBe(
       [
-        'Time log report:',
-        '================',
-        '  0ms |   0.00% | Group 1',
-        '       0ms (0%) |   Subgroup 1',
-        '            0ms |     Item 1',
-        '  ============================',
-        '            0ms | Out Of Order',
+        '0ms | Out Of Order',
+        '==================',
+        '0ms |  0.0% | Group 1',
+        '0ms |  0.0% |   Subgroup 1',
+        '0ms |  0.0% |     Item 1',
       ].join('\n')
     );
   });
@@ -142,12 +131,10 @@ describe('TimeLogger', () => {
     const report = logger.getReport();
     expect(report).toBe(
       [
-        'Time log report:',
-        '================',
-        '  10ms |  50.00% | Group 1',
-        '  10ms |  50.00% | Group 2',
-        '  ========================',
-        '            20ms | Restart Test',
+        '20ms | Restart Test',
+        '===================',
+        '10ms | 50.0% | Group 1',
+        '10ms | 50.0% | Group 2',
       ].join('\n')
     );
   });
@@ -165,12 +152,10 @@ describe('TimeLogger', () => {
     const report = logger.getReport();
     expect(report).toBe(
       [
-        'Time log report:',
-        '================',
-        '  10ms | 100.00% | Group',
-        '     10ms (100%) |   Subgroup',
-        '  ===========================',
-        '            10ms | Session',
+        '10ms | Session',
+        '==============',
+        '10ms |  100% | Group',
+        '10ms |  100% |   Subgroup',
       ].join('\n')
     );
   });

@@ -17,23 +17,13 @@ function buildReportLine(
   obj: TimeObject,
   lvl: 0 | 1 | 2,
   totalMs: number,
-  leftLength: number
+  totalLen: number
 ) {
   const pctNum = totalMs ? (obj.duration / totalMs) * 100 : 0;
+  const pct = pctNum === 100 ? ' 100' : pctNum.toFixed(1).padStart(4, ' ');
+  const dur = obj.duration.toString().padStart(totalLen, ' ');
 
-  let left = '';
-  let right = '';
-  if (lvl === 0) {
-    left = `${obj.duration}ms | ${pctNum.toFixed(2).padStart(6, ' ')}%`;
-  } else if (lvl === 1) {
-    left = `${obj.duration}ms (${pctNum.toFixed(0)}%)`;
-    right = right.padEnd(2, ' ');
-  } else {
-    left = `${obj.duration}ms`;
-    right = right.padEnd(4, ' ');
-  }
-
-  return `  ${left.padStart(leftLength, ' ')} | ${right}${obj.name}`;
+  return `${dur}ms | ${pct}% | ${''.padStart(lvl * 2, ' ')}${obj.name}`;
 }
 
 export default class TimeLogger {
@@ -122,26 +112,22 @@ export default class TimeLogger {
   getReport() {
     const session = this._nodes.get('session')!.report[0];
     const totalMs = session.duration;
-    const totalLen = totalMs.toString().length + 12;
+    const totalLen = totalMs.toString().length;
+    const title = `${totalMs}ms | ${session.name}`;
 
     const report = [
-      'Time log report:',
-      '================',
+      title,
+      ''.padEnd(title.length, '='),
       ...(session.children ?? []).flatMap((group) => [
         buildReportLine(group, 0, totalMs, totalLen),
         ...(group.children ?? []).flatMap((subgroup) => [
-          buildReportLine(subgroup, 1, group.duration, totalLen),
+          buildReportLine(subgroup, 1, totalMs, totalLen),
           ...(subgroup.children ?? []).map((item) =>
-            buildReportLine(item, 2, 0, totalLen)
+            buildReportLine(item, 2, totalMs, totalLen)
           ),
         ]),
       ]),
     ];
-
-    const lineLen = report.reduce((max, line) => Math.max(max, line.length), 0);
-    report.push('  '.padEnd(lineLen, '='));
-    const summary = `${totalMs}ms`;
-    report.push(`  ${summary.padStart(totalLen, ' ')} | ${session.name}`);
 
     return report.join('\n');
   }
