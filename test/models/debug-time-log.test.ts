@@ -8,55 +8,43 @@ describe('TimeLogger', () => {
   let consoleSpy: jest.SpyInstance;
 
   beforeEach(() => {
+    jest.useFakeTimers();
     consoleSpy = jest.spyOn(console, 'log').mockImplementation();
-    TimeLogger.setOptions({ active: false, aggregated: false });
   });
 
   afterEach(() => {
+    jest.useRealTimers();
     consoleSpy.mockRestore();
   });
 
-  test('should not log when inactive', () => {
-    TimeLogger.startSession('Test Session');
-    TimeLogger.add('Task 1');
-    TimeLogger.end('Task 1');
-    TimeLogger.endSession();
-
-    expect(consoleSpy).not.toHaveBeenCalled();
-  });
-
   test('should log individual times when not aggregated', () => {
-    jest.useFakeTimers();
-    TimeLogger.setOptions({ active: true, aggregated: false });
+    const logger = new TimeLogger({ aggregated: false });
 
-    TimeLogger.startSession('Test Session');
-    TimeLogger.add('Task 1');
+    logger.startSession('Test Session');
+    logger.add('Task 1');
     jest.advanceTimersByTime(100);
-    TimeLogger.end('Task 1');
-    TimeLogger.endSession();
+    logger.end('Task 1');
+    logger.endSession();
     expect(consoleSpy).toHaveBeenCalledWith('Time log: Task 1 --==+> 100ms');
     expect(consoleSpy).toHaveBeenCalledWith(
       'Time log: Test Session --==+> 100ms'
     );
-
-    jest.useRealTimers();
   });
 
   test('should create aggregated report', () => {
-    jest.useFakeTimers();
-    TimeLogger.setOptions({ active: true, aggregated: true });
+    const logger = new TimeLogger({ aggregated: true });
 
-    TimeLogger.startSession('Test Session');
+    logger.startSession('Test Session');
 
-    TimeLogger.add('Task 1');
+    logger.add('Task 1');
     jest.advanceTimersByTime(100);
-    TimeLogger.end('Task 1');
+    logger.end('Task 1');
 
-    TimeLogger.add('Task 2');
+    logger.add('Task 2');
     jest.advanceTimersByTime(200);
-    TimeLogger.end('Task 2');
+    logger.end('Task 2');
 
-    TimeLogger.endSession();
+    logger.endSession();
 
     expect(consoleSpy).toHaveBeenCalledWith(
       [
@@ -68,65 +56,56 @@ describe('TimeLogger', () => {
         '            300ms | Test Session',
       ].join('\n')
     );
-
-    jest.useRealTimers();
   });
 
   test('should handle multiple adds before end', () => {
-    jest.useFakeTimers();
-    TimeLogger.setOptions({ active: true, aggregated: false });
+    const logger = new TimeLogger({ aggregated: false });
 
-    TimeLogger.startSession('Test Session');
-    TimeLogger.add('Task 1');
-
-    jest.advanceTimersByTime(100);
-    TimeLogger.add('Task 1'); // Should log the first interval
+    logger.startSession('Test Session');
+    logger.add('Task 1');
 
     jest.advanceTimersByTime(100);
-    TimeLogger.end('Task 1'); // Should log the second interval
+    logger.add('Task 1'); // Should log the first interval
 
-    TimeLogger.endSession();
+    jest.advanceTimersByTime(100);
+    logger.end('Task 1'); // Should log the second interval
+
+    logger.endSession();
 
     expect(consoleSpy).toHaveBeenCalledTimes(3);
-
-    jest.useRealTimers();
   });
 
   test('should handle close to zero times', () => {
-    jest.useFakeTimers();
-    TimeLogger.setOptions({ active: true, aggregated: false });
+    const logger = new TimeLogger({ aggregated: false });
 
-    TimeLogger.startSession('Test Session');
+    logger.startSession('Test Session');
 
-    TimeLogger.add('Task 1');
+    logger.add('Task 1');
     jest.advanceTimersByTime(0);
-    TimeLogger.end('Task 1');
+    logger.end('Task 1');
 
-    TimeLogger.endSession();
+    logger.endSession();
 
     expect(consoleSpy).toHaveBeenCalledWith('Time log: Task 1 --==+> 0ms');
     expect(consoleSpy).toHaveBeenCalledWith(
       'Time log: Test Session --==+> 0ms'
     );
-
-    jest.useRealTimers();
   });
 
   test('should handle close to zero times when aggregated', () => {
-    jest.useFakeTimers();
-    TimeLogger.setOptions({ active: true, aggregated: true });
+    const logger = new TimeLogger({ aggregated: true });
 
-    TimeLogger.startSession('Test Session');
+    logger.startSession('Test Session');
 
-    TimeLogger.add('Task 1');
+    logger.add('Task 1');
     jest.advanceTimersByTime(0);
-    TimeLogger.end('Task 1');
+    logger.end('Task 1');
 
-    TimeLogger.add('Task 2');
+    logger.add('Task 2');
     jest.advanceTimersByTime(0);
-    TimeLogger.end('Task 2');
+    logger.end('Task 2');
 
-    TimeLogger.endSession();
+    logger.endSession();
 
     expect(consoleSpy).toHaveBeenCalledWith(
       [
@@ -138,37 +117,29 @@ describe('TimeLogger', () => {
         '            0ms | Test Session',
       ].join('\n')
     );
-
-    jest.useRealTimers();
   });
 
   test('should handle start and end without adds', () => {
-    jest.useFakeTimers();
-    TimeLogger.setOptions({ active: true, aggregated: false });
+    const logger = new TimeLogger({ aggregated: false });
 
-    TimeLogger.startSession('Test Session');
+    logger.startSession('Test Session');
     jest.advanceTimersByTime(100);
-    TimeLogger.endSession();
+    logger.endSession();
 
     expect(consoleSpy).toHaveBeenCalledWith(
       'Time log: Test Session --==+> 100ms'
     );
-
-    jest.useRealTimers();
   });
 
   test('should handle start and end without adds when aggregated', () => {
-    jest.useFakeTimers();
-    TimeLogger.setOptions({ active: true, aggregated: true });
+    const logger = new TimeLogger({ aggregated: true });
 
-    TimeLogger.startSession('Test Session');
+    logger.startSession('Test Session');
     jest.advanceTimersByTime(100);
-    TimeLogger.endSession();
+    logger.endSession();
 
     expect(consoleSpy).toHaveBeenCalledWith(
       'Time log: Test Session --==+> 100ms'
     );
-
-    jest.useRealTimers();
   });
 });
