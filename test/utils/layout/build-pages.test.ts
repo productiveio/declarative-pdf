@@ -133,6 +133,17 @@ describe('buildPages', () => {
     await expect(buildPages(opts)).rejects.toThrow('Document page has no pages');
   });
 
+  test('throws error when target PDF is not provided', async () => {
+    const opts = await mockBuildPagesOpts({
+      totalPagesNumber: 1,
+      layout: {pageCount: 1},
+    });
+    // @ts-expect-error Mocking missing property
+    opts.target = undefined;
+
+    await expect(buildPages(opts)).rejects.toThrow('No target PDF document provided');
+  });
+
   test('creates correct number of pages without settings', async () => {
     const opts = await mockBuildPagesOpts({
       totalPagesNumber: 2,
