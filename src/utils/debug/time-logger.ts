@@ -17,16 +17,23 @@ function buildReportLine(
   obj: TimeObject,
   lvl: 0 | 1 | 2,
   totalMs: number,
-  totalLen: number
+  leftLength: number
 ) {
-  const PCT_PREFIX = ['  ', '  ‣ ', '        ...'];
-  const PCT_SUFFIX = ['%  ', '%', ''];
-  const NAME_PREFIX = ['', ' ', '  '];
   const pctNum = totalMs ? (obj.duration / totalMs) * 100 : 0;
-  const pct = lvl === 2 ? '' : pctNum.toFixed(2).padStart(6, ' ');
-  const dur = obj.duration.toString().padStart(totalLen, ' ');
 
-  return `${PCT_PREFIX[lvl]}${pct}${PCT_SUFFIX[lvl]} | ${dur}ms | ${NAME_PREFIX[lvl]}${obj.name}`;
+  let left = '';
+  let right = '';
+  if (lvl === 0) {
+    left = `${obj.duration}ms | ${pctNum.toFixed(2).padStart(6, ' ')}%`;
+  } else if (lvl === 1) {
+    left = `${obj.duration}ms (${pctNum.toFixed(0)}%)`;
+    right = right.padEnd(2, ' ');
+  } else {
+    left = `${obj.duration}ms`;
+    right = right.padEnd(4, ' ');
+  }
+
+  return `  ${left.padStart(leftLength, ' ')} | ${right}${obj.name}`;
 }
 
 export default class TimeLogger {
@@ -69,7 +76,6 @@ export default class TimeLogger {
     if (node.parent && !node.parent.current.name) {
       this.startNode(node.parent);
     }
-
 
     node.current.name = name || node.defaultName;
     node.current.start = Date.now();
@@ -116,7 +122,7 @@ export default class TimeLogger {
   getReport() {
     const session = this._nodes.get('session')!.report[0];
     const totalMs = session.duration;
-    const totalLen = totalMs.toString().length;
+    const totalLen = totalMs.toString().length + 12;
 
     const report = [
       'Time log report:',
@@ -134,7 +140,8 @@ export default class TimeLogger {
 
     const lineLen = report.reduce((max, line) => Math.max(max, line.length), 0);
     report.push('  '.padEnd(lineLen, '='));
-    report.push(`              ${totalMs}ms | ${session.name}`);
+    const summary = `${totalMs}ms`;
+    report.push(`  ${summary.padStart(totalLen, ' ')} | ${session.name}`);
 
     return report.join('\n');
   }

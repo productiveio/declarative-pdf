@@ -47,19 +47,19 @@ describe('TimeLogger', () => {
       [
         'Time log report:',
         '================',
-        '   30.00%   |  30ms | Solo Group',
-        '   20.00%   |  20ms | Group',
-        '  ‣  50.00% |  10ms |  Subgroup without group 1',
-        '  ‣  50.00% |  10ms |  Subgroup without group 2',
-        '   20.00%   |  20ms | Group',
-        '  ‣ 100.00% |  20ms |  Subgroup',
-        '        ... |  10ms |   Item without stuff 1',
-        '        ... |  10ms |   Item without stuff 2',
-        '   30.00%   |  30ms | Group',
-        '  ‣  33.33% |  10ms |  Subgroup',
-        '        ... |  10ms |   Solo item without stuff',
+        '   30ms |  30.00% | Solo Group',
+        '   20ms |  20.00% | Group',
+        '       10ms (50%) |   Subgroup without group 1',
+        '       10ms (50%) |   Subgroup without group 2',
+        '   20ms |  20.00% | Group',
+        '      20ms (100%) |   Subgroup',
+        '             10ms |     Item without stuff 1',
+        '             10ms |     Item without stuff 2',
+        '   30ms |  30.00% | Group',
+        '       10ms (33%) |   Subgroup',
+        '             10ms |     Solo item without stuff',
         '  =============================================',
-        '              100ms | Test Session',
+        '            100ms | Test Session',
       ].join('\n')
     );
   });
@@ -75,7 +75,7 @@ describe('TimeLogger', () => {
         'Time log report:',
         '================',
         '  ==============',
-        '              0ms | Empty Session',
+        '            0ms | Empty Session',
       ].join('\n')
     );
   });
@@ -94,10 +94,10 @@ describe('TimeLogger', () => {
       [
         'Time log report:',
         '================',
-        '    0.00%   | 0ms | Empty Group',
-        '  ‣   0.00% | 0ms |  Empty Subgroup',
-        '  =================================',
-        '              0ms | Nested Empty',
+        '  0ms |   0.00% | Empty Group',
+        '       0ms (0%) |   Empty Subgroup',
+        '  ================================',
+        '            0ms | Nested Empty',
       ].join('\n')
     );
   });
@@ -117,11 +117,11 @@ describe('TimeLogger', () => {
       [
         'Time log report:',
         '================',
-        '    0.00%   | 0ms | Group 1',
-        '  ‣   0.00% | 0ms |  Subgroup 1',
-        '        ... | 0ms |   Item 1',
-        '  =============================',
-        '              0ms | Out Of Order',
+        '  0ms |   0.00% | Group 1',
+        '       0ms (0%) |   Subgroup 1',
+        '            0ms |     Item 1',
+        '  ============================',
+        '            0ms | Out Of Order',
       ].join('\n')
     );
   });
@@ -144,10 +144,10 @@ describe('TimeLogger', () => {
       [
         'Time log report:',
         '================',
-        '   50.00%   | 10ms | Group 1',
-        '   50.00%   | 10ms | Group 2',
-        '  ==========================',
-        '              20ms | Restart Test',
+        '  10ms |  50.00% | Group 1',
+        '  10ms |  50.00% | Group 2',
+        '  ========================',
+        '            20ms | Restart Test',
       ].join('\n')
     );
   });
@@ -167,10 +167,10 @@ describe('TimeLogger', () => {
       [
         'Time log report:',
         '================',
-        '  100.00%   | 10ms | Group',
-        '  ‣ 100.00% | 10ms |  Subgroup',
-        '  ============================',
-        '              10ms | Session',
+        '  10ms | 100.00% | Group',
+        '     10ms (100%) |   Subgroup',
+        '  ===========================',
+        '            10ms | Session',
       ].join('\n')
     );
   });
