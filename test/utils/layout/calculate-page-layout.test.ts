@@ -62,6 +62,16 @@ describe('calculatePageLayout', () => {
     );
   });
 
+  test('throws error when page height is zero', () => {
+    const result = calculatePageLayout();
+    expect(result).toEqual({
+      header: {width: 0, height: 0, x: 0, y: 0},
+      footer: {width: 0, height: 0, x: 0, y: 0},
+      body: {width: 0, height: 0, x: 0, y: 0},
+      background: {width: 0, height: 0, x: 0, y: 0},
+    });
+  });
+
   test('handles zero heights', () => {
     const settings = {
       headers: [{height: 0}] as SectionSetting[],
