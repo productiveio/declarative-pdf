@@ -113,11 +113,11 @@ export default class TimeLogger {
     const report = [
       title,
       ''.padEnd(title.length, '='),
-      ...(session.children ?? []).flatMap((group) => [
-        buildReportLine(group, 0, totalMs, totalLen),
-        ...(group.children ?? []).flatMap((subgroup) => [
-          buildReportLine(subgroup, 1, totalMs, totalLen),
-          ...(subgroup.children ?? []).map((item) => buildReportLine(item, 2, totalMs, totalLen)),
+      ...session.children!.flatMap((level1) => [
+        buildReportLine(level1, 0, totalMs, totalLen),
+        ...level1.children!.flatMap((level2) => [
+          buildReportLine(level2, 1, totalMs, totalLen),
+          ...level2.children!.map((level3) => buildReportLine(level3, 2, totalMs, totalLen)),
         ]),
       ]),
     ];
