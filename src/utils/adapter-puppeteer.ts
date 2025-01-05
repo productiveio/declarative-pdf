@@ -31,7 +31,6 @@ export default class HTMLAdapter {
   }
 
   get page(): Page {
-    if (!this.browser) throw new Error('Browser not set');
     if (!this._page) throw new Error('Page not set');
     if (this._page.isClosed()) throw new Error('Page is closed');
 
