@@ -1,4 +1,4 @@
-import { Browser } from 'puppeteer';
+import {Browser} from 'puppeteer';
 import DeclarativePDF from '@app/index';
 
 describe('DeclarativePDF', () => {

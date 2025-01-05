@@ -68,9 +68,7 @@ describe('TimeLogger', () => {
     logger.session().end();
 
     const report = logger.getReport();
-    expect(report).toBe(
-      ['0ms | Empty Session', '==================='].join('\n')
-    );
+    expect(report).toBe(['0ms | Empty Session', '==================='].join('\n'));
   });
 
   test('should handle nested empty phases', () => {
@@ -84,12 +82,9 @@ describe('TimeLogger', () => {
 
     const report = logger.getReport();
     expect(report).toBe(
-      [
-        '0ms | Nested Empty',
-        '==================',
-        '0ms |  0.0% | Empty Group',
-        '0ms |  0.0% |   Empty Subgroup',
-      ].join('\n')
+      ['0ms | Nested Empty', '==================', '0ms |  0.0% | Empty Group', '0ms |  0.0% |   Empty Subgroup'].join(
+        '\n'
+      )
     );
   });
 
@@ -130,12 +125,7 @@ describe('TimeLogger', () => {
 
     const report = logger.getReport();
     expect(report).toBe(
-      [
-        '20ms | Restart Test',
-        '===================',
-        '10ms | 50.0% | Group 1',
-        '10ms | 50.0% | Group 2',
-      ].join('\n')
+      ['20ms | Restart Test', '===================', '10ms | 50.0% | Group 1', '10ms | 50.0% | Group 2'].join('\n')
     );
   });
 
@@ -151,12 +141,7 @@ describe('TimeLogger', () => {
 
     const report = logger.getReport();
     expect(report).toBe(
-      [
-        '10ms | Session',
-        '==============',
-        '10ms |  100% | Group',
-        '10ms |  100% |   Subgroup',
-      ].join('\n')
+      ['10ms | Session', '==============', '10ms |  100% | Group', '10ms |  100% |   Subgroup'].join('\n')
     );
   });
 });

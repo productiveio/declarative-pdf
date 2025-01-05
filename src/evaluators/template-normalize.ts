@@ -20,9 +20,7 @@ export default function evalTemplateNormalize() {
     (el) => !['DOCUMENT-PAGE', 'SCRIPT', 'STYLE'].includes(el.nodeName)
   );
 
-  const hasDocumentPage = Array.from(document.body.children).some(
-    (el) => el.tagName === 'DOCUMENT-PAGE'
-  );
+  const hasDocumentPage = Array.from(document.body.children).some((el) => el.tagName === 'DOCUMENT-PAGE');
 
   // Only keep free els if there is no document-page
   if (freeEls.length && !hasDocumentPage) {
@@ -39,20 +37,10 @@ export default function evalTemplateNormalize() {
   // those childnodes must not be empty
   Array.from(document.querySelectorAll('document-page')).forEach((doc) => {
     const docFreeEls = Array.from(doc.childNodes).filter(
-      (el) =>
-        ![
-          'PAGE-BODY',
-          'PAGE-BACKGROUND',
-          'PAGE-FOOTER',
-          'PAGE-HEADER',
-          'SCRIPT',
-          'STYLE',
-        ].includes(el.nodeName)
+      (el) => !['PAGE-BODY', 'PAGE-BACKGROUND', 'PAGE-FOOTER', 'PAGE-HEADER', 'SCRIPT', 'STYLE'].includes(el.nodeName)
     );
 
-    const hasPageBody = Array.from(doc.children).some(
-      (el) => el.tagName === 'PAGE-BODY'
-    );
+    const hasPageBody = Array.from(doc.children).some((el) => el.tagName === 'PAGE-BODY');
 
     // Only keep free els if there is no page-body
     if (docFreeEls.length && !hasPageBody) {
@@ -64,11 +52,7 @@ export default function evalTemplateNormalize() {
     }
 
     // Remove empty elements
-    Array.from(
-      doc.querySelectorAll(
-        'page-body, page-header, page-footer, page-background'
-      )
-    ).forEach((el) => {
+    Array.from(doc.querySelectorAll('page-body, page-header, page-footer, page-background')).forEach((el) => {
       if (!el.childNodes.length) {
         el.remove();
       }

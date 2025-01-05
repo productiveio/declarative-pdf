@@ -7,14 +7,8 @@ import Variant from '@app/consts/physical-page';
 jest.mock('puppeteer');
 jest.mock('jsdom');
 
-const originalOffsetHeight = Object.getOwnPropertyDescriptor(
-  HTMLElement.prototype,
-  'offsetHeight'
-);
-const originalOffsetWidth = Object.getOwnPropertyDescriptor(
-  HTMLElement.prototype,
-  'offsetWidth'
-);
+const originalOffsetHeight = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetHeight');
+const originalOffsetWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetWidth');
 
 beforeAll(() => {
   Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
@@ -28,19 +22,9 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-  if (originalOffsetHeight)
-    Object.defineProperty(
-      HTMLElement.prototype,
-      'offsetHeight',
-      originalOffsetHeight
-    );
+  if (originalOffsetHeight) Object.defineProperty(HTMLElement.prototype, 'offsetHeight', originalOffsetHeight);
 
-  if (originalOffsetWidth)
-    Object.defineProperty(
-      HTMLElement.prototype,
-      'offsetWidth',
-      originalOffsetWidth
-    );
+  if (originalOffsetWidth) Object.defineProperty(HTMLElement.prototype, 'offsetWidth', originalOffsetWidth);
 });
 
 describe('evalSectionSettings', () => {

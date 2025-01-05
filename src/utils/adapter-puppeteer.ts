@@ -1,12 +1,12 @@
-import { PAPER_SIZE } from '@app/consts/paper-size';
+import {PAPER_SIZE} from '@app/consts/paper-size';
 import evalSectionSettings from '@app/evaluators/section-settings';
 import evalPrepareSection from '@app/evaluators/prepare-section';
 import evalTemplateNormalize from '@app/evaluators/template-normalize';
 import evalTemplateSettings from '@app/evaluators/template-settings';
 import evalResetVisibility from '@app/evaluators/reset-visibility';
 
-import type { Browser, Page } from 'puppeteer';
-import type { PrepareSection } from '@app/evaluators/prepare-section';
+import type {Browser, Page} from 'puppeteer';
+import type {PrepareSection} from '@app/evaluators/prepare-section';
 
 export type MinimumBrowser = Pick<Browser, 'newPage' | 'connected'>;
 
@@ -50,7 +50,7 @@ export default class HTMLAdapter {
     });
   }
 
-  setViewport(opts: { width: number; height: number }) {
+  setViewport(opts: {width: number; height: number}) {
     return this.page.setViewport(opts);
   }
 
@@ -58,14 +58,14 @@ export default class HTMLAdapter {
     return this.page.evaluate(evalTemplateNormalize);
   }
 
-  getTemplateSettings(opts: { width: number; height: number; ppi: number }) {
+  getTemplateSettings(opts: {width: number; height: number; ppi: number}) {
     return this.page.evaluate(evalTemplateSettings, {
       default: opts,
       size: PAPER_SIZE,
     });
   }
 
-  getSectionSettings(opts: { index: number }) {
+  getSectionSettings(opts: {index: number}) {
     return this.page.evaluate(evalSectionSettings, opts.index);
   }
 
@@ -90,7 +90,7 @@ export default class HTMLAdapter {
   pdf(opts: {
     width: number;
     height: number;
-    margin?: { top?: number; right?: number; bottom?: number; left?: number };
+    margin?: {top?: number; right?: number; bottom?: number; left?: number};
     transparentBg?: boolean;
   }): Promise<Uint8Array> {
     return this.page.pdf({

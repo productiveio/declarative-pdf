@@ -13,12 +13,7 @@ interface TimeNode {
   child?: TimeNode;
 }
 
-function buildReportLine(
-  obj: TimeObject,
-  lvl: 0 | 1 | 2,
-  totalMs: number,
-  totalLen: number
-) {
+function buildReportLine(obj: TimeObject, lvl: 0 | 1 | 2, totalMs: number, totalLen: number) {
   const pctNum = totalMs ? (obj.duration / totalMs) * 100 : 0;
   const pct = pctNum === 100 ? ' 100' : pctNum.toFixed(1).padStart(4, ' ');
   const dur = obj.duration.toString().padStart(totalLen, ' ');
@@ -41,7 +36,7 @@ export default class TimeLogger {
     const defaultName = key[0].toUpperCase() + key.slice(1);
     const timeNode = {
       defaultName,
-      current: { name: '', start: 0, duration: 0 },
+      current: {name: '', start: 0, duration: 0},
       report: [],
       parent,
     };
@@ -76,7 +71,7 @@ export default class TimeLogger {
     if (node.child) this.endNode(node.child);
 
     node.current.duration = Date.now() - node.current.start;
-    const reportNode = { ...node.current };
+    const reportNode = {...node.current};
 
     // Handle children
     if (node.child) {
@@ -122,9 +117,7 @@ export default class TimeLogger {
         buildReportLine(group, 0, totalMs, totalLen),
         ...(group.children ?? []).flatMap((subgroup) => [
           buildReportLine(subgroup, 1, totalMs, totalLen),
-          ...(subgroup.children ?? []).map((item) =>
-            buildReportLine(item, 2, totalMs, totalLen)
-          ),
+          ...(subgroup.children ?? []).map((item) => buildReportLine(item, 2, totalMs, totalLen)),
         ]),
       ]),
     ];

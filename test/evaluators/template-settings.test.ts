@@ -2,12 +2,8 @@
  * @jest-environment jsdom
  */
 import evalTemplateSettings from '@app/evaluators/template-settings';
-import { PAPER_SIZE } from '@app/consts/paper-size';
-import {
-  DEFAULT_HEIGHT,
-  DEFAULT_WIDTH,
-  DEFAULT_PPI,
-} from '@app/utils/paper-defaults';
+import {PAPER_SIZE} from '@app/consts/paper-size';
+import {DEFAULT_HEIGHT, DEFAULT_WIDTH, DEFAULT_PPI} from '@app/utils/paper-defaults';
 
 const templateDefaults = {
   default: {

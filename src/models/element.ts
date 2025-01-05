@@ -1,5 +1,5 @@
-import type { PDFDocument, PDFEmbeddedPage } from 'pdf-lib';
-import type { SectionSetting } from '@app/evaluators/section-settings';
+import type {PDFDocument, PDFEmbeddedPage} from 'pdf-lib';
+import type {SectionSetting} from '@app/evaluators/section-settings';
 
 interface BodyElementOpts {
   buffer: Buffer;

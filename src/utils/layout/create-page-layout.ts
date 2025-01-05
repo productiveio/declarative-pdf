@@ -1,13 +1,7 @@
 import calculatePageLayout from '@app/utils/layout/calculate-page-layout';
-import {
-  hasPageNumbers,
-  hasSectionPageNumbers,
-} from '@app/utils/layout/has-page-numbers';
+import {hasPageNumbers, hasSectionPageNumbers} from '@app/utils/layout/has-page-numbers';
 
-import type {
-  SectionSettings,
-  SectionSetting,
-} from '@app/evaluators/section-settings';
+import type {SectionSettings, SectionSetting} from '@app/evaluators/section-settings';
 
 export interface BodyLayout {
   width: number;
@@ -39,24 +33,12 @@ export function createPageLayoutSettings(
   pageHeight: number = 0,
   pageWidth: number = 0
 ): PageLayout {
-  const pageLayout = calculatePageLayout(
-    sectionSettings,
-    pageHeight,
-    pageWidth
-  );
+  const pageLayout = calculatePageLayout(sectionSettings, pageHeight, pageWidth);
   const transparentBg = !!sectionSettings?.backgrounds.length;
 
-  const {
-    headers = [],
-    footers = [],
-    backgrounds = [],
-  } = sectionSettings ?? {};
+  const {headers = [], footers = [], backgrounds = []} = sectionSettings ?? {};
 
-  const hasAnySection = !!(
-    headers.length ||
-    footers.length ||
-    backgrounds.length
-  );
+  const hasAnySection = !!(headers.length || footers.length || backgrounds.length);
 
   return {
     height: pageHeight,

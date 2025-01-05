@@ -1,7 +1,4 @@
-import type {
-  SectionSettings,
-  SectionSetting,
-} from '@app/evaluators/section-settings';
+import type {SectionSettings, SectionSetting} from '@app/evaluators/section-settings';
 
 export function hasPageNumbers(sectionSettings?: SectionSettings): boolean {
   if (!sectionSettings) return false;
@@ -21,7 +18,5 @@ export function hasPageNumbers(sectionSettings?: SectionSettings): boolean {
 export function hasSectionPageNumbers(sectionSettings?: SectionSetting[]) {
   if (!sectionSettings) return false;
 
-  return sectionSettings.some(
-    (ss) => ss.hasCurrentPageNumber || ss.hasTotalPagesNumber
-  );
+  return sectionSettings.some((ss) => ss.hasCurrentPageNumber || ss.hasTotalPagesNumber);
 }

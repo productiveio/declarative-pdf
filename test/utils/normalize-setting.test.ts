@@ -1,8 +1,8 @@
-import { normalizeSetting } from '@app/utils/normalize-setting';
+import {normalizeSetting} from '@app/utils/normalize-setting';
 
 describe('normalizeSetting', () => {
   it('should return defaults if none is provided', () => {
-    const setting = { index: 1 };
+    const setting = {index: 1};
     const result = normalizeSetting(setting);
     expect(result).toEqual({
       index: 1,
@@ -55,7 +55,7 @@ describe('normalizeSetting', () => {
   });
 
   it('should return capped width if width is less than 1 and height is provided', () => {
-    const setting = { index: 1, width: 0, height: 100, hasSections: true };
+    const setting = {index: 1, width: 0, height: 100, hasSections: true};
     const result = normalizeSetting(setting);
     expect(result).toEqual({
       index: 1,
@@ -68,7 +68,7 @@ describe('normalizeSetting', () => {
   });
 
   it('should return default width and height if width is greater than 420_000 and height is provided', () => {
-    const setting = { index: 1, width: 420_001, height: 100 };
+    const setting = {index: 1, width: 420_001, height: 100};
     const result = normalizeSetting(setting);
     expect(result).toEqual({
       index: 1,

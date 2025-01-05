@@ -1,11 +1,8 @@
 /**
  * @jest-environment node
  */
-import { createPageLayoutSettings } from '@app/utils/layout/create-page-layout';
-import type {
-  SectionSetting,
-  SectionSettings,
-} from '@app/evaluators/section-settings';
+import {createPageLayoutSettings} from '@app/utils/layout/create-page-layout';
+import type {SectionSetting, SectionSettings} from '@app/evaluators/section-settings';
 
 describe('createPageLayoutSettings', () => {
   const makeBasicSettings = (): SectionSettings => ({
@@ -14,9 +11,7 @@ describe('createPageLayoutSettings', () => {
     backgrounds: [],
   });
 
-  const makeSectionSetting = (
-    props: Partial<SectionSetting> = {}
-  ): SectionSetting => ({
+  const makeSectionSetting = (props: Partial<SectionSetting> = {}): SectionSetting => ({
     height: 100,
     hasCurrentPageNumber: false,
     hasTotalPagesNumber: false,
@@ -90,8 +85,8 @@ describe('createPageLayoutSettings', () => {
 
   test('handles sections with page numbers', () => {
     const settings: SectionSettings = {
-      headers: [makeSectionSetting({ hasCurrentPageNumber: true })],
-      footers: [makeSectionSetting({ hasTotalPagesNumber: true })],
+      headers: [makeSectionSetting({hasCurrentPageNumber: true})],
+      footers: [makeSectionSetting({hasTotalPagesNumber: true})],
       backgrounds: [],
     };
 
@@ -120,9 +115,9 @@ describe('createPageLayoutSettings', () => {
 
   test('calculates correct section heights and positions', () => {
     const settings: SectionSettings = {
-      headers: [makeSectionSetting({ height: 200 })],
-      footers: [makeSectionSetting({ height: 150 })],
-      backgrounds: [makeSectionSetting({ height: 1000 })],
+      headers: [makeSectionSetting({height: 200})],
+      footers: [makeSectionSetting({height: 150})],
+      backgrounds: [makeSectionSetting({height: 1000})],
     };
 
     const result = createPageLayoutSettings(settings, 1000, 500);
@@ -136,9 +131,9 @@ describe('createPageLayoutSettings', () => {
   });
 
   test('preserves section settings in output', () => {
-    const headerSetting = makeSectionSetting({ height: 100 });
-    const footerSetting = makeSectionSetting({ height: 150 });
-    const backgroundSetting = makeSectionSetting({ height: 1000 });
+    const headerSetting = makeSectionSetting({height: 100});
+    const footerSetting = makeSectionSetting({height: 150});
+    const backgroundSetting = makeSectionSetting({height: 1000});
 
     const settings: SectionSettings = {
       headers: [headerSetting],

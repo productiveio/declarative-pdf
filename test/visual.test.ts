@@ -1,7 +1,7 @@
 /**
  * @jest-environment jest-environment-node
  */
-import puppeteer, { type Browser } from 'puppeteer';
+import puppeteer, {type Browser} from 'puppeteer';
 import PDF from '@app/index';
 import fs from 'fs';
 import writeBuffer from '@app/utils/write-buffer';
@@ -40,17 +40,11 @@ const testRunner = async (htmlPath: string, pdfName: string) => {
     aggregated: true,
     pdfName,
   };
-  const actualPdfBuffer = await new PDF(browser, { debug }).generate(html);
-  await writeBuffer(
-    actualPdfBuffer,
-    `${config.paths.actualPdfRootFolder}/${pdfName}`
-  );
+  const actualPdfBuffer = await new PDF(browser, {debug}).generate(html);
+  await writeBuffer(actualPdfBuffer, `${config.paths.actualPdfRootFolder}/${pdfName}`);
 
   const comparePdf = new ComparePdf(config);
-  const result = await comparePdf
-    .actualPdfFile(pdfName)
-    .baselinePdfFile(pdfName)
-    .compare();
+  const result = await comparePdf.actualPdfFile(pdfName).baselinePdfFile(pdfName).compare();
 
   expect(result?.status).toBe('passed');
 };
@@ -61,12 +55,7 @@ beforeAll(async () => {
   browser = await puppeteer.launch({
     pipe: true,
     headless: true,
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-web-security',
-      '--font-render-hinting=none',
-    ],
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security', '--font-render-hinting=none'],
   });
 });
 
@@ -84,23 +73,14 @@ describe('PDF visual regression test', () => {
   });
 
   test('a4 72 standard template', async () => {
-    await testRunner(
-      './test/examples/a4-72-standard.html',
-      `a4-72-standard.pdf`
-    );
+    await testRunner('./test/examples/a4-72-standard.html', `a4-72-standard.pdf`);
   });
 
   test('a4 72 multipage template', async () => {
-    await testRunner(
-      './test/examples/a4-72-multipage.html',
-      `a4-72-multipage.pdf`
-    );
+    await testRunner('./test/examples/a4-72-multipage.html', `a4-72-multipage.pdf`);
   });
 
   test.skip('a4 297 standard template', async () => {
-    await testRunner(
-      './test/examples/a4-297-standard.html',
-      `a4-297-standard.pdf`
-    );
+    await testRunner('./test/examples/a4-297-standard.html', `a4-297-standard.pdf`);
   });
 });

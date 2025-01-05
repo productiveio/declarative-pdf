@@ -1,4 +1,4 @@
-import type { PAPER_SIZE } from '@app/consts/paper-size';
+import type {PAPER_SIZE} from '@app/consts/paper-size';
 
 type TemplateSettingOpts = {
   default: {
@@ -24,8 +24,7 @@ export default function evalTemplateSettings(opts: TemplateSettingOpts) {
    * @param ppi Pixels per inch
    * @returns Pixel value
    */
-  const convertMmToPx = (mm: number, ppi: number) =>
-    Math.round(mm * (ppi / 25.4));
+  const convertMmToPx = (mm: number, ppi: number) => Math.round(mm * (ppi / 25.4));
 
   /**
    * Gets width and height from a size string
@@ -52,9 +51,7 @@ export default function evalTemplateSettings(opts: TemplateSettingOpts) {
 
     const ppi = attrPpi && attrPpi > 0 ? attrPpi : opts.default.ppi;
 
-    const hasSections = !!docPageEl.querySelector(
-      'page-header, page-footer, page-background'
-    );
+    const hasSections = !!docPageEl.querySelector('page-header, page-footer, page-background');
 
     let bodyMarginBottom = 0;
     let bodyMarginTop = 0;
@@ -93,9 +90,7 @@ export default function evalTemplateSettings(opts: TemplateSettingOpts) {
     };
   };
 
-  const docPageEls = Array.from(
-    document.querySelectorAll<HTMLElement>('document-page')
-  );
+  const docPageEls = Array.from(document.querySelectorAll<HTMLElement>('document-page'));
 
   return docPageEls.map(getPageSettings);
 }

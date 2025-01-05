@@ -1,12 +1,12 @@
-import { PDFDocument } from 'pdf-lib';
-import { BodyElement } from '@app/models/element';
-import { createPageLayoutSettings } from '@app/utils/layout/create-page-layout';
+import {PDFDocument} from 'pdf-lib';
+import {BodyElement} from '@app/models/element';
+import {createPageLayoutSettings} from '@app/utils/layout/create-page-layout';
 
 import type TimeLogger from '@app/utils/debug/time-logger';
 import type DeclarativePDF from '@app/index';
-import type { SectionSettings } from '@app/evaluators/section-settings';
-import type { SectionElement } from '@app/models/element';
-import type { PageLayout } from '@app/utils/layout/create-page-layout';
+import type {SectionSettings} from '@app/evaluators/section-settings';
+import type {SectionElement} from '@app/models/element';
+import type {PageLayout} from '@app/utils/layout/create-page-layout';
 
 export type DocumentPageOpts = {
   parent: DeclarativePDF;
@@ -72,17 +72,10 @@ export class DocumentPage {
    * construct other elements that might need to display
    * current page / total page number.
    */
-  async createLayoutAndBody(
-    sectionSettings?: SectionSettings,
-    logger?: TimeLogger
-  ) {
-    this.layout = createPageLayoutSettings(
-      sectionSettings,
-      this.height,
-      this.width
-    );
+  async createLayoutAndBody(sectionSettings?: SectionSettings, logger?: TimeLogger) {
+    this.layout = createPageLayoutSettings(sectionSettings, this.height, this.width);
 
-    await this.html.prepareSection({ documentPageIndex: this.index });
+    await this.html.prepareSection({documentPageIndex: this.index});
 
     logger?.item().start('[5.3.1] Print body to pdf buffer');
     const uint8Array = await this.html.pdf({
@@ -119,24 +112,17 @@ export class DocumentPage {
 
   get pageCount() {
     if (!this.layout?.pageCount) {
-      throw new Error(
-        `Body generated for document page ${this.index} has no pages`
-      );
+      throw new Error(`Body generated for document page ${this.index} has no pages`);
     }
 
     return this.layout.pageCount;
   }
 
   get pageCountOffset() {
-    const offset = this.previousDocumentPages.reduce(
-      (acc, doc) => acc + doc.pageCount,
-      0
-    );
+    const offset = this.previousDocumentPages.reduce((acc, doc) => acc + doc.pageCount, 0);
 
     if (offset < this.previousDocumentPages.length) {
-      throw new Error(
-        'Page count offset is less than number of document pages'
-      );
+      throw new Error('Page count offset is less than number of document pages');
     }
 
     return offset;

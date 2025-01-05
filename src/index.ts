@@ -1,10 +1,10 @@
-import { PDFDocument } from 'pdf-lib';
-import { DocumentPage } from '@app/models/document-page';
-import { normalizeSetting } from '@app/utils/normalize-setting';
-import { PaperDefaults, type PaperOpts } from '@app/utils/paper-defaults';
-import HTMLAdapter, { type MinimumBrowser } from '@app/utils/adapter-puppeteer';
+import {PDFDocument} from 'pdf-lib';
+import {DocumentPage} from '@app/models/document-page';
+import {normalizeSetting} from '@app/utils/normalize-setting';
+import {PaperDefaults, type PaperOpts} from '@app/utils/paper-defaults';
+import HTMLAdapter, {type MinimumBrowser} from '@app/utils/adapter-puppeteer';
 import TimeLogger from '@app/utils/debug/time-logger';
-import { buildPages } from '@app/utils/layout/build-pages';
+import {buildPages} from '@app/utils/layout/build-pages';
 
 interface DebugOptions {
   /** Do we want to log debug information */
@@ -60,9 +60,7 @@ export default class DeclarativePDF {
   async generate(template: string) {
     const logger = this.debug.log ? new TimeLogger() : undefined;
 
-    logger
-      ?.session()
-      .start(`[Σ] Total time for ${this.debug.pdfName ?? 'PDF'}`);
+    logger?.session().start(`[Σ] Total time for ${this.debug.pdfName ?? 'PDF'}`);
     /** (re)set documentPages */
     this.documentPages = [];
 
@@ -94,10 +92,7 @@ export default class DeclarativePDF {
        * because there are no headers, footers or sections to process. So,
        * resulting PDF will be the same as the body buffer.
        */
-      if (
-        this.documentPages.length === 1 &&
-        !this.documentPages[0].hasSections
-      ) {
+      if (this.documentPages.length === 1 && !this.documentPages[0].hasSections) {
         return this.documentPages[0].body!.buffer;
       }
 
@@ -151,9 +146,7 @@ export default class DeclarativePDF {
     });
 
     documentPageSettings.forEach((setting) => {
-      this.documentPages.push(
-        new DocumentPage({ parent: this, ...normalizeSetting(setting) })
-      );
+      this.documentPages.push(new DocumentPage({parent: this, ...normalizeSetting(setting)}));
     });
   }
 
@@ -184,7 +177,7 @@ export default class DeclarativePDF {
       let settings;
       if (doc.hasSections) {
         logger?.subgroup().start('[5.2] Get section settings');
-        settings = await this.html.getSectionSettings({ index });
+        settings = await this.html.getSectionSettings({index});
         logger?.subgroup().end();
       }
 

@@ -1,12 +1,12 @@
 /**
  * @jest-environment node
  */
-import { PDFDocument } from 'pdf-lib';
-import { BodyElement } from '@app/models/element';
-import { buildPages } from '@app/utils/layout/build-pages';
-import { createPageLayoutSettings } from '@app/utils/layout/create-page-layout';
+import {PDFDocument} from 'pdf-lib';
+import {BodyElement} from '@app/models/element';
+import {buildPages} from '@app/utils/layout/build-pages';
+import {createPageLayoutSettings} from '@app/utils/layout/create-page-layout';
 
-import type { SectionSetting } from '@app/evaluators/section-settings';
+import type {SectionSetting} from '@app/evaluators/section-settings';
 // import type { BodyElement } from '@app/models/element';
 import type HTMLAdapter from '@app/utils/adapter-puppeteer';
 
@@ -130,18 +130,16 @@ describe('buildPages', () => {
   test('throws error when document page has no pages', async () => {
     const opts = await mockBuildPagesOpts();
 
-    await expect(buildPages(opts)).rejects.toThrow(
-      'Document page has no pages'
-    );
+    await expect(buildPages(opts)).rejects.toThrow('Document page has no pages');
   });
 
   test('creates correct number of pages without settings', async () => {
     const opts = await mockBuildPagesOpts({
       totalPagesNumber: 2,
-      layout: { pageCount: 2 },
+      layout: {pageCount: 2},
     });
 
-    const { pages, elements } = await buildPages(opts);
+    const {pages, elements} = await buildPages(opts);
     expect(pages).toHaveLength(0);
     expect(elements).toHaveLength(0);
     // TODO: check what to do with pages - maybe rename to pageElements?
@@ -175,14 +173,14 @@ describe('buildPages', () => {
       },
     });
 
-    const { pages } = await buildPages(opts);
+    const {pages} = await buildPages(opts);
     expect(pages[0].currentPageNumber).toBe(3);
     expect(pages[1].currentPageNumber).toBe(4);
   });
 
   test('reuses existing section elements when possible', async () => {
     const header = mockSectionSetting();
-    const footer = mockSectionSetting({ hasCurrentPageNumber: true });
+    const footer = mockSectionSetting({hasCurrentPageNumber: true});
     const background = mockSectionSetting();
 
     const opts = await mockBuildPagesOpts({
@@ -199,7 +197,7 @@ describe('buildPages', () => {
       totalPagesNumber: 4,
     });
 
-    const { pages, elements } = await buildPages(opts);
+    const {pages, elements} = await buildPages(opts);
 
     expect(elements).toHaveLength(4);
     expect(pages[0].header).toBe(elements[0]);

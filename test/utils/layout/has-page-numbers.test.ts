@@ -1,15 +1,9 @@
 /**
  * @jest-environment node
  */
-import {
-  hasPageNumbers,
-  hasSectionPageNumbers,
-} from '@app/utils/layout/has-page-numbers';
+import {hasPageNumbers, hasSectionPageNumbers} from '@app/utils/layout/has-page-numbers';
 
-import type {
-  SectionSettings,
-  SectionSetting,
-} from '@app/evaluators/section-settings';
+import type {SectionSettings, SectionSetting} from '@app/evaluators/section-settings';
 
 describe('hasPageNumbers', () => {
   test('returns false for empty section settings', () => {
@@ -186,8 +180,6 @@ describe('hasSectionPageNumbers', () => {
   });
 
   test('returns false when settings is undefined', () => {
-    expect(
-      hasSectionPageNumbers(undefined as unknown as SectionSetting[])
-    ).toBe(false);
+    expect(hasSectionPageNumbers(undefined as unknown as SectionSetting[])).toBe(false);
   });
 });

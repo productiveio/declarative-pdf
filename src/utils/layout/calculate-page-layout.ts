@@ -1,7 +1,4 @@
-import type {
-  SectionSettings,
-  SectionSetting,
-} from '@app/evaluators/section-settings';
+import type {SectionSettings, SectionSetting} from '@app/evaluators/section-settings';
 
 export const getMaxHeight = (els: SectionSetting[]) => {
   return els.reduce((x, s) => Math.max(x, s.height ?? 0), 0);

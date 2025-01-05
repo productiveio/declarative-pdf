@@ -1,11 +1,11 @@
-import { PDFDocument } from 'pdf-lib';
-import { selectSection } from '@app/utils/select-section';
-import { SectionElement } from '@app/models/element';
+import {PDFDocument} from 'pdf-lib';
+import {selectSection} from '@app/utils/select-section';
+import {SectionElement} from '@app/models/element';
 
-import type { PDFPage } from 'pdf-lib';
-import type { PageLayout } from '@app/utils/layout/create-page-layout';
-import type { SectionSetting } from '@app/evaluators/section-settings';
-import type { BodyElement } from '@app/models/element';
+import type {PDFPage} from 'pdf-lib';
+import type {PageLayout} from '@app/utils/layout/create-page-layout';
+import type {SectionSetting} from '@app/evaluators/section-settings';
+import type {BodyElement} from '@app/models/element';
 import type HTMLAdapter from '@app/utils/adapter-puppeteer';
 import type TimeLogger from '@app/utils/debug/time-logger';
 
@@ -23,20 +23,9 @@ interface SectionElementOpts {
   logger?: TimeLogger;
 }
 
-async function createSectionElement(
-  sectionType: SectionType,
-  setting: SectionSetting,
-  opts: SectionElementOpts
-) {
-  const {
-    documentPageIndex,
-    currentPageNumber,
-    totalPagesNumber,
-    html,
-    layout,
-    logger,
-  } = opts;
-  const { physicalPageIndex } = setting;
+async function createSectionElement(sectionType: SectionType, setting: SectionSetting, opts: SectionElementOpts) {
+  const {documentPageIndex, currentPageNumber, totalPagesNumber, html, layout, logger} = opts;
+  const {physicalPageIndex} = setting;
 
   html.prepareSection({
     documentPageIndex,
@@ -71,10 +60,7 @@ async function createSectionElement(
   });
 }
 
-async function resolveSectionElement(
-  sectionType: SectionType,
-  opts: SectionElementOpts
-) {
+async function resolveSectionElement(sectionType: SectionType, opts: SectionElementOpts) {
   const setting = selectSection(
     opts.layout?.[sectionType]?.settings ?? [],
     opts.pageIndex,
@@ -85,10 +71,7 @@ async function resolveSectionElement(
   if (!setting) return undefined;
 
   const element = opts.elements.find(
-    (el) =>
-      el.setting === setting &&
-      !el.setting.hasCurrentPageNumber &&
-      !el.setting.hasTotalPagesNumber
+    (el) => el.setting === setting && !el.setting.hasCurrentPageNumber && !el.setting.hasTotalPagesNumber
   );
   if (element) return element;
 
@@ -109,17 +92,8 @@ interface BuildPagesOpts {
 }
 
 export async function buildPages(opts: BuildPagesOpts) {
-  const {
-    documentPageIndex,
-    pageCountOffset,
-    totalPagesNumber,
-    layout,
-    body,
-    target,
-    html,
-    logger,
-  } = opts;
-  const { pageCount } = layout;
+  const {documentPageIndex, pageCountOffset, totalPagesNumber, layout, body, target, html, logger} = opts;
+  const {pageCount} = layout;
 
   if (!pageCount) throw new Error('Document page has no pages');
   if (!target) throw new Error('No target PDF document provided');
@@ -141,13 +115,10 @@ export async function buildPages(opts: BuildPagesOpts) {
    */
   if (!layout.hasAnySection) {
     logger?.subgroup().start('[6.3] Copy pages');
-    const copiedPages = await target.copyPages(
-      body.pdf,
-      body.pdf.getPageIndices()
-    );
+    const copiedPages = await target.copyPages(body.pdf, body.pdf.getPageIndices());
     copiedPages.forEach((page) => target.addPage(page));
     logger?.subgroup().end();
-    return { pages, elements };
+    return {pages, elements};
   }
 
   /**
@@ -155,7 +126,7 @@ export async function buildPages(opts: BuildPagesOpts) {
    * for each page index and resolve the header, footer and background
    * and place them on the page.
    */
-  const pageIndices = Array.from({ length: pageCount }, (_, i) => i);
+  const pageIndices = Array.from({length: pageCount}, (_, i) => i);
 
   for (const pageIndex of pageIndices) {
     const currentPageNumber = pageIndex + 1 + pageCountOffset;
@@ -198,7 +169,7 @@ export async function buildPages(opts: BuildPagesOpts) {
     });
   }
 
-  return { pages, elements };
+  return {pages, elements};
 }
 
 async function embedAndPlaceSection(page: PDFPage, section?: SectionElement) {
@@ -214,11 +185,7 @@ async function embedAndPlaceSection(page: PDFPage, section?: SectionElement) {
   });
 }
 
-async function embedAndPlaceBody(
-  page: PDFPage,
-  body: BodyElement,
-  idx: number
-) {
+async function embedAndPlaceBody(page: PDFPage, body: BodyElement, idx: number) {
   const [embeddedPage] = await body.embedPageIdx(page.doc, idx);
 
   page.drawPage(embeddedPage, {

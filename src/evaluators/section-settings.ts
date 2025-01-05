@@ -21,9 +21,7 @@ export interface SectionSettings {
  * This function will evaluate the settings for the sections of a document page
  * and return a SectionSettings object.
  */
-export default function evalSectionSettings(
-  documentPageIndex: number
-): SectionSettings {
+export default function evalSectionSettings(documentPageIndex: number): SectionSettings {
   /** physical page variants */
   const variants = ['first', 'last', 'even', 'odd', 'default'] as const;
 
@@ -34,12 +32,7 @@ export default function evalSectionSettings(
    */
   const getElementHeight = (el: HTMLElement) => {
     return Math.ceil(
-      Math.max(
-        el.clientHeight ?? 0,
-        el.offsetHeight ?? 0,
-        el.scrollHeight ?? 0,
-        el.getBoundingClientRect().height ?? 0
-      )
+      Math.max(el.clientHeight ?? 0, el.offsetHeight ?? 0, el.scrollHeight ?? 0, el.getBoundingClientRect().height ?? 0)
     );
   };
 
@@ -49,9 +42,7 @@ export default function evalSectionSettings(
    * @returns true if the element contains a current page number element
    */
   const hasCurrentPageNumber = (el: HTMLElement) => {
-    const currentPageNumber = el.querySelector(
-      'current-page-number, span.page-number'
-    );
+    const currentPageNumber = el.querySelector('current-page-number, span.page-number');
     return !!currentPageNumber;
   };
 
@@ -61,9 +52,7 @@ export default function evalSectionSettings(
    * @returns true if the element contains a total pages number element
    */
   const hasTotalPagesNumber = (el: HTMLElement) => {
-    const totalPagesNumber = el.querySelector(
-      'total-pages-number, span.total-pages'
-    );
+    const totalPagesNumber = el.querySelector('total-pages-number, span.total-pages');
     return !!totalPagesNumber;
   };
 
@@ -81,10 +70,7 @@ export default function evalSectionSettings(
    * @param el A section or physical page element
    * @param physicalPageIndex A number if the element is a physical page within the section
    */
-  const getSettings = (
-    el: HTMLElement,
-    physicalPageIndex?: number
-  ): SectionSetting => {
+  const getSettings = (el: HTMLElement, physicalPageIndex?: number): SectionSetting => {
     let physicalPageType;
     if (physicalPageIndex === undefined) {
       physicalPageType = undefined;
@@ -106,9 +92,7 @@ export default function evalSectionSettings(
     const sectionEl = docPageEl.querySelector<HTMLElement>(`page-${type}`);
     if (!sectionEl) return [];
 
-    const physicalPageEl = Array.from(
-      sectionEl.querySelectorAll<HTMLElement>('physical-page')
-    );
+    const physicalPageEl = Array.from(sectionEl.querySelectorAll<HTMLElement>('physical-page'));
     if (!physicalPageEl.length) {
       return [getSettings(sectionEl)];
     }
@@ -118,7 +102,7 @@ export default function evalSectionSettings(
 
   const docPageEls = document.querySelectorAll<HTMLElement>('document-page');
   const docPageEl = docPageEls[documentPageIndex];
-  if (!docPageEl) return { headers: [], footers: [], backgrounds: [] };
+  if (!docPageEl) return {headers: [], footers: [], backgrounds: []};
 
   const filterSections = (s: SectionSetting) => s && s.height > 0;
   return {

@@ -25,7 +25,7 @@ declare module 'compare-pdf' {
 
     actualPdfFile(pdfName: string): ComparePdf;
     baselinePdfFile(pdfName: string): ComparePdf;
-    compare(): Promise<{ status: string }>;
+    compare(): Promise<{status: string}>;
   }
 
   export default ComparePdf;
