@@ -36,9 +36,8 @@ const testRunner = async (htmlPath: string, pdfName: string) => {
     encoding: 'utf8',
   });
   const debug = {
-    log: true,
-    aggregated: true,
-    pdfName,
+    timeLog: true,
+    pdfName: pdfName === 'standard.pdf' ? undefined : pdfName,
   };
   const actualPdfBuffer = await new PDF(browser, {debug}).generate(html);
   await writeBuffer(actualPdfBuffer, `${config.paths.actualPdfRootFolder}/${pdfName}`);

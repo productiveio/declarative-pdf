@@ -127,8 +127,4 @@ export class DocumentPage {
 
     return offset;
   }
-
-  get totalPagesNumber() {
-    return this.parent.totalPagesNumber;
-  }
 }

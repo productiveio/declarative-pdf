@@ -8,11 +8,11 @@ import {buildPages} from '@app/utils/layout/build-pages';
 
 interface DebugOptions {
   /** Do we want to log debug information */
-  log?: boolean;
-  /** Do we want to aggregate logs */
-  aggregated?: boolean;
+  timeLog?: boolean;
   /** Which filename to use for PDF */
   pdfName?: string;
+  /** Do we want to attach generated segments to the PDF */
+  attachSegments?: boolean;
 }
 
 // TODO: add more normalization options (maybe we want to do a part of standard normalization)
@@ -58,7 +58,7 @@ export default class DeclarativePDF {
    * @param template A string containing valid HTML document
    */
   async generate(template: string) {
-    const logger = this.debug.log ? new TimeLogger() : undefined;
+    const logger = this.debug.timeLog ? new TimeLogger() : undefined;
 
     logger?.session().start(`[Σ] Total time for ${this.debug.pdfName ?? 'PDF'}`);
     /** (re)set documentPages */
@@ -148,13 +148,6 @@ export default class DeclarativePDF {
     documentPageSettings.forEach((setting) => {
       this.documentPages.push(new DocumentPage({parent: this, ...normalizeSetting(setting)}));
     });
-  }
-
-  // TODO: remove this getter
-  get needsLayouting() {
-    if (!this.documentPages.length) throw new Error('No document pages found');
-
-    return this.documentPages.some((doc) => doc.hasSections);
   }
 
   /**
