@@ -44,7 +44,7 @@ export default class DeclarativePDF {
   }
 
   get totalPagesNumber() {
-    return this.documentPages.reduce((acc, doc) => acc + doc.pageCount, 0);
+    return this.documentPages.reduce((acc, doc) => acc + doc.layout!.pageCount, 0);
   }
 
   /**

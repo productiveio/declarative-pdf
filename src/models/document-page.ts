@@ -110,21 +110,7 @@ export class DocumentPage {
     return this.parent.documentPages.slice(0, this.index);
   }
 
-  get pageCount() {
-    if (!this.layout?.pageCount) {
-      throw new Error(`Body generated for document page ${this.index} has no pages`);
-    }
-
-    return this.layout.pageCount;
-  }
-
   get pageCountOffset() {
-    const offset = this.previousDocumentPages.reduce((acc, doc) => acc + doc.pageCount, 0);
-
-    if (offset < this.previousDocumentPages.length) {
-      throw new Error('Page count offset is less than number of document pages');
-    }
-
-    return offset;
+    return this.previousDocumentPages.reduce((acc, doc) => acc + doc.layout!.pageCount, 0);
   }
 }
