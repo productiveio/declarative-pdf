@@ -3,7 +3,7 @@ import { DocumentPage } from '@app/models/document-page';
 import { normalizeSetting } from '@app/utils/normalize-setting';
 import { PaperDefaults, type PaperOpts } from '@app/utils/paper-defaults';
 import HTMLAdapter, { type MinimumBrowser } from '@app/utils/adapter-puppeteer';
-import TimeLogger from '@app/models/debug-time-log';
+import TimeLogger from '@app/utils/debug/time-logger';
 import { buildPages } from '@app/utils/layout/build-pages';
 
 interface DebugOptions {
@@ -58,42 +58,34 @@ export default class DeclarativePDF {
    * @param template A string containing valid HTML document
    */
   async generate(template: string) {
-    const logger = this.debug.log
-      ? new TimeLogger({ aggregated: this.debug.aggregated })
-      : undefined;
+    const logger = this.debug.log ? new TimeLogger() : undefined;
 
-    const JOB0 = `[Σ] Total time for ${this.debug.pdfName ?? 'PDF'}`;
-    logger?.startSession(JOB0);
+    logger
+      ?.session()
+      .start(`[Σ] Total time for ${this.debug.pdfName ?? 'PDF'}`);
     /** (re)set documentPages */
     this.documentPages = [];
 
     try {
       /** open a new tab in the browser */
-      const JOB1 = '[1] Opening new tab';
-      logger?.add(JOB1);
+      logger?.group().start('[1] Opening new tab');
       await this.html.newPage();
-      logger?.end(JOB1);
 
       /** send the template to the tab and normalize it */
-      const JOB2 = '[2] Setting content and loading html';
-      logger?.add(JOB2);
+      logger?.group().start('[2] Setting content and loading html');
       await this.html.setContent(template);
-      logger?.end(JOB2);
-      const JOB3 = '[3] Normalizing content';
-      logger?.add(JOB3);
+
+      logger?.group().start('[3] Normalizing content');
       await this.html.normalize();
-      logger?.end(JOB3);
 
       /** get from DOM index, width and height for every document-page element */
-      const JOB4 = '[4] Getting document page settings from DOM';
-      logger?.add(JOB4);
+      logger?.group().start('[4] Getting document page settings from DOM');
       await this.getDocumentPageSettings();
-      logger?.end(JOB4);
+
       /** for every document page model, get from DOM what that document-page contains */
-      const JOB5 = '[5] Build page layout and body';
-      logger?.add(JOB5);
-      await this.buildLayoutForEachDocumentPage();
-      logger?.end(JOB5);
+      logger?.group().start('[5] Build page layout and body');
+      await this.buildLayoutForEachDocumentPage(logger);
+      logger?.group().end();
 
       /**
        * Return early for only one document page with only a body element.
@@ -113,35 +105,35 @@ export default class DeclarativePDF {
        * We either have multiple document pages or some section elements,
        * so we need to process them to build the final PDF.
        */
-      const JOB6 = '[6] Process sections and build final PDF';
-      logger?.add(JOB6);
-      const result = await this.buildPDF();
-      logger?.end(JOB6);
+      logger?.group().start('[6] Process sections and build final PDF');
+      const result = await this.buildPDF(logger);
+      logger?.group().end();
 
       return result;
     } catch (error) {
       /** cleanup - always close opened tab in the browser to avoid memory leaks */
-      const JOBx = '[x] Closing tab after error';
-      logger?.add(JOBx);
+      logger?.group().start('[x] Closing tab after error');
       await this.html.close();
-      logger?.end(JOBx);
 
       /** cleanup - always close the logger session */
-      logger?.end(JOB0);
-      logger?.endSession();
+      logger?.session().end();
+      const report = logger?.getReport();
+
+      // TODO: add a way to return the report
+      if (report) console.log(report);
+      // console.error(error);
 
       /** rethrow the error (this will skip the finally block) */
       throw error;
     } finally {
       /** cleanup - close the tab in browser */
-      const JOB7 = '[7] Closing tab';
-      logger?.add(JOB7);
+      logger?.group().start('[7] Closing tab');
       await this.html.close();
-      logger?.end(JOB7);
 
       /** cleanup - close the logger session */
-      logger?.end(JOB0);
-      logger?.endSession();
+      logger?.session().end();
+      const report = logger?.getReport();
+      if (report) console.log(report);
     }
   }
 
@@ -181,22 +173,28 @@ export default class DeclarativePDF {
    * from which we get the number of pages and finally have all the
    * information needed to build the final PDF.
    */
-  private async buildLayoutForEachDocumentPage() {
+  private async buildLayoutForEachDocumentPage(logger?: TimeLogger) {
     if (!this.documentPages.length) throw new Error('No document pages found');
 
     for (const [index, doc] of this.documentPages.entries()) {
+      logger?.subgroup().start('set viewport');
       await this.html.setViewport(doc.viewPort);
+      logger?.subgroup().end();
 
       let settings;
       if (doc.hasSections) {
+        logger?.subgroup().start('get section settings');
         settings = await this.html.getSectionSettings({ index });
+        logger?.subgroup().end();
       }
 
-      await doc.createLayoutAndBody(settings);
+      logger?.subgroup().start('create layout and body');
+      await doc.createLayoutAndBody(settings, logger);
+      logger?.subgroup().end();
     }
   }
 
-  private async buildPDF() {
+  private async buildPDF(logger?: TimeLogger) {
     if (!this.documentPages?.length) throw new Error('No document pages found');
 
     const outputPDF = await PDFDocument.create();
@@ -210,6 +208,7 @@ export default class DeclarativePDF {
         body: doc.body!,
         target: outputPDF,
         html: this.html,
+        logger,
       });
     }
 

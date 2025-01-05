@@ -2,6 +2,7 @@ import { PDFDocument } from 'pdf-lib';
 import { BodyElement } from '@app/models/element';
 import { createPageLayoutSettings } from '@app/utils/layout/create-page-layout';
 
+import type TimeLogger from '@app/utils/debug/time-logger';
 import type DeclarativePDF from '@app/index';
 import type { SectionSettings } from '@app/evaluators/section-settings';
 import type { SectionElement } from '@app/models/element';
@@ -71,7 +72,10 @@ export class DocumentPage {
    * construct other elements that might need to display
    * current page / total page number.
    */
-  async createLayoutAndBody(sectionSettings?: SectionSettings) {
+  async createLayoutAndBody(
+    sectionSettings?: SectionSettings,
+    logger?: TimeLogger
+  ) {
     this.layout = createPageLayoutSettings(
       sectionSettings,
       this.height,
@@ -79,6 +83,8 @@ export class DocumentPage {
     );
 
     await this.html.prepareSection({ documentPageIndex: this.index });
+
+    logger?.item().start('print body to pdf buffer');
     const uint8Array = await this.html.pdf({
       width: this.layout.width,
       height: this.layout.body.height,
@@ -88,8 +94,14 @@ export class DocumentPage {
       },
       transparentBg: this.layout.body.transparentBg,
     });
+    logger?.item().end();
+
     const buffer = Buffer.from(uint8Array);
+
+    logger?.item().start('load body pdf as PDFDocument');
     const pdf = await PDFDocument.load(uint8Array);
+    logger?.item().end();
+
     await this.html.resetVisibility();
 
     this.layout.pageCount = pdf.getPageCount();

@@ -7,6 +7,7 @@ import type { PageLayout } from '@app/utils/layout/create-page-layout';
 import type { SectionSetting } from '@app/evaluators/section-settings';
 import type { BodyElement } from '@app/models/element';
 import type HTMLAdapter from '@app/utils/adapter-puppeteer';
+import type TimeLogger from '@app/utils/debug/time-logger';
 
 type SectionType = 'header' | 'footer' | 'background';
 
@@ -19,6 +20,7 @@ interface SectionElementOpts {
   elements: SectionElement[];
   layout: PageLayout;
   html: HTMLAdapter;
+  logger?: TimeLogger;
 }
 
 async function createSectionElement(
@@ -32,6 +34,7 @@ async function createSectionElement(
     totalPagesNumber,
     html,
     layout,
+    logger,
   } = opts;
   const { physicalPageIndex } = setting;
 
@@ -43,12 +46,16 @@ async function createSectionElement(
     totalPagesNumber,
   });
 
+  logger?.item().start(`[${sectionType}] rendering section`);
   const uint8Array = await html.pdf({
     width: layout.width,
     height: setting.height,
     transparentBg: !!layout?.[sectionType]?.transparentBg,
   });
+  logger?.item().end();
+
   const buffer = Buffer.from(uint8Array);
+
   const pdf = await PDFDocument.load(buffer);
 
   return new SectionElement({
@@ -98,6 +105,7 @@ interface BuildPagesOpts {
   body: BodyElement;
   target: PDFDocument;
   html: HTMLAdapter;
+  logger?: TimeLogger;
 }
 
 export async function buildPages(opts: BuildPagesOpts) {
@@ -109,6 +117,7 @@ export async function buildPages(opts: BuildPagesOpts) {
     body,
     target,
     html,
+    logger,
   } = opts;
   const { pageCount } = layout;
 
@@ -131,11 +140,13 @@ export async function buildPages(opts: BuildPagesOpts) {
    * This is the simplest case and we can exit early.
    */
   if (!layout.hasAnySection) {
+    logger?.subgroup().start('copy pages');
     const copiedPages = await target.copyPages(
       body.pdf,
       body.pdf.getPageIndices()
     );
     copiedPages.forEach((page) => target.addPage(page));
+    logger?.subgroup().end();
     return { pages, elements };
   }
 
@@ -158,20 +169,25 @@ export async function buildPages(opts: BuildPagesOpts) {
       elements,
       layout,
       html,
+      logger,
     };
 
+    logger?.subgroup().start(`[${pageIndex}] resolve section elements`);
     const header = await resolveSectionElement('header', opts);
     const footer = await resolveSectionElement('footer', opts);
     const background = await resolveSectionElement('background', opts);
+    logger?.subgroup().end();
 
     // TODO: do something with the target? embed? append?
     // we might need the body element as well
 
+    logger?.subgroup().start(`[${pageIndex}] embed and place sections`);
     const targetPage = target.addPage([layout.width, layout.height]);
     await embedAndPlaceSection(targetPage, background);
     await embedAndPlaceSection(targetPage, header);
     await embedAndPlaceSection(targetPage, footer);
     await embedAndPlaceBody(targetPage, body, pageIndex);
+    logger?.subgroup().end();
 
     pages.push({
       pageIndex,
