@@ -51,6 +51,10 @@ async function createSectionElement(sectionType: SectionType, setting: SectionSe
     buffer,
     pdf,
     setting,
+    debug: {
+      type: sectionType,
+      pageNumber: currentPageNumber,
+    },
     layout: {
       width: layout.width,
       height: layout[sectionType]!.height,
@@ -89,6 +93,7 @@ interface BuildPagesOpts {
   target: PDFDocument;
   html: HTMLAdapter;
   logger?: TimeLogger;
+  attachSegmentsForDebugging?: boolean;
 }
 
 export async function buildPages(opts: BuildPagesOpts) {
@@ -114,7 +119,7 @@ export async function buildPages(opts: BuildPagesOpts) {
    * This is the simplest case and we can exit early.
    */
   if (!layout.hasAnySection) {
-    logger?.level2().start('[6.3] Copy pages');
+    logger?.level2().start('[6.3] Copy body pages (no sections)');
     const copiedPages = await target.copyPages(body.pdf, body.pdf.getPageIndices());
     copiedPages.forEach((page) => target.addPage(page));
     logger?.level2().end();
@@ -166,6 +171,23 @@ export async function buildPages(opts: BuildPagesOpts) {
       header,
       footer,
       background,
+    });
+  }
+
+  if (opts.attachSegmentsForDebugging) {
+    for (const element of elements) {
+      await target.attach(element.buffer, element.name, {
+        mimeType: 'application/pdf',
+        description: `${element.debug.type} section first created for page ${element.debug.pageNumber}`,
+        creationDate: new Date(),
+        modificationDate: new Date(),
+      });
+    }
+    await target.attach(body.buffer, `${pageCountOffset + 1}-body.pdf`, {
+      mimeType: 'application/pdf',
+      description: `Body element first created for page ${pageCountOffset + 1}`,
+      creationDate: new Date(),
+      modificationDate: new Date(),
     });
   }
 

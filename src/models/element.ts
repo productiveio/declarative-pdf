@@ -44,9 +44,15 @@ export class BodyElement {
   }
 }
 
+type SectionType = 'header' | 'footer' | 'background';
+
 interface SectionElementOpts {
   buffer: Buffer;
   pdf: PDFDocument;
+  debug: {
+    type: SectionType;
+    pageNumber: number;
+  };
   setting: SectionSetting;
   layout: {
     width: number;
@@ -61,7 +67,9 @@ export class SectionElement {
   declare pdf: PDFDocument;
   declare setting: SectionSetting;
   declare layout: SectionElementOpts['layout'];
+  declare debug: SectionElementOpts['debug'];
 
+  declare private _name: string;
   private embeddedPage?: PDFEmbeddedPage;
 
   constructor(opts: SectionElementOpts) {
@@ -69,6 +77,9 @@ export class SectionElement {
     this.pdf = opts.pdf;
     this.setting = opts.setting;
     this.layout = opts.layout;
+
+    this.debug = opts.debug;
+    this._name = `${opts.debug.pageNumber}-${opts.debug.type}.pdf`;
   }
 
   get x() {
@@ -85,6 +96,10 @@ export class SectionElement {
 
   get height() {
     return this.setting.height;
+  }
+
+  get name() {
+    return this._name;
   }
 
   async embedPage(targetDocument: PDFDocument) {

@@ -1,4 +1,4 @@
-import {PDFDocument} from 'pdf-lib';
+import {PDFDocument, StandardFonts, PageSizes, rgb} from 'pdf-lib';
 import {DocumentPage} from '@app/models/document-page';
 import {normalizeSetting} from '@app/utils/normalize-setting';
 import {PaperDefaults, type PaperOpts} from '@app/utils/paper-defaults';
@@ -60,7 +60,7 @@ export default class DeclarativePDF {
   async generate(template: string) {
     const logger = this.debug.timeLog ? new TimeLogger() : undefined;
 
-    logger?.session().start(`[Σ] Total time for ${this.debug.pdfName ?? 'PDF'}`);
+    logger?.session().start(`Total time for ${this.debug.pdfName ?? 'PDF'}`);
     /** (re)set documentPages */
     this.documentPages = [];
 
@@ -73,7 +73,7 @@ export default class DeclarativePDF {
       logger?.level1().start('[2] Setting content and loading html');
       await this.html.setContent(template);
 
-      logger?.level1().start('[3] Normalizing content');
+      logger?.level1().start('[3] Normalising content');
       await this.html.normalize();
 
       /** get from DOM index, width and height for every document-page element */
@@ -108,10 +108,39 @@ export default class DeclarativePDF {
        * so we need to process them to build the final PDF.
        */
       logger?.level1().start('[6] Process sections and build final PDF');
-      const result = await this.buildPDF(logger);
+      const pdf = await this.buildPDF(logger);
       logger?.level1().end();
 
-      return result;
+      /** cleanup - close the tab in browser */
+      logger?.level1().start('[7] Closing tab');
+      await this.html.close();
+
+      /** cleanup - close the logger session */
+      logger?.session().end();
+      const report = logger?.getReport();
+      if (report) {
+        console.log(report);
+        const reportPdf = await PDFDocument.create();
+        const font = await reportPdf.embedFont(StandardFonts.Courier);
+        const page = reportPdf.addPage(PageSizes.A4);
+        page.setFont(font);
+        report.split('\n').forEach((line, index) => {
+          let color = rgb(0, 0, 0.8);
+          if (line.includes('|   [')) color = rgb(0.6, 0.6, 0.6);
+          else if (line.includes('|     [')) color = rgb(0.8, 0.8, 0.8);
+          page.drawText(line, {x: 50, y: 750 - index * 12, size: 10, color});
+        });
+        const reportBytes = await reportPdf.save();
+
+        pdf.attach(reportBytes, 'time-log.pdf', {
+          mimeType: 'application/pdf',
+          description: 'Time log report',
+          creationDate: new Date(),
+          modificationDate: new Date(),
+        });
+      }
+
+      return await pdf.save();
     } catch (error) {
       /** cleanup - always close opened tab in the browser to avoid memory leaks */
       logger?.level1().start('[x] Closing tab after error');
@@ -127,15 +156,6 @@ export default class DeclarativePDF {
 
       /** rethrow the error (this will skip the finally block) */
       throw error;
-    } finally {
-      /** cleanup - close the tab in browser */
-      logger?.level1().start('[7] Closing tab');
-      await this.html.close();
-
-      /** cleanup - close the logger session */
-      logger?.session().end();
-      const report = logger?.getReport();
-      if (report) console.log(report);
     }
   }
 
@@ -199,9 +219,10 @@ export default class DeclarativePDF {
         target: outputPDF,
         html: this.html,
         logger,
+        attachSegmentsForDebugging: this.debug.attachSegments,
       });
     }
 
-    return outputPDF.save();
+    return outputPDF;
   }
 }

@@ -38,6 +38,7 @@ const testRunner = async (htmlPath: string, pdfName: string) => {
   const debug = {
     timeLog: true,
     pdfName: pdfName === 'standard.pdf' ? undefined : pdfName,
+    attachSegments: true,
   };
   const actualPdfBuffer = await new PDF(browser, {debug}).generate(html);
   await writeBuffer(actualPdfBuffer, `${config.paths.actualPdfRootFolder}/${pdfName}`);
