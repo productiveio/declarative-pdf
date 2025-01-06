@@ -24,6 +24,9 @@
   "files": [
     "dist"
   ],
+  "engines": {
+    "node": ">=20.18"
+  },
   "author": "The Productive Company",
   "contributors": [
     "Tibor Rogulja"
@@ -35,9 +38,8 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "start": "ts-node src/index.ts",
-    "create": "npm run build && npm run test",
-    "build": "rm -rf dist && tsup src/index.ts --format cjs,esm --dts --clean && cp shims/index.wrapper.cjs dist/",
+    "build": "pnpm run test && pnpm run build:lib",
+    "build:lib": "rm -rf dist && tsup src/index.ts --format cjs,esm --dts --clean && cp shims/index.wrapper.cjs dist/",
     "lint": "eslint .",
     "test": "node ./bin/check-canvas.cjs && jest",
     "test:cov": "node ./bin/check-canvas.cjs && jest --coverage"
