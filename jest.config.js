@@ -15,5 +15,5 @@ export default {
       statements: 95,
     },
   },
-  coverageReporters: ['text', 'html'],
+  coverageReporters: ['text', 'html', 'json-summary'],
 };

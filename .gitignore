@@ -22,7 +22,8 @@ lerna-debug.log*
 # debug files
 generated/
 manual_tests/
-coverage/
+coverage/*
+!coverage/coverage-summary.json
 
 # build files
 dist/
