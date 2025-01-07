@@ -9,6 +9,7 @@ import {buildPages} from '@app/utils/layout/build-pages';
 interface DebugOptions {
   /** Do we want to log debug information */
   timeLog?: boolean;
+  // TODO: pdfName in debug options? do we need it in main opts?
   /** Which filename to use for PDF */
   pdfName?: string;
   /** Do we want to attach generated segments to the PDF */
