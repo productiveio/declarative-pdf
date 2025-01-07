@@ -43,7 +43,8 @@
     "examples": "node docs/examples/index.js",
     "lint": "eslint .",
     "test": "node ./bin/check-canvas.cjs && jest",
-    "test:cov": "node ./bin/check-canvas.cjs && jest --coverage"
+    "test:cov": "node ./bin/check-canvas.cjs && jest --coverage",
+    "test:ci": "jest --testPathIgnorePatterns=\"<rootDir>/test/visual.test.ts\""
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
