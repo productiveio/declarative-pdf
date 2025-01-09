@@ -2,7 +2,7 @@ import {PDFDocument, StandardFonts, PageSizes, rgb} from 'pdf-lib';
 import {DocumentPage} from '@app/models/document-page';
 import {normalizeSetting} from '@app/utils/normalize-setting';
 import {PaperDefaults, type PaperOpts} from '@app/utils/paper-defaults';
-import HTMLAdapter, {type MinimumBrowser} from '@app/utils/adapter-puppeteer';
+import HTMLAdapter, {type MinimumBrowser, type MinimumPage} from '@app/utils/adapter-puppeteer';
 import TimeLogger from '@app/utils/debug/time-logger';
 import {buildPages} from '@app/utils/layout/build-pages';
 
@@ -65,15 +65,13 @@ export default class DeclarativePDF {
 
   /**
    * Generates a pdf buffer from string containing html template.
-   * TODO: add another method that creates pdf from puppeteer page (already loaded content)
    *
    * When calling this method, it is expected that:
    * - the browser is initialized and ready
-   * - template you pass in is string containing valid HTML
-   *
-   * @param template A string containing valid HTML document
+   * - the template is a valid HTML document -OR- a valid Page instance
    */
-  async generate(template: string) {
+  async generate(input: string | MinimumPage) {
+    const isPageHandledInternally = typeof input === 'string';
     const logger = this.debug.timeLog ? new TimeLogger() : undefined;
 
     logger?.session().start(`Total time for ${this.debug.pdfName ?? 'PDF'}`);
@@ -81,15 +79,20 @@ export default class DeclarativePDF {
     this.documentPages = [];
 
     try {
-      /** open a new tab in the browser */
-      logger?.level1().start('[1] Opening new tab');
-      await this.html.newPage();
+      if (isPageHandledInternally) {
+        /** open a new tab in the browser */
+        logger?.level1().start('[1] Opening new tab');
+        await this.html.newPage();
 
-      /** send the template to the tab and normalize it */
-      logger?.level1().start('[2] Setting content and loading html');
-      await this.html.setContent(template);
+        /** send the template to the tab and normalize it */
+        logger?.level1().start('[2] Setting content and loading html');
+        await this.html.setContent(input);
+      } else {
+        /** use the provided page instance */
+        this.html.setPage(input);
+      }
 
-      logger?.level1().start('[3] Normalising content');
+      logger?.level1().start('[3] Normalizing content');
       await this.html.normalize(this.normalize);
 
       /** get from DOM index, width and height for every document-page element */
@@ -127,9 +130,11 @@ export default class DeclarativePDF {
       const pdf = await this.buildPDF(logger);
       logger?.level1().end();
 
-      /** cleanup - close the tab in browser */
-      logger?.level1().start('[7] Closing tab');
-      await this.html.close();
+      if (isPageHandledInternally) {
+        /** cleanup - close the tab in browser */
+        logger?.level1().start('[7] Closing tab');
+        await this.html.close();
+      }
 
       /** cleanup - close the logger session */
       logger?.session().end();
@@ -158,9 +163,11 @@ export default class DeclarativePDF {
 
       return await pdf.save();
     } catch (error) {
-      /** cleanup - always close opened tab in the browser to avoid memory leaks */
-      logger?.level1().start('[x] Closing tab after error');
-      await this.html.close();
+      if (isPageHandledInternally) {
+        /** cleanup - always close opened tab in the browser to avoid memory leaks */
+        logger?.level1().start('[x] Closing tab after error');
+        await this.html.close();
+      }
 
       /** cleanup - always close the logger session */
       logger?.session().end();

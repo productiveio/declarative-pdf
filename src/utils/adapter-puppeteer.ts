@@ -10,10 +10,11 @@ import type {PrepareSection} from '@app/evaluators/prepare-section';
 import type {NormalizeOptions} from '@app/index';
 
 export type MinimumBrowser = Pick<Browser, 'newPage' | 'connected'>;
+export type MinimumPage = Pick<Page, 'setContent' | 'setViewport' | 'evaluate' | 'pdf' | 'close' | 'isClosed'>;
 
 export default class HTMLAdapter {
   declare private _browser?: MinimumBrowser;
-  declare private _page?: Page;
+  declare private _page?: MinimumPage;
 
   constructor(browser: MinimumBrowser) {
     this._browser = browser;
@@ -31,7 +32,7 @@ export default class HTMLAdapter {
     return this._browser;
   }
 
-  get page(): Page {
+  get page() {
     if (!this._page) throw new Error('Page not set');
     if (this._page.isClosed()) throw new Error('Page is closed');
 
@@ -42,6 +43,12 @@ export default class HTMLAdapter {
     if (this._page) throw new Error('Page already set');
 
     this._page = await this.browser.newPage();
+  }
+
+  async setPage(page: MinimumPage) {
+    if (this._page) throw new Error('Page already set');
+
+    this._page = page;
   }
 
   setContent(content: string) {

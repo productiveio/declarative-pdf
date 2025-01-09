@@ -49,6 +49,29 @@ const testRunner = async (htmlPath: string, pdfName: string) => {
   expect(result?.status).toBe('passed');
 };
 
+const pageTestRunner = async (htmlPath: string, pdfName: string) => {
+  const html = fs.readFileSync(htmlPath, {
+    encoding: 'utf8',
+  });
+  const debug = {
+    timeLog: true,
+    pdfName: pdfName === 'standard.pdf' ? undefined : pdfName,
+    attachSegments: true,
+  };
+
+  const page = await browser.newPage();
+  await page.setContent(html);
+
+  const actualPdfBuffer = await new PDF(browser, {debug}).generate(page);
+  await writeBuffer(actualPdfBuffer, `${config.paths.actualPdfRootFolder}/${pdfName}`);
+
+  const comparePdf = new ComparePdf(config);
+  const result = await comparePdf.actualPdfFile(pdfName).baselinePdfFile(pdfName).compare();
+
+  expect(result?.status).toBe('passed');
+  await page.close();
+}
+
 let browser: Browser;
 
 beforeAll(async () => {
@@ -65,7 +88,7 @@ afterAll(async () => {
 
 describe('PDF visual regression test', () => {
   test('standard template', async () => {
-    await testRunner('./test/examples/standard.html', `standard.pdf`);
+    await pageTestRunner('./test/examples/standard.html', `standard.pdf`);
   });
 
   test('elegant template', async () => {

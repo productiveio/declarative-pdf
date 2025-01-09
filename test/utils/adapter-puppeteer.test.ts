@@ -3,7 +3,7 @@
  */
 import HTMLAdapter from '@app/utils/adapter-puppeteer';
 import type {Page} from 'puppeteer';
-import type {MinimumBrowser} from '@app/utils/adapter-puppeteer';
+import type {MinimumBrowser, MinimumPage} from '@app/utils/adapter-puppeteer';
 
 describe('HTMLAdapter', () => {
   let mockPage: jest.Mocked<Page>;
@@ -83,6 +83,24 @@ describe('HTMLAdapter', () => {
       await adapter.newPage();
       expect(mockBrowser.newPage).toHaveBeenCalled();
       expect(adapter['_page']).toBe(mockPage);
+    });
+  });
+
+  describe('setPage', () => {
+    test('throws if page already exists', async () => {
+      const adapter = new HTMLAdapter(mockBrowser);
+      adapter['_page'] = mockPage;
+      const newPage = {...mockPage} as MinimumPage;
+
+      await expect(adapter.setPage(newPage)).rejects.toThrow('Page already set');
+    });
+
+    test('sets provided page', async () => {
+      const adapter = new HTMLAdapter(mockBrowser);
+      const newPage = {...mockPage} as MinimumPage;
+
+      await adapter.setPage(newPage);
+      expect(adapter['_page']).toBe(newPage);
     });
   });
 
