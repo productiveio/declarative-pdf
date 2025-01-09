@@ -9,8 +9,7 @@ import {buildPages} from '@app/utils/layout/build-pages';
 interface DebugOptions {
   /** Do we want to log debug information */
   timeLog?: boolean;
-  // TODO: pdfName in debug options? do we need it in main opts?
-  /** Which filename to use for PDF */
+  /** A name to use in header of time log report */
   pdfName?: string;
   /** Do we want to attach generated segments to the PDF */
   attachSegments?: boolean;
@@ -134,7 +133,7 @@ export default class DeclarativePDF {
 
       /** cleanup - close the logger session */
       logger?.session().end();
-      const report = logger?.getReport();
+      const report = logger?.report;
       if (report) {
         console.log(report);
         const reportPdf = await PDFDocument.create();
@@ -165,13 +164,9 @@ export default class DeclarativePDF {
 
       /** cleanup - always close the logger session */
       logger?.session().end();
-      const report = logger?.getReport();
-
-      // TODO: add a way to return the report
+      const report = logger?.report;
       if (report) console.log(report);
-      // console.error(error);
 
-      /** rethrow the error (this will skip the finally block) */
       throw error;
     }
   }

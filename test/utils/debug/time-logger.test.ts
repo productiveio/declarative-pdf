@@ -42,8 +42,7 @@ describe('TimeLogger', () => {
 
     logger.session().end();
 
-    const report = logger.getReport();
-    expect(report).toBe(
+    expect(logger.report).toBe(
       [
         '100ms | Test Session',
         '====================',
@@ -67,8 +66,7 @@ describe('TimeLogger', () => {
     logger.session().start('Empty Session');
     logger.session().end();
 
-    const report = logger.getReport();
-    expect(report).toBe(['0ms | Empty Session', '==================='].join('\n'));
+    expect(logger.report).toBe(['0ms | Empty Session', '==================='].join('\n'));
   });
 
   test('should handle nested empty phases', () => {
@@ -80,8 +78,7 @@ describe('TimeLogger', () => {
     logger.level1().end();
     logger.session().end();
 
-    const report = logger.getReport();
-    expect(report).toBe(
+    expect(logger.report).toBe(
       ['0ms | Nested Empty', '==================', '0ms |  0.0% | Empty Group', '0ms |  0.0% |   Empty Subgroup'].join(
         '\n'
       )
@@ -98,8 +95,7 @@ describe('TimeLogger', () => {
     // End session without properly ending other nodes
     logger.session().end();
 
-    const report = logger.getReport();
-    expect(report).toBe(
+    expect(logger.report).toBe(
       [
         '0ms | Out Of Order',
         '==================',
@@ -123,8 +119,7 @@ describe('TimeLogger', () => {
 
     logger.session().end();
 
-    const report = logger.getReport();
-    expect(report).toBe(
+    expect(logger.report).toBe(
       ['20ms | Restart Test', '===================', '10ms | 50.0% | Group 1', '10ms | 50.0% | Group 2'].join('\n')
     );
   });
@@ -139,8 +134,7 @@ describe('TimeLogger', () => {
     logger.level1().end();
     logger.session().end();
 
-    const report = logger.getReport();
-    expect(report).toBe(
+    expect(logger.report).toBe(
       ['10ms | Session', '==============', '10ms |  100% | Level 1', '10ms |  100% |   Level 2'].join('\n')
     );
   });

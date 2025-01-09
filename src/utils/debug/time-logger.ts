@@ -23,6 +23,7 @@ function buildReportLine(obj: TimeObject, lvl: 0 | 1 | 2, totalMs: number, total
 
 export default class TimeLogger {
   private _nodes: Map<string, TimeNode> = new Map();
+  private _report = '';
 
   constructor() {
     this.setupNode('session');
@@ -82,6 +83,9 @@ export default class TimeLogger {
 
     node.report.push(reportNode);
     this.resetTimeObject(node.current);
+
+    // When top level node ends, generate report
+    if (!node.parent) this.generateReport();
   }
 
   // Public methods remain similar but use handleNode
@@ -104,7 +108,7 @@ export default class TimeLogger {
     timeObj.duration = 0;
   }
 
-  getReport() {
+  private generateReport() {
     const session = this._nodes.get('session')!.report[0];
     const totalMs = session.duration;
     const totalLen = totalMs.toString().length;
@@ -122,6 +126,10 @@ export default class TimeLogger {
       ]),
     ];
 
-    return report.join('\n');
+    this._report = report.join('\n');
+  }
+
+  get report() {
+    return this._report;
   }
 }
