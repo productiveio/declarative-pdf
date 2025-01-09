@@ -16,10 +16,25 @@ interface DebugOptions {
   attachSegments?: boolean;
 }
 
+export interface NormalizeOptions {
+  /** Add 'pdf' to document body classList (default: true) */
+  addPdfClass?: boolean;
+  /** Set document body margin to 0 (default: true) */
+  setBodyMargin?: boolean;
+  /** Set document body padding to 0 (default: true) */
+  setBodyPadding?: boolean;
+  /** Set document body background to transparent (default: true) */
+  setBodyTransparent?: boolean;
+  /** Remove any body child that is not 'document-page', 'script' or 'style' (default: true) */
+  normalizeBody?: boolean;
+  /** Remove any document-page child that is not 'document-page', 'script' or 'style' (default: true) */
+  normalizeDocumentPage?: boolean;
+}
+
 // TODO: add more normalization options (maybe we want to do a part of standard normalization)
 interface DeclarativePDFOpts {
-  /** Should we normalize the content (remove excess elements, wrap content to tags) */
-  normalize?: boolean;
+  /** Should we normalize the content (remove excess elements, set some defaults...) */
+  normalize?: NormalizeOptions;
   /** Override for paper defaults (A4 / 72ppi) */
   defaults?: PaperOpts;
   /** Debug options (attaches parts, logs timings) */
@@ -29,6 +44,7 @@ interface DeclarativePDFOpts {
 export default class DeclarativePDF {
   declare html: HTMLAdapter;
   declare defaults: PaperDefaults;
+  declare normalize?: NormalizeOptions;
   declare debug: DebugOptions;
 
   documentPages: DocumentPage[] = [];
@@ -41,6 +57,7 @@ export default class DeclarativePDF {
   constructor(browser: MinimumBrowser, opts?: DeclarativePDFOpts) {
     this.html = new HTMLAdapter(browser);
     this.defaults = new PaperDefaults(opts?.defaults);
+    this.normalize = opts?.normalize;
     this.debug = opts?.debug ?? {};
   }
 
@@ -75,7 +92,7 @@ export default class DeclarativePDF {
       await this.html.setContent(template);
 
       logger?.level1().start('[3] Normalising content');
-      await this.html.normalize();
+      await this.html.normalize(this.normalize);
 
       /** get from DOM index, width and height for every document-page element */
       logger?.level1().start('[4] Getting document page settings from DOM');

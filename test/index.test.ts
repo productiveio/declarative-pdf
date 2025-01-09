@@ -59,7 +59,6 @@ describe('DeclarativePDF', () => {
 
     test('initializes with custom options', () => {
       const opts = {
-        normalize: true,
         defaults: {ppi: 300},
         debug: {timeLog: true},
       };

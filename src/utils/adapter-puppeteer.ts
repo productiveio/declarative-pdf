@@ -7,6 +7,7 @@ import evalResetVisibility from '@app/evaluators/reset-visibility';
 
 import type {Browser, Page} from 'puppeteer';
 import type {PrepareSection} from '@app/evaluators/prepare-section';
+import type {NormalizeOptions} from '@app/index';
 
 export type MinimumBrowser = Pick<Browser, 'newPage' | 'connected'>;
 
@@ -53,8 +54,8 @@ export default class HTMLAdapter {
     return this.page.setViewport(opts);
   }
 
-  normalize() {
-    return this.page.evaluate(evalTemplateNormalize);
+  normalize(opts?: NormalizeOptions) {
+    return this.page.evaluate(evalTemplateNormalize, opts);
   }
 
   getTemplateSettings(opts: {width: number; height: number; ppi: number}) {
