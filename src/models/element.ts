@@ -1,4 +1,4 @@
-import type {PDFDocument, PDFEmbeddedPage} from 'pdf-lib';
+import type {PDFDocument, PDFPage, PDFEmbeddedPage} from 'pdf-lib';
 import type {SectionSetting} from '@app/evaluators/section-settings';
 
 interface BodyElementOpts {
@@ -39,8 +39,8 @@ export class BodyElement {
     return this.layout.height;
   }
 
-  async embedPageIdx(targetDocument: PDFDocument, idx: number) {
-    return await targetDocument.embedPdf(this.pdf, [idx]);
+  async embedPageIdx(targetPage: PDFPage, idx: number) {
+    return await targetPage.doc.embedPdf(this.pdf, [idx]);
   }
 }
 
@@ -102,10 +102,10 @@ export class SectionElement {
     return this._name;
   }
 
-  async embedPage(targetDocument: PDFDocument) {
+  async embedPage(targetPage: PDFPage) {
     if (this.embeddedPage) return this.embeddedPage;
 
-    const pages = await targetDocument.embedPdf(this.pdf);
+    const pages = await targetPage.doc.embedPdf(this.pdf);
     this.embeddedPage = pages[0];
     return pages[0];
   }

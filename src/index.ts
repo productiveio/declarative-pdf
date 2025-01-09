@@ -31,7 +31,6 @@ export interface NormalizeOptions {
   normalizeDocumentPage?: boolean;
 }
 
-// TODO: add more normalization options (maybe we want to do a part of standard normalization)
 interface DeclarativePDFOpts {
   /** Should we normalize the content (remove excess elements, set some defaults...) */
   normalize?: NormalizeOptions;

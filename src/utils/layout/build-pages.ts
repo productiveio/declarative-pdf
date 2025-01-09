@@ -154,9 +154,6 @@ export async function buildPages(opts: BuildPagesOpts) {
     const background = await resolveSectionElement('background', opts);
     logger?.level2().end();
 
-    // TODO: do something with the target? embed? append?
-    // we might need the body element as well
-
     logger?.level2().start(`[6.2] Embed and place page ${pageIndex} sections`);
     const targetPage = target.addPage([layout.width, layout.height]);
     await embedAndPlaceSection(targetPage, background);
@@ -197,7 +194,7 @@ export async function buildPages(opts: BuildPagesOpts) {
 async function embedAndPlaceSection(page: PDFPage, section?: SectionElement) {
   if (!section) return;
 
-  const embeddedPage = await section.embedPage(page.doc);
+  const embeddedPage = await section.embedPage(page);
 
   page.drawPage(embeddedPage, {
     x: section.x,
@@ -208,7 +205,7 @@ async function embedAndPlaceSection(page: PDFPage, section?: SectionElement) {
 }
 
 async function embedAndPlaceBody(page: PDFPage, body: BodyElement, idx: number) {
-  const [embeddedPage] = await body.embedPageIdx(page.doc, idx);
+  const [embeddedPage] = await body.embedPageIdx(page, idx);
 
   page.drawPage(embeddedPage, {
     x: body.x,
