@@ -12,11 +12,13 @@ export default function calculatePageLayout(
 ) {
   const headerHeight = getMaxHeight(sectionSettings?.headers ?? []);
   const footerHeight = getMaxHeight(sectionSettings?.footers ?? []);
-  const bodyHeight = pageHeight - headerHeight - footerHeight;
+  // Add minimum overlap to avoid white lines between sections
+  const bodyHeight = pageHeight ? pageHeight - headerHeight - footerHeight + 2 : 0;
   const backgroundHeight = pageHeight;
   const headerY = pageHeight - headerHeight;
-  const footerY = 0;
-  const bodyY = footerHeight;
+  // Cut bottom whitespace which may occur due to rounding errors
+  const footerY = footerHeight ? -1 : 0;
+  const bodyY = footerHeight - (pageHeight ? 1 : 0);
   const backgroundY = 0;
 
   if (bodyHeight < pageHeight / 3) {

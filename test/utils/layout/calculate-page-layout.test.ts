@@ -43,8 +43,8 @@ describe('calculatePageLayout', () => {
     const result = calculatePageLayout(settings, pageHeight, pageWidth);
     expect(result).toEqual({
       header: {width: 800, height: 200, x: 0, y: 800},
-      footer: {width: 800, height: 150, x: 0, y: 0},
-      body: {width: 800, height: 650, x: 0, y: 150},
+      footer: {width: 800, height: 150, x: 0, y: -1},
+      body: {width: 800, height: 652, x: 0, y: 149},
       background: {width: 800, height: 1000, x: 0, y: 0},
     });
   });
@@ -58,7 +58,7 @@ describe('calculatePageLayout', () => {
     const pageHeight = 1000;
 
     expect(() => calculatePageLayout(settings, pageHeight)).toThrow(
-      `Header/footer too big. Page height: 1000px, header: 1000px, footer: 1000px, body: -1000px.`
+      `Header/footer too big. Page height: 1000px, header: 1000px, footer: 1000px, body: -998px.`
     );
   });
 
@@ -85,7 +85,7 @@ describe('calculatePageLayout', () => {
     expect(result).toEqual({
       header: {width: 800, height: 0, x: 0, y: 1000},
       footer: {width: 800, height: 0, x: 0, y: 0},
-      body: {width: 800, height: 1000, x: 0, y: 0},
+      body: {width: 800, height: 1002, x: 0, y: -1},
       background: {width: 800, height: 1000, x: 0, y: 0},
     });
   });

@@ -30,9 +30,9 @@ describe('createPageLayoutSettings', () => {
       pageCount: 0,
       body: {
         width: 500,
-        height: 1000,
+        height: 1002,
         x: 0,
-        y: 0,
+        y: -1,
         transparentBg: false,
       },
       header: undefined,
@@ -58,9 +58,9 @@ describe('createPageLayoutSettings', () => {
       pageCount: 0,
       body: {
         width: 500,
-        height: 1000,
+        height: 1002,
         x: 0,
-        y: 0,
+        y: -1,
         transparentBg: true,
       },
       header: undefined,
@@ -125,7 +125,7 @@ describe('createPageLayoutSettings', () => {
     expect(result.header?.height).toBe(200);
     expect(result.header?.y).toBe(800); // 1000 - 200
     expect(result.footer?.height).toBe(150);
-    expect(result.footer?.y).toBe(0);
+    expect(result.footer?.y).toBe(-1);
     expect(result.background?.height).toBe(1000);
     expect(result.background?.y).toBe(0);
   });
