@@ -1,29 +1,56 @@
-# Overview
+![Declarative PDF visualization](./docs/img/hero.png)
 
-A tool for generating PDF documents from HTML template that use declarative elements to control the layout and content of the PDF.
+<div align="center">
+  <strong>Generate PDF documents from HTML template in node environment.</strong>
+</div>
+<div align="center">
+  Fine-tune your PDFs with customisable page size, headers, footers, backgrounds, and page numbering. All from a simple HTML template.
+</div>
 
-> TODO: insert a visual representation of the template conversion to PDF
+<br>
 
-|          Feature          |                                                                                     Description                                                                                     |
-| :------------------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| headers and footers       | Use `<page-header>` and `<page-footer>` elements to define the header and footer for each `<document-page>`.                                                                        |
-| page backgrounds          | Use `<page-background>` element to specify a custom background for each `<document-page>`.                                                                                          |
-| page size and orientation | Use `<document-page>` element to specify page size and orientation.                                                                                                                 |
-| multi-page content        | Use `<document-page>` element to spans across as many pages as needed. You can have multiple `<document-page>` elements in a single template with different sizes and orientations. |
-| page numbering            | Use `<current-page-number>` and `<total-pages-number>` elements to display page numbers within headers or footers.                                                                  |
-| physical page variants    | Use `<physical-page>` element to specify different sections (headers, footers, backgrounds) placement. Variants are: `first`, `last`, `even`, `odd`.                                |
-
-Layout is controlled using a set of custom HTML tags that define the structure of the PDF document. The package uses puppeteer to slice your template and generate PDF elements from it. Those elements are then used to assemble PDF pages into your PDF document.
-
-> [!NOTE]
-> Unlike other HTML-to-PDF solutions that require manual coding of PDF layout and content, our tool uses declarative HTML elements to control the layout and content of the PDF. This makes it easier and faster to generate PDF documents from HTML templates, as you can simply define the structure of the PDF using custom HTML tags. Additionally, our tool provides features such as headers and footers, page backgrounds, and page numbering, which are not always available in other HTML-to-PDF solutions.
+<div align="center">
+  <img
+    alt="NPM version"
+    src="https://img.shields.io./npm/v/declarative-pdf.svg"
+  />
+  <img
+    alt="Required Node version"
+    src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fproductiveio%2Fdeclarative-pdf%2Frefs%2Fheads%2Fmaster%2Fpackage.json&query=engines.node&style=plastic&label=node"
+  />
+  <img
+    alt="Test coverage"
+    src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fproductiveio%2Fdeclarative-pdf%2Frefs%2Fheads%2Fmaster%2Fcoverage%2Fcoverage-summary.json&query=total.lines.pct&suffix=%25&style=plastic&label=test%20coverage"
+  >
+</div>
 
 # Table of contents
+
+- [Features](#features)
+- [Motivation](#motivation)
 - [Installation](#installation)
-- [Usage](#usage)
-- [API reference](#api-reference)
-- [Template syntax](#template-syntax)
-- [Template examples](#template-examples)
+- [Usage examples](#usage-examples)
+  - [Create from HTML template string](#create-from-html-template-string)
+  - [Debug created PDF](#debug-created-pdf)
+  - [Create from Puppeteer tab](#create-from-puppeteer-tab)
+  - [Create from Express server](#create-from-express-server)
+- [Template](#template)
+- [Documentation](#documentation)
+
+# Features
+
+- `repeating sections` - customizable headers, footers, and backgrounds for each page
+- `section variants` - define variants for headers, footers, and backgrounds for different pages
+- `page size and orientation` - define page size by name or by width, height and ppi
+- `multi-page content` - content that spans across multiple pages
+- `page numbering` - display page numbers within headers, footers or backgrounds
+
+# Motivation
+
+Creating PDF documents programmatically can be a complex and time-consuming task. Traditional methods often require intricate control over layout and content, which can be cumbersome and error-prone. This tool aims to simplify this process by using declarative HTML elements to control layout and content. By leveraging puppeteer, it slices your template and generates PDF elements from it, which are then used to assemble the final PDF document.
+
+> [!NOTE]
+> This approach allows you to focus on the content of your PDF, rather than the layout, making PDF generation more intuitive and efficient.
 
 # Installation
 
@@ -34,126 +61,364 @@ Install it locally in your project folder:
 npm install --save declarative-pdf
 # or using yarn
 yarn add declarative-pdf
+# or using pnpm
+pnpm add declarative-pdf
 ```
 
 > [!NOTE]
 > This package supports both CommonJS and ES modules. So you can either `require` it or `import` it.
 
-# Usage
+# Usage examples
 
-We need a valid template for this to work, so let's use the one supplied in examples folder. For example:
+## Create from HTML template string
 
-```typescript
-import {readFileSync, writeFileSync} from 'fs';
-import puppeteer from 'puppeteer';
-import PDF from 'declarative-pdf';
+<table>
+  <tr>
+    <td colspan="3" align="center">
+      Example A files
+    </td>
+  </tr>
+  <tr align="center">
+    <td>
+      <a href="./docs/examples/example-a.js">
+        <img src="./docs/img/icon-code.png" alt="Example A code" width="30" height="30" />
+      </a>
+      <br />
+      <sub>
+        code
+      </sub>
+    </td>
+    <td>
+      <a href="./docs/examples/example-simple.html">
+        <img src="./docs/img/icon-html.png" alt="Example A html" width="30" height="30" />
+      </a>
+      <br />
+      <sub>
+        template
+      </sub>
+    </td>
+    <td>
+      <a href="./docs/examples/example-a.pdf">
+        <img src="./docs/img/icon-pdf.png" alt="Example A pdf" width="30" height="30" />
+      </a>
+      <br />
+      <sub>
+        result
+      </sub>
+    </td>
+  </tr>
+</table>
 
-(async function () {
-  const html = await readFileSync('./examples/basic-template.html', {encoding: 'utf8'});
-  const browser = await puppeteer.launch();
+<details>
+  <summary>View code:</small></summary>
 
-  const pdfBuffer = await new PDF(browser).generate(html);
-  await writeFile('./example-output.pdf', pdfBuffer);
-})();
-```
+  ```javascript
+  // ./docs/examples/example-a.js
+  import puppeteer from 'puppeteer';
+  import DeclarativePDF from '../../dist/index.js';
+  import {read, write} from './utils.js';
 
-This would generate a PDF file `example-output.pdf` in your project folder. But it can be just as easily plugged into your express server:
+  (async () => {
+    const html = await read('example-simple.html');
+    const browser = await puppeteer.launch();
 
-```js
-const express = require('express');
-const PDF = require('declarative-pdf');
-const puppeteer = require('puppeteer');
+    const pdf = new DeclarativePDF(browser);
+    const pdfBuffer = await pdf.generate(html);
+    await write('example-a.pdf', pdfBuffer);
 
-(async function() {
-  const app = express();
-  const browser = await puppeteer.launch();
+    await browser.close();
+  })();
+  ```
+</details>
 
-  app.use(express.urlencoded({
-    extended: true,
-    limit: '2000kb' // default limit is 100kb and templates can grow
-  }));
+Most basic example is to create a PDF from a string. This approach is useful when you want to let declarative-pdf handle opening and closing tabs, and you don't need to interact with the page directly.
 
-  async function generate(req, res) {
-    const template = req.body.template;
-    const name = req.body.name;
-    const filename = `${name}.pdf`;
+## Create from Puppeteer tab
 
-    const pdfBuffer = await new PDF(browser).generate(template);
+<table>
+  <tr>
+    <td colspan="3" align="center">
+      Example B files
+    </td>
+  </tr>
+  <tr align="center">
+    <td>
+      <a href="./docs/examples/example-b.js">
+        <img src="./docs/img/icon-code.png" alt="Example B code" width="30" height="30" />
+      </a>
+      <br />
+      <sub>
+        code
+      </sub>
+    </td>
+    <td>
+      <a href="./docs/examples/example-simple.html">
+        <img src="./docs/img/icon-html.png" alt="Example B html" width="30" height="30" />
+      </a>
+      <br />
+      <sub>
+        template
+      </sub>
+    </td>
+    <td>
+      <a href="./docs/examples/example-b.pdf">
+        <img src="./docs/img/icon-pdf.png" alt="Example B pdf" width="30" height="30" />
+      </a>
+      <br />
+      <sub>
+        result
+      </sub>
+    </td>
+  </tr>
+</table>
 
-    res.setHeader('Content-disposition', `inline; name="${name}"; filename="${filename}"`);
-    res.setHeader('Content-Type', 'application/pdf');
-    res.writeHead(200);
-    res.end(Buffer.from(pdfBuffer).toString('base64'));
-  }
+<details>
+  <summary>View code:</small></summary>
 
-  app.post('/generate', generate);
+  ```javascript
+  // ./docs/examples/example-b.js
+  import puppeteer from 'puppeteer';
+  import DeclarativePDF from '../../dist/index.js';
+  import {read, write} from './utils.js';
 
-  const server = http.createServer(app);
-  server.listen(config.port);
-})();
-```
+  (async () => {
+    const html = await read('example-simple.html');
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setContent(html);
 
-So if you send POST request to this endpoint, with `template` as a string, containing your whole template file and `name` as a string, this would respond with generated PDF file.
+    const pdf = new DeclarativePDF(browser);
+    const pdfBuffer = await pdf.generate(page);
+    await write('example-b.pdf', pdfBuffer);
+
+    await browser.close();
+  })();
+  ```
+</details>
+
+Another way is when you already have a puppeteer tab open, and you want to generate a PDF from it. This approach is useful when you want to interact with the page directly, or when you want to use puppeteer's API to manipulate the page before generating a PDF.
+
+## Debug created PDF
+
+<table>
+  <tr>
+    <td colspan="3" align="center">
+      Example C files
+    </td>
+  </tr>
+  <tr align="center">
+    <td>
+      <a href="./docs/examples/example-c.js">
+        <img src="./docs/img/icon-code.png" alt="Example C code" width="30" height="30" />
+      </a>
+      <br />
+      <sub>
+        code
+      </sub>
+    </td>
+    <td>
+      <a href="./docs/examples/example-simple-bgcolor.html">
+        <img src="./docs/img/icon-html.png" alt="Example C html" width="30" height="30" />
+      </a>
+      <br />
+      <sub>
+        template
+      </sub>
+    </td>
+    <td>
+      <a href="./docs/examples/example-c.pdf">
+        <img src="./docs/img/icon-pdf.png" alt="Example C pdf" width="30" height="30" />
+      </a>
+      <br />
+      <sub>
+        result
+      </sub>
+    </td>
+  </tr>
+</table>
+
+<details>
+  <summary>View code:</small></summary>
+
+  ```javascript
+  // ./docs/examples/example-c.js
+  import puppeteer from 'puppeteer';
+  import DeclarativePDF from '../../dist/index.js';
+  import {read, write} from './utils.js';
+
+  (async () => {
+    const html = await read('example-simple-bgcolor.html');
+    const browser = await puppeteer.launch();
+
+    const pdf = new DeclarativePDF(browser, {debug: {timeLog: true, attachSegments: true, pdfName: 'example-c.pdf'}});
+    const pdfBuffer = await pdf.generate(html);
+    await write('example-c.pdf', pdfBuffer);
+
+    await browser.close();
+  })();
+  ```
+</details>
+
+Building a complex template can lead to some unexpected results. CSS styles might not be applied as expected, or the layout might not be as you intended. Some backgrounds might interfere with the content, or headers and footers might not be positioned correctly.
+
+To help you debug these issues, you can set the `debug` option when creating a new `DeclarativePDF` instance. This will attach individual sections from which the final PDF is constructed, as well as the timing logs for each step.
 
 > [!NOTE]
-> Spinning up puppeteer browser can be an expensive operation, so in some server scenarios it might be beneficial to keep browser instance running. With `keepAlive` option set to `true`, we are keeping the browser instance running and only disposing individual browser tabs.
+> Only some PDF readers can view attachments. This includes Adobe Acrobat Reader, Foxit Reader, and Firefox browser. Here is the screenshot of where you can find those attachments in Firefox:
+>
+> ![Example C attachments location](./docs/img/example-c.png)
 
-# API reference
+## Complete examples
 
-"declarative-pdf" exports a class. To instantiate this class a `Browser` instance is needed as mandatory first parameter, and optional `options` second parameter. This instance is then used to generate PDF documents from HTML templates via the `generate` method, which accepts only one mandatory parameter, the HTML template string.
+<table>
+  <tr>
+    <td colspan="7" align="center">
+      Mockup files and their results
+    </td>
+  </tr>
+  <tr align="center">
+    <td>
+      <a href="./docs/examples/mockup-pages.js">
+        <img src="./docs/img/icon-code.png" alt="Complete example code" width="30" height="30" />
+      </a>
+      <br />
+      <sub>
+        code
+      </sub>
+    </td>
+    <td>
+      <a href="./docs/examples/a4-72-multipage.html">
+        <img src="./docs/img/icon-html.png" alt="Complete example html 1" width="30" height="30" />
+      </a>
+      <br />
+      <sub>
+        mockup 1
+      </sub>
+    </td>
+    <td>
+      <a href="./docs/examples/a4-72-standard.html">
+        <img src="./docs/img/icon-html.png" alt="Complete example html 2" width="30" height="30" />
+      </a>
+      <br />
+      <sub>
+        mockup 2
+      </sub>
+    </td>
+    <td>
+      <a href="./docs/examples/a4-297-standard.html">
+        <img src="./docs/img/icon-html.png" alt="Complete example html 3" width="30" height="30" />
+      </a>
+      <br />
+      <sub>
+        mockup 3
+      </sub>
+    </td>
+    <td>
+      <a href="./docs/examples/a4-72-multipage.pdf">
+        <img src="./docs/img/icon-pdf.png" alt="Complete example pdf 1" width="30" height="30" />
+      </a>
+      <br />
+      <sub>
+        result 1
+      </sub>
+    </td>
+    <td>
+      <a href="./docs/examples/a4-72-standard.pdf">
+        <img src="./docs/img/icon-pdf.png" alt="Complete example pdf 2" width="30" height="30" />
+      </a>
+      <br />
+      <sub>
+        result 2
+      </sub>
+    </td>
+    <td>
+      <a href="./docs/examples/a4-297-standard.pdf">
+        <img src="./docs/img/icon-pdf.png" alt="Complete example pdf 3" width="30" height="30" />
+      </a>
+      <br />
+      <sub>
+        result 3
+      </sub>
+    </td>
+  </tr>
+</table>
 
-```js
-const PDF = require('declarative-pdf');
+<details>
+  <summary>View code:</small></summary>
 
-/**
- * Create a new PDF generator instance.
- *
- * @param {puppeteer.Browser} browser - A puppeteer browser instance.
- * @param {object} options - Optional options for the PDF generation.
- *
- * @returns {PDF} - A new PDF generator instance.
- */
-const pdf = new PDF(browser, options);
-```
+  ```javascript
+  // ./docs/examples/mockup-pages.js
+  import puppeteer from 'puppeteer';
+  import DeclarativePDF from '../../dist/index.js';
+  import {read, write} from './utils.js';
 
-The options object is used to change the PDF page size defaults, for cases when template does not specify it:
+  (async () => {
+    const browser = await puppeteer.launch();
+    const pdf = new DeclarativePDF(browser);
 
-```typescript
-type Options =
-  | {
-      ppi: number; // a number of pixels per inch, ranging from 18 to 42_000, default is 72
-      format: 'a0' | 'a1' | 'a2' | 'a3' | 'a4' | 'a5' | 'a6' | 'letter' | 'legal' | 'tabloid' | 'ledger'; // default is 'a4'
+    for (const name of ['a4-72-multipage', 'a4-72-standard', 'a4-297-standard']) {
+      const html = await read(`${name}.html`);
+      const pdfBuffer = await pdf.generate(html);
+
+      await write(`${name}.pdf`, pdfBuffer);
     }
-  | {
-      ppi: number; // a number of pixels per inch, ranging from 18 to 42_000, default is 72
-      width: number; // a width of the page in pixels, ranging from 1 to 420_000, default is 595
-      height: number; // a height of the page in pixels, ranging from 1 to 420_000, default is 842
-    };
-```
 
-- `ppi`: a number only used to calculate the width and the height from the values defined by the `format`, ranging from 18 to 42_000
-- `format`: is one of the common paper formats... for custom formats, use `width` and `height` instead
-- `width`: is a number of pixels, ranging from 1 to 420_000
-- `height`: is a number of pixels, ranging from 1 to 420_000
+    await browser.close();
+  })();
+  ```
+</details>
 
-In case of invalid options, a default value will be used.
+## Create from Express server
 
-```js
-/**
- * Generates a PDF document from the given HTML template string.
- *
- * @param {string} html - The HTML template to use for the PDF document.
- *
- * @returns {Promise<Buffer>} - A promise that resolves with the PDF document as a Buffer.
- */
-const pdfBuffer = await pdf.generate(html)
-```
+It is quite possible to plug this into your express server. For example, if you send POST request with `template` as a string, this would respond with generated PDF file.
 
-The `generate` method returns a promise that resolves with the generated PDF document as a Buffer.
+> [!NOTE]
+> Spinning up puppeteer browser can be an expensive operation, so it might be beneficial to keep browser instance running. DeclarativePDF will open and close tabs, but not the browser itself.
 
-# Template syntax
+<details>
+  <summary>View code:</small></summary>
 
-Template example:
+  ```js
+  const express = require('express');
+  const DeclarativePDF = require('declarative-pdf');
+  const puppeteer = require('puppeteer');
+
+  (async function () {
+    const app = express();
+    const browser = await puppeteer.launch();
+
+    app.use(
+      express.urlencoded({
+        extended: true,
+        limit: '2000kb', // default limit is 100kb and templates can grow
+      })
+    );
+
+    async function generate(req, res) {
+      const template = req.body.template;
+      const name = req.body.name;
+      const filename = `${name}.pdf`;
+
+      const pdfBuffer = await new DeclarativePDF(browser).generate(template);
+
+      res.setHeader('Content-disposition', `inline; name="${name}"; filename="${filename}"`);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.writeHead(200);
+      res.end(Buffer.from(pdfBuffer).toString('base64'));
+    }
+
+    app.post('/generate', generate);
+
+    const server = http.createServer(app);
+    server.listen(80);
+  })();
+  ```
+</details>
+
+# Template
+
+Template structure:
+
 ```html
 <html>
   <head>
@@ -163,27 +428,25 @@ Template example:
   </head>
   <body>
     <document-page>
-      <page-background>
-        /* Add any page-background content here */
-      </page-background>
-      <page-header>
-        /* Add any page-header content here */
-      </page-header>
-      <page-body>
-        /* Add any page-body content here */
-      </page-body>
-      <page-footer>
-        /* Add any page-footer content here */
-      </page-footer>
+      <page-background> /* Add any page-background content here */ </page-background>
+      <page-header> /* Add any page-header content here */ </page-header>
+      <page-body> /* Add any page-body content here */ </page-body>
+      <page-footer> /* Add any page-footer content here */ </page-footer>
     </document-page>
   </body>
 </html>
 ```
 
-In this template, the `<page-header>`, `<page-body>`, and `<page-footer>` elements are used to define the structure of the PDF, with the `<page-header>` and `<page-footer>` elements being used as the header and footer, respectively, for each page. The `<page-body>` element spans multiple pages if necessary. The `<page-background>` element can be used to specify a custom background for each page. The `<document-page>` element acts as a container for the other elements.
-
 Detailed explanation can be found here: [template.md](docs/template.md).
 
-# Template examples
+# Documentation
 
-Included template examples can be found in the `examples` folder. They are meant to be used as a starting point for your own projects. Detailed explanation can be found here: [examples.md](docs/examples.md).
+- TODO: fill this up
+- link to template doc
+- link to examples doc
+- link to API reference
+- link to development guide
+
+# License
+
+[MIT](LICENSE)
