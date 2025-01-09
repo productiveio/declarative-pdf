@@ -264,9 +264,14 @@ Building a complex template can lead to some unexpected results. CSS styles migh
 To help you debug these issues, you can set the `debug` option when creating a new `DeclarativePDF` instance. This will attach individual sections from which the final PDF is constructed, as well as the timing logs for each step.
 
 > [!NOTE]
-> Only some PDF readers can view attachments. This includes Adobe Acrobat Reader, Foxit Reader, and Firefox browser. Here is the screenshot of where you can find those attachments in Firefox:
->
-> ![Example C attachments location](./docs/img/example-c.png)
+> Only some PDF readers can view attachments. This includes Adobe Acrobat Reader, Foxit Reader, and Firefox browser.
+
+<details>
+  <summary>View screenshot of attachments in Firefox:</small></summary>
+
+
+  ![Example C attachments location](./docs/img/example-c.png)
+</details>
 
 ## Complete examples
 
