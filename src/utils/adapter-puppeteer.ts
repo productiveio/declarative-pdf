@@ -113,6 +113,7 @@ export default class HTMLAdapter {
   async close() {
     if (this._page && !this._page.isClosed()) {
       await this._page?.close();
+      this._page = undefined;
     }
   }
 }
