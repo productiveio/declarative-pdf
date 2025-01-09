@@ -5,10 +5,12 @@ import {read, write} from './utils.js';
 (async () => {
   const html = await read('example-simple.html');
   const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  await page.setContent(html);
 
   const pdf = new DeclarativePDF(browser);
-  const pdfBuffer = await pdf.generate(html);
-  await write('example-a.pdf', pdfBuffer);
+  const pdfBuffer = await pdf.generate(page);
+  await write('example-c.pdf', pdfBuffer);
 
   await browser.close();
 })();
