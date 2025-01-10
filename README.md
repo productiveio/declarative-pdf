@@ -442,15 +442,16 @@ Template structure:
 </html>
 ```
 
-Detailed explanation can be found here: [template.md](docs/template.md).
+This is the most basic template structure. Check out the template documentation for more advanced features.
 
 # Documentation
 
-- TODO: fill this up
-- link to template doc
-- link to examples doc
-- link to API reference
-- link to development guide
+Further reading:
+
+- [api reference](docs/api.md)
+- [template documentation](docs/template.md)
+- [examples](docs/examples/)
+- [development guilde](docs/development.md)
 
 # License
 
