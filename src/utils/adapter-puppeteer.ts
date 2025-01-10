@@ -26,7 +26,7 @@ export default class HTMLAdapter {
       if (!this._browser.connected) throw new Error('Browser not connected');
     } else {
       // @ts-expect-error - handle old puppeteer versions
-      if (this._browser.isConnected()) throw new Error('Browser not connected');
+      if (!this._browser?.isConnected?.()) throw new Error('Browser not connected');
     }
 
     return this._browser;
@@ -45,10 +45,14 @@ export default class HTMLAdapter {
     this._page = await this.browser.newPage();
   }
 
-  async setPage(page: MinimumPage) {
+  setPage(page: MinimumPage) {
     if (this._page) throw new Error('Page already set');
 
     this._page = page;
+  }
+
+  releasePage() {
+    this._page = undefined;
   }
 
   setContent(content: string) {
@@ -65,7 +69,7 @@ export default class HTMLAdapter {
     return this.page.evaluate(evalTemplateNormalize, opts);
   }
 
-  getTemplateSettings(opts: {width: number; height: number; ppi: number}) {
+  async getTemplateSettings(opts: {width: number; height: number; ppi: number}) {
     return this.page.evaluate(evalTemplateSettings, {
       default: opts,
       size: PAPER_SIZE,

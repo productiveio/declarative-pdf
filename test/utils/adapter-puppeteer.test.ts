@@ -2,11 +2,26 @@
  * @jest-environment node
  */
 import HTMLAdapter from '@app/utils/adapter-puppeteer';
-import type {Page} from 'puppeteer';
+import puppeteer, {type Browser} from 'puppeteer';
 import type {MinimumBrowser, MinimumPage} from '@app/utils/adapter-puppeteer';
 
+let browser: Browser;
+
+beforeAll(async () => {
+  browser = await puppeteer.launch({
+    pipe: true,
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security', '--font-render-hinting=none'],
+  });
+});
+
+afterAll(async () => {
+  await browser.close();
+});
+
+
 describe('HTMLAdapter', () => {
-  let mockPage: jest.Mocked<Page>;
+  let mockPage: jest.Mocked<MinimumPage>;
   let mockBrowser: jest.Mocked<MinimumBrowser>;
 
   beforeEach(() => {
@@ -16,7 +31,7 @@ describe('HTMLAdapter', () => {
       evaluate: jest.fn(),
       isClosed: jest.fn().mockReturnValue(false),
       close: jest.fn(),
-    } as any;
+    } as unknown as jest.Mocked<MinimumPage>;
 
     mockBrowser = {
       newPage: jest.fn().mockResolvedValue(mockPage),
@@ -25,82 +40,99 @@ describe('HTMLAdapter', () => {
   });
 
   test('constructor sets browser', () => {
-    const adapter = new HTMLAdapter(mockBrowser);
-    expect(adapter['_browser']).toBe(mockBrowser);
+    const adapter = new HTMLAdapter(browser);
+
+    expect(adapter['_browser']).toBe(browser);
   });
 
   describe('browser getter', () => {
     test('throws when browser not set', () => {
-      const adapter = new HTMLAdapter(mockBrowser);
+      const adapter = new HTMLAdapter(browser);
       adapter['_browser'] = undefined;
+
       expect(() => adapter.browser).toThrow('Browser not set');
     });
 
     test('throws when browser not connected (modern puppeteer)', () => {
       const adapter = new HTMLAdapter({...mockBrowser, connected: false});
+
       expect(() => adapter.browser).toThrow('Browser not connected');
     });
 
     test('throws when browser not connected (legacy puppeteer)', () => {
       const legacyBrowser = {
         newPage: jest.fn().mockResolvedValue(mockPage),
-        isConnected: () => true,
+        isConnected: () => false,
       };
       const adapter = new HTMLAdapter(legacyBrowser as any);
+
       expect(() => adapter.browser).toThrow('Browser not connected');
     });
   });
 
   describe('page getter', () => {
     test('throws when page not set', () => {
-      const adapter = new HTMLAdapter(mockBrowser);
+      const adapter = new HTMLAdapter(browser);
+
       expect(() => adapter.page).toThrow('Page not set');
     });
 
-    test('throws when page is closed', () => {
-      const adapter = new HTMLAdapter(mockBrowser);
-      adapter['_page'] = mockPage;
-      mockPage.isClosed.mockReturnValue(true);
+    test('throws when page is closed', async () => {
+      const adapter = new HTMLAdapter(browser);
+      await adapter.newPage();
+      await adapter['_page']?.close();
+
       expect(() => adapter.page).toThrow('Page is closed');
     });
 
     test('returns page when valid', async () => {
-      const adapter = new HTMLAdapter(mockBrowser);
-      adapter['_page'] = mockPage;
-      expect(adapter.page).toBe(mockPage);
+      const adapter = new HTMLAdapter(browser);
+      await adapter.newPage();
+      const pages = await browser.pages();
+      const page = pages[pages.length - 1];
+
+      expect(adapter.page).toBe(page);
+      await page.close();
     });
   });
 
   describe('newPage', () => {
     test('throws if page already exists', async () => {
-      const adapter = new HTMLAdapter(mockBrowser);
-      adapter['_page'] = mockPage;
-      await expect(adapter.newPage()).rejects.toThrow('Page already set');
+      const adapter = new HTMLAdapter(browser);
+      await adapter.newPage();
+
+      await expect(() => adapter.newPage()).rejects.toThrow('Page already set');
+      await adapter.close();
     });
 
     test('creates new page', async () => {
-      const adapter = new HTMLAdapter(mockBrowser);
+      const adapter = new HTMLAdapter(browser);
       await adapter.newPage();
-      expect(mockBrowser.newPage).toHaveBeenCalled();
-      expect(adapter['_page']).toBe(mockPage);
+      const pages = await browser.pages();
+      const page = pages[pages.length - 1];
+
+      expect(adapter['_page']).toBe(page);
+      await adapter.close();
     });
   });
 
   describe('setPage', () => {
     test('throws if page already exists', async () => {
-      const adapter = new HTMLAdapter(mockBrowser);
-      adapter['_page'] = mockPage;
-      const newPage = {...mockPage} as MinimumPage;
+      const adapter = new HTMLAdapter(browser);
+      const newPage = await browser.newPage();
+      adapter.setPage(newPage);
 
-      await expect(adapter.setPage(newPage)).rejects.toThrow('Page already set');
+      expect(() => adapter.setPage(newPage)).toThrow('Page already set');
+      await adapter.close();
     });
 
     test('sets provided page', async () => {
-      const adapter = new HTMLAdapter(mockBrowser);
-      const newPage = {...mockPage} as MinimumPage;
+      const adapter = new HTMLAdapter(browser);
+      const newPage = await browser.newPage();
 
-      await adapter.setPage(newPage);
+      adapter.setPage(newPage);
       expect(adapter['_page']).toBe(newPage);
+      await adapter.close();
     });
   });
 
@@ -175,6 +207,7 @@ describe('HTMLAdapter', () => {
       const adapter = new HTMLAdapter(mockBrowser);
       adapter['_page'] = mockPage;
       await adapter.close();
+
       expect(mockPage.close).toHaveBeenCalled();
     });
 
@@ -183,6 +216,7 @@ describe('HTMLAdapter', () => {
       adapter['_page'] = mockPage;
       mockPage.isClosed.mockReturnValue(true);
       await adapter.close();
+
       expect(mockPage.close).not.toHaveBeenCalled();
     });
   });

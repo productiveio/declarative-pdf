@@ -134,6 +134,9 @@ export default class DeclarativePDF {
         /** cleanup - close the tab in browser */
         logger?.level1().start('[7] Closing tab');
         await this.html.close();
+      } else {
+        /** cleanup - release the page */
+        this.html.releasePage();
       }
 
       /** cleanup - close the logger session */
@@ -167,6 +170,9 @@ export default class DeclarativePDF {
         /** cleanup - always close opened tab in the browser to avoid memory leaks */
         logger?.level1().start('[x] Closing tab after error');
         await this.html.close();
+      } else {
+        /** cleanup - release the page */
+        this.html.releasePage();
       }
 
       /** cleanup - always close the logger session */
