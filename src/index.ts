@@ -70,7 +70,7 @@ export default class DeclarativePDF {
    * - the browser is initialized and ready
    * - the template is a valid HTML document -OR- a valid Page instance
    */
-  async generate(input: string | MinimumPage) {
+  async generate(input: string | MinimumPage): Promise<Buffer> {
     const isPageHandledInternally = typeof input === 'string';
     const logger = this.debug.timeLog ? new TimeLogger() : undefined;
 
@@ -161,7 +161,7 @@ export default class DeclarativePDF {
         });
       }
 
-      return await pdf.save();
+      return Buffer.from(await pdf.save());
     } catch (error) {
       if (isPageHandledInternally) {
         /** cleanup - always close opened tab in the browser to avoid memory leaks */
