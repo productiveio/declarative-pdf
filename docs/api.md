@@ -13,8 +13,6 @@ The main class for generating PDFs from HTML templates.
     - [Behavior](#behavior)
     - [Example](#example)
 
-
-
 ## Constructor
 
 ```typescript

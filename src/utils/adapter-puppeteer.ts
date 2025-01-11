@@ -9,8 +9,20 @@ import type {Browser, Page} from 'puppeteer';
 import type {PrepareSection} from '@app/evaluators/prepare-section';
 import type {NormalizeOptions} from '@app/index';
 
-export type MinimumBrowser = Pick<Browser, 'newPage' | 'connected'>;
-export type MinimumPage = Pick<Page, 'setContent' | 'setViewport' | 'evaluate' | 'pdf' | 'close' | 'isClosed'>;
+type AnyFunction = (...args: any[]) => any;
+export type MinimumBrowser = {
+  newPage: AnyFunction;
+  isConnected?: AnyFunction;
+  connected?: boolean;
+};
+export type MinimumPage = {
+  setContent: AnyFunction;
+  setViewport: AnyFunction;
+  evaluate: AnyFunction;
+  pdf: AnyFunction;
+  close: AnyFunction;
+  isClosed: AnyFunction;
+};
 
 export default class HTMLAdapter {
   declare private _browser?: MinimumBrowser;
@@ -20,23 +32,22 @@ export default class HTMLAdapter {
     this._browser = browser;
   }
 
-  get browser(): MinimumBrowser {
+  get browser(): Browser {
     if (!this._browser) throw new Error('Browser not set');
     if ('connected' in this._browser) {
       if (!this._browser.connected) throw new Error('Browser not connected');
     } else {
-      // @ts-expect-error - handle old puppeteer versions
       if (!this._browser?.isConnected?.()) throw new Error('Browser not connected');
     }
 
-    return this._browser;
+    return this._browser as Browser;
   }
 
-  get page() {
+  get page(): Page {
     if (!this._page) throw new Error('Page not set');
     if (this._page.isClosed()) throw new Error('Page is closed');
 
-    return this._page;
+    return this._page as Page;
   }
 
   async newPage() {

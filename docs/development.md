@@ -73,7 +73,7 @@ pnpm build
 Then, in the project where you want to link the library, run:
 
 ```bash
-pnpm link ../path/to/declarative-pdf
+npm link ../path/to/declarative-pdf
 ```
 
 This will link the library to the project. You can now import it as if it was installed from npm:
@@ -85,7 +85,7 @@ import { createPdf } from 'declarative-pdf';
 When you're done testing, don't forget to unlink the library:
 
 ```bash
-pnpm unlink declarative-pdf
+npm unlink declarative-pdf
 ```
 
 ## Preparing for publishing

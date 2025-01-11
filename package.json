@@ -37,7 +37,6 @@
     "url": "https://github.com/productiveio/declarative-pdf.git"
   },
   "scripts": {
-    "preinstall": "npx only-allow pnpm",
     "build": "pnpm run test && pnpm run build:lib",
     "build:lib": "rm -rf dist && tsup src/index.ts --format cjs,esm --dts --clean && cp shims/index.wrapper.cjs dist/",
     "examples": "node docs/examples/index.js",
