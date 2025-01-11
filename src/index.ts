@@ -5,6 +5,7 @@ import {PaperDefaults, type PaperOpts} from '@app/utils/paper-defaults';
 import HTMLAdapter, {type MinimumBrowser, type MinimumPage} from '@app/utils/adapter-puppeteer';
 import TimeLogger from '@app/utils/debug/time-logger';
 import {buildPages} from '@app/utils/layout/build-pages';
+import {version} from '../package.json';
 
 interface DebugOptions {
   /** Do we want to log debug information */
@@ -74,7 +75,7 @@ export default class DeclarativePDF {
     const isPageHandledInternally = typeof input === 'string';
     const logger = this.debug.timeLog ? new TimeLogger() : undefined;
 
-    logger?.session().start(`Total time for ${this.debug.pdfName ?? 'PDF'}`);
+    logger?.session().start(`DeclarativePDF v${version} rendering ${this.debug.pdfName ?? 'PDF'}`);
     /** (re)set documentPages */
     this.documentPages = [];
 
