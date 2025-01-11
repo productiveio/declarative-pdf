@@ -93,22 +93,17 @@ async generate(input: string | MinimumPage): Promise<Buffer>
 #### Behavior
 
 1. if input is string:
-
-- opens new browser tab
-- sets content and normalizes it
-- closes tab after completion
-
+    - opens new browser tab
+    - sets content and normalizes it
+    - closes tab after completion
 2. if input is page:
-
-- uses provided page directly
-- does not close the page after completion
-
+    - uses provided page directly
+    - does not close the page after completion
 3. in both cases:
-
-- parses document pages from template
-- creates layouts and sections
-- generates final PDF
-- attaches debug information if enabled
+    - parses document pages from template
+    - creates layouts and sections
+    - generates final PDF
+    - attaches debug information if enabled
 
 #### Example
 
