@@ -103,7 +103,8 @@ export async function buildPages(opts: BuildPagesOpts) {
   if (!pageCount) throw new Error('Document page has no pages');
   if (!target) throw new Error('No target PDF document provided');
 
-  // TODO: do I need this pages object? for debugging?
+  // TODO: use pages in debug mode (some overview of how the doc was built)
+  /** pages are used for testing purposes only */
   const pages: {
     pageIndex: number;
     currentPageNumber: number;
@@ -111,6 +112,7 @@ export async function buildPages(opts: BuildPagesOpts) {
     footer?: SectionElement;
     background?: SectionElement;
   }[] = [];
+  /** elements are used for testing and debugging purposes */
   const elements: SectionElement[] = [];
 
   /**

@@ -7,7 +7,6 @@ import {buildPages} from '@app/utils/layout/build-pages';
 import {createPageLayoutSettings} from '@app/utils/layout/create-page-layout';
 
 import type {SectionSetting} from '@app/evaluators/section-settings';
-// import type { BodyElement } from '@app/models/element';
 import type HTMLAdapter from '@app/utils/adapter-puppeteer';
 
 /**
@@ -153,21 +152,6 @@ describe('buildPages', () => {
     const {pages, elements} = await buildPages(opts);
     expect(pages).toHaveLength(0);
     expect(elements).toHaveLength(0);
-    // TODO: check what to do with pages - maybe rename to pageElements?
-    // expect(pages[0]).toEqual({
-    //   pageIndex: 0,
-    //   currentPageNumber: 1,
-    //   header: undefined,
-    //   footer: undefined,
-    //   background: undefined,
-    // });
-    // expect(pages[1]).toEqual({
-    //   pageIndex: 1,
-    //   currentPageNumber: 2,
-    //   header: undefined,
-    //   footer: undefined,
-    //   background: undefined,
-    // });
   });
 
   test('calculates correct page numbers with offset', async () => {

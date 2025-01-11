@@ -4,7 +4,6 @@
 import puppeteer, {type Browser} from 'puppeteer';
 import PDF from '@app/index';
 import fs from 'fs';
-import writeBuffer from '@app/utils/write-buffer';
 import ComparePdf from 'compare-pdf';
 
 jest.useRealTimers();
@@ -41,7 +40,7 @@ const testRunner = async (htmlPath: string, pdfName: string) => {
     attachSegments: true,
   };
   const actualPdfBuffer = await new PDF(browser, {debug}).generate(html);
-  await writeBuffer(actualPdfBuffer, `${config.paths.actualPdfRootFolder}/${pdfName}`);
+  fs.writeFileSync(`${config.paths.actualPdfRootFolder}/${pdfName}`, actualPdfBuffer);
 
   const comparePdf = new ComparePdf(config);
   const result = await comparePdf.actualPdfFile(pdfName).baselinePdfFile(pdfName).compare();
@@ -63,7 +62,7 @@ const pageTestRunner = async (htmlPath: string, pdfName: string) => {
   await page.setContent(html);
 
   const actualPdfBuffer = await new PDF(browser, {debug}).generate(page);
-  await writeBuffer(actualPdfBuffer, `${config.paths.actualPdfRootFolder}/${pdfName}`);
+  fs.writeFileSync(`${config.paths.actualPdfRootFolder}/${pdfName}`, actualPdfBuffer);
 
   const comparePdf = new ComparePdf(config);
   const result = await comparePdf.actualPdfFile(pdfName).baselinePdfFile(pdfName).compare();

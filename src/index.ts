@@ -234,7 +234,6 @@ export default class DeclarativePDF {
     const outputPDF = await PDFDocument.create();
 
     for (const doc of this.documentPages) {
-      // TODO: do we need to return anything from buildPages?
       await buildPages({
         documentPageIndex: doc.index,
         pageCountOffset: doc.pageCountOffset,

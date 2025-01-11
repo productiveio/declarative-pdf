@@ -4,7 +4,6 @@ export const getMaxHeight = (els: SectionSetting[]) => {
   return els.reduce((x, s) => Math.max(x, s.height ?? 0), 0);
 };
 
-// TODO: Check if we need to force background height?
 export default function calculatePageLayout(
   sectionSettings?: SectionSettings,
   pageHeight: number = 0,
