@@ -1,25 +1,15 @@
-import { PAPER_SIZE } from '@app/consts/paper-size';
+import {PAPER_SIZE} from '@app/consts/paper-size';
 
 /** Asserts that obj.format is a valid format */
-const hasFormat = (
-  obj: PaperOpts | undefined
-): obj is { format: keyof typeof PAPER_SIZE } =>
-  !!obj &&
-  'format' in obj &&
-  typeof obj.format === 'string' &&
-  Object.keys(PAPER_SIZE).includes(obj.format);
+const hasFormat = (obj: PaperOpts | undefined): obj is {format: keyof typeof PAPER_SIZE} =>
+  !!obj && 'format' in obj && typeof obj.format === 'string' && Object.keys(PAPER_SIZE).includes(obj.format);
 
 /** Asserts that obj.ppi is a valid ppi (pixels per inch) */
-const hasPpi = (obj: PaperOpts | undefined): obj is { ppi: number } =>
-  !!obj &&
-  'ppi' in obj &&
-  typeof obj?.ppi === 'number' &&
-  !isNaN(obj.ppi) &&
-  obj.ppi > 18 &&
-  obj.ppi < 42_000;
+const hasPpi = (obj: PaperOpts | undefined): obj is {ppi: number} =>
+  !!obj && 'ppi' in obj && typeof obj?.ppi === 'number' && !isNaN(obj.ppi) && obj.ppi > 18 && obj.ppi < 42_000;
 
 /** Asserts that obj.width is a valid width */
-const hasWidth = (obj: PaperOpts | undefined): obj is { width: number } =>
+const hasWidth = (obj: PaperOpts | undefined): obj is {width: number} =>
   !!obj &&
   'width' in obj &&
   typeof obj?.width === 'number' &&
@@ -28,7 +18,7 @@ const hasWidth = (obj: PaperOpts | undefined): obj is { width: number } =>
   obj.width <= 420_000;
 
 /** Asserts that obj.height is a valid height */
-const hasHeight = (obj: PaperOpts | undefined): obj is { height: number } =>
+const hasHeight = (obj: PaperOpts | undefined): obj is {height: number} =>
   !!obj &&
   'height' in obj &&
   typeof obj?.height === 'number' &&
@@ -43,19 +33,14 @@ const hasHeight = (obj: PaperOpts | undefined): obj is { height: number } =>
  * @param ppi Pixels per inch
  * @returns Pixel value
  */
-const convertMmToPx = (mm: number, ppi: number) =>
-  Math.round(mm * (ppi / 25.4));
+const convertMmToPx = (mm: number, ppi: number) => Math.round(mm * (ppi / 25.4));
 
-type PaperOpts =
-  | {
-      ppi?: number;
-      format?: keyof typeof PAPER_SIZE;
-    }
-  | {
-      ppi?: number;
-      width?: number;
-      height?: number;
-    };
+export interface PaperOpts {
+  ppi?: number;
+  format?: keyof typeof PAPER_SIZE;
+  width?: number;
+  height?: number;
+}
 
 export const DEFAULT_FORMAT = 'a4';
 export const DEFAULT_PPI = 72;

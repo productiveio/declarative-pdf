@@ -1,20 +1,24 @@
-import { Browser } from 'puppeteer';
 import DeclarativePDF from '@app/index';
+import type {MinimumBrowser} from '@app/utils/adapter-puppeteer';
 
 describe('DeclarativePDF', () => {
-  let browser: Browser;
-  let pdf: DeclarativePDF;
+  let mockBrowser: jest.Mocked<MinimumBrowser>;
+  let consoleLogSpy: jest.SpyInstance;
 
   beforeEach(() => {
-    // Mock the puppeteer Browser
-    browser = {} as Browser;
+    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+    mockBrowser = {
+      newPage: jest.fn(),
+      connected: true,
+    };
+  });
 
-    // Create a new DeclarativePDF instance
-    pdf = new DeclarativePDF(browser);
+  afterEach(() => {
+    consoleLogSpy.mockRestore();
   });
 
   it('should close the html object when an error occurs', async () => {
-    // Arrange
+    const pdf = new DeclarativePDF(mockBrowser);
     const mockHtmlClose = jest.fn();
     pdf.html = {
       close: mockHtmlClose,
@@ -22,6 +26,8 @@ describe('DeclarativePDF', () => {
       setContent: jest.fn(),
       normalize: jest.fn(),
     } as any;
+
+    expect(() => pdf.generate('<html></html>')).rejects.toThrow('Test error');
 
     // Act
     try {
@@ -32,5 +38,30 @@ describe('DeclarativePDF', () => {
 
     // Assert
     expect(mockHtmlClose).toHaveBeenCalled();
+    expect(consoleLogSpy).not.toHaveBeenCalled();
+  });
+
+  it('should report and close the html object when an error occurs', async () => {
+    const pdf = new DeclarativePDF(mockBrowser, {debug: {timeLog: true}});
+    const mockHtmlClose = jest.fn();
+    pdf.html = {
+      close: mockHtmlClose,
+      newPage: jest.fn().mockRejectedValue(new Error('Test error')),
+      setContent: jest.fn(),
+      normalize: jest.fn(),
+    } as any;
+
+    expect(() => pdf.generate('<html></html>')).rejects.toThrow('Test error');
+
+    // Act
+    try {
+      await pdf.generate('<html></html>');
+    } catch (_err) {
+      // Ignore the error
+    }
+
+    // Assert
+    expect(mockHtmlClose).toHaveBeenCalled();
+    expect(consoleLogSpy).toHaveBeenCalled();
   });
 });

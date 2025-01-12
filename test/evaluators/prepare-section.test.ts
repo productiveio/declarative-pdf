@@ -108,7 +108,7 @@ describe('evalPrepareSection', () => {
       <document-page> ... </document-page>
       <document-page> ... </document-page>
     `;
-    evalPrepareSection({ documentPageIndex: 1, sectionType: 'header' });
+    evalPrepareSection({documentPageIndex: 1, sectionType: 'header'});
     const docPages = document.querySelectorAll<HTMLElement>('document-page');
     expect(docPages[0].style.display).toBe('none');
     expect(docPages[1].style.display).toBe('block');
@@ -122,7 +122,7 @@ describe('evalPrepareSection', () => {
         <page-body> ... </page-body>
       </document>
     `;
-    evalPrepareSection({ documentPageIndex: 0 });
+    evalPrepareSection({documentPageIndex: 0});
     const docPage = document.querySelector<HTMLElement>('document-page');
     expect(docPage?.style.display).toBe('block');
     const header = docPage?.querySelector<HTMLElement>('page-header');
@@ -229,22 +229,16 @@ describe('evalPrepareSection', () => {
     expect(docPages[0].style.display).toBe('none');
     expect(docPages[1].style.display).toBe('block');
 
-    docPages[0]
-      .querySelectorAll<HTMLElement>('current-page-number, total-pages-number')
-      .forEach((el) => {
+    docPages[0].querySelectorAll<HTMLElement>('current-page-number, total-pages-number').forEach((el) => {
+      expect(el.textContent).toBe(' NaN ');
+    });
+
+    docPages[1].querySelectorAll<HTMLElement>('page-background, page-body, page-footer').forEach((el) => {
+      expect(el.style.display).toBe('none');
+      el.querySelectorAll<HTMLElement>('current-page-number, total-pages-number').forEach((el) => {
         expect(el.textContent).toBe(' NaN ');
       });
-
-    docPages[1]
-      .querySelectorAll<HTMLElement>('page-background, page-body, page-footer')
-      .forEach((el) => {
-        expect(el.style.display).toBe('none');
-        el.querySelectorAll<HTMLElement>(
-          'current-page-number, total-pages-number'
-        ).forEach((el) => {
-          expect(el.textContent).toBe(' NaN ');
-        });
-      });
+    });
 
     const header = docPages[1].querySelector<HTMLElement>('page-header');
     expect(header?.style.display).toBe('block');
@@ -253,24 +247,12 @@ describe('evalPrepareSection', () => {
     expect(subSecEls?.length).toBe(2);
 
     expect(subSecEls?.[0].style.display).toBe('none');
-    expect(
-      subSecEls?.[0].querySelector<HTMLElement>('current-page-number')
-        ?.textContent
-    ).toBe(' NaN ');
-    expect(
-      subSecEls?.[0].querySelector<HTMLElement>('total-pages-number')
-        ?.textContent
-    ).toBe(' NaN ');
+    expect(subSecEls?.[0].querySelector<HTMLElement>('current-page-number')?.textContent).toBe(' NaN ');
+    expect(subSecEls?.[0].querySelector<HTMLElement>('total-pages-number')?.textContent).toBe(' NaN ');
 
     expect(subSecEls?.[1].style.display).toBe('block');
-    expect(
-      subSecEls?.[1].querySelector<HTMLElement>('current-page-number')
-        ?.textContent
-    ).toBe('24');
-    expect(
-      subSecEls?.[1].querySelector<HTMLElement>('total-pages-number')
-        ?.textContent
-    ).toBe('42');
+    expect(subSecEls?.[1].querySelector<HTMLElement>('current-page-number')?.textContent).toBe('24');
+    expect(subSecEls?.[1].querySelector<HTMLElement>('total-pages-number')?.textContent).toBe('42');
   });
 
   test('it injects page numbers for span elements', () => {
@@ -314,13 +296,10 @@ describe('evalPrepareSection', () => {
       totalPagesNumber: 42,
     });
 
-    const totalPages =
-      document.querySelector<HTMLElement>('total-pages-number');
+    const totalPages = document.querySelector<HTMLElement>('total-pages-number');
     expect(totalPages?.textContent).toBe('42');
 
-    const pageNumber = document.querySelector<HTMLElement>(
-      'current-page-number'
-    );
+    const pageNumber = document.querySelector<HTMLElement>('current-page-number');
     expect(pageNumber?.textContent).toBe('24');
   });
 
@@ -330,7 +309,7 @@ describe('evalPrepareSection', () => {
         <page-body> ... </page-body>
       </document-page>
     `;
-    evalPrepareSection({ documentPageIndex: 0 });
+    evalPrepareSection({documentPageIndex: 0});
     const body = document.querySelector<HTMLElement>('page-body');
     expect(body?.style.marginTop).toBe('0px');
     expect(body?.style.marginBottom).toBe('0px');

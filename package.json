@@ -1,6 +1,6 @@
 {
   "name": "declarative-pdf",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "A tool for generating PDF documents from declarative HTML templates",
   "keywords": [
     "pdf",
@@ -24,6 +24,9 @@
   "files": [
     "dist"
   ],
+  "engines": {
+    "node": ">=20.18"
+  },
   "author": "The Productive Company",
   "contributors": [
     "Tibor Rogulja"
@@ -34,12 +37,13 @@
     "url": "https://github.com/productiveio/declarative-pdf.git"
   },
   "scripts": {
-    "preinstall": "npx only-allow pnpm",
-    "start": "ts-node src/index.ts",
-    "create": "npm run build && npm run test",
-    "build": "rm -rf dist && tsup src/index.ts --format cjs,esm --dts --clean && cp shims/index.wrapper.cjs dist/",
+    "build": "pnpm run test && pnpm run build:lib",
+    "build:lib": "rm -rf dist && tsup src/index.ts --format cjs,esm --dts --clean && cp shims/index.wrapper.cjs dist/",
+    "examples": "node docs/examples/index.js",
     "lint": "eslint .",
-    "test": "node ./bin/check-canvas.cjs && jest"
+    "test": "node ./bin/check-canvas.cjs && jest",
+    "test:cov": "node ./bin/check-canvas.cjs && jest --coverage",
+    "test:ci": "jest --testPathIgnorePatterns=\"<rootDir>/test/visual.test.ts\""
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
@@ -54,9 +58,9 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "jest-ts-webcompat-resolver": "^1.0.0",
-    "jsdom": "^25.0.1",
+    "jsdom": "^26.0.0",
     "prettier": "^3.4.2",
-    "puppeteer": "^23.11.1",
+    "puppeteer": "^24.0.0",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",

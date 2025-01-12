@@ -2,12 +2,8 @@
  * @jest-environment jsdom
  */
 import evalTemplateSettings from '@app/evaluators/template-settings';
-import { PAPER_SIZE } from '@app/consts/paper-size';
-import {
-  DEFAULT_HEIGHT,
-  DEFAULT_WIDTH,
-  DEFAULT_PPI,
-} from '@app/utils/paper-defaults';
+import {PAPER_SIZE} from '@app/consts/paper-size';
+import {DEFAULT_HEIGHT, DEFAULT_WIDTH, DEFAULT_PPI} from '@app/utils/paper-defaults';
 
 const templateDefaults = {
   default: {
@@ -22,6 +18,13 @@ jest.mock('puppeteer');
 jest.mock('jsdom');
 
 describe('evalTemplateSettings', () => {
+  test('it returns empty array when no document-page elements are found', () => {
+    document.body.innerHTML = '';
+    const result = evalTemplateSettings(templateDefaults);
+
+    expect(result).toEqual([]);
+  });
+
   test('it works with valid document-page elements', () => {
     document.body.innerHTML = `
       <document-page format="letter"> ... </document-page>
@@ -38,6 +41,7 @@ describe('evalTemplateSettings', () => {
         height: 791,
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
+        hasSections: false,
       },
       {
         index: 1,
@@ -45,6 +49,7 @@ describe('evalTemplateSettings', () => {
         height: 3508,
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
+        hasSections: false,
       },
       {
         index: 2,
@@ -52,6 +57,7 @@ describe('evalTemplateSettings', () => {
         height: 800,
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
+        hasSections: false,
       },
       {
         index: 3,
@@ -59,6 +65,7 @@ describe('evalTemplateSettings', () => {
         height: 842,
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
+        hasSections: false,
       },
     ]);
   });
@@ -82,6 +89,7 @@ describe('evalTemplateSettings', () => {
         height: 842,
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
+        hasSections: false,
       },
       {
         index: 1,
@@ -89,6 +97,7 @@ describe('evalTemplateSettings', () => {
         height: 842,
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
+        hasSections: false,
       },
       {
         index: 2,
@@ -96,6 +105,7 @@ describe('evalTemplateSettings', () => {
         height: 842,
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
+        hasSections: false,
       },
       {
         index: 3,
@@ -103,6 +113,7 @@ describe('evalTemplateSettings', () => {
         height: 842,
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
+        hasSections: false,
       },
       {
         index: 4,
@@ -110,6 +121,7 @@ describe('evalTemplateSettings', () => {
         height: 842,
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
+        hasSections: false,
       },
       {
         index: 5,
@@ -117,6 +129,7 @@ describe('evalTemplateSettings', () => {
         height: 842,
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
+        hasSections: false,
       },
       {
         index: 6,
@@ -124,6 +137,7 @@ describe('evalTemplateSettings', () => {
         height: 842,
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
+        hasSections: false,
       },
     ]);
   });
@@ -141,6 +155,7 @@ describe('evalTemplateSettings', () => {
         height: 842,
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
+        hasSections: false,
       },
     ]);
   });
@@ -158,6 +173,7 @@ describe('evalTemplateSettings', () => {
         height: 600,
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
+        hasSections: false,
       },
     ]);
   });
@@ -175,6 +191,7 @@ describe('evalTemplateSettings', () => {
         height: 791,
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
+        hasSections: false,
       },
     ]);
   });
@@ -192,6 +209,7 @@ describe('evalTemplateSettings', () => {
         height: 800,
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
+        hasSections: false,
       },
     ]);
   });
@@ -214,6 +232,7 @@ describe('evalTemplateSettings', () => {
         height: 842,
         bodyMarginTop: 10,
         bodyMarginBottom: 20,
+        hasSections: false,
       },
       {
         index: 1,
@@ -221,6 +240,116 @@ describe('evalTemplateSettings', () => {
         height: 842,
         bodyMarginTop: 30,
         bodyMarginBottom: 40,
+        hasSections: false,
+      },
+    ]);
+  });
+
+  test('it correctly detects sections', () => {
+    document.body.innerHTML = `
+      <document-page>
+        <page-header> ... </page-header>
+        <page-footer> ... </page-footer>
+        <page-background> ... </page-background>
+        <page-body> ... </page-body>
+      </document-page>
+      <document-page>
+        <page-header> ... </page-header>
+        <page-footer> ... </page-footer>
+        <page-body> ... </page-body>
+      </document-page>
+      <document-page>
+        <page-header> ... </page-header>
+        <page-background> ... </page-background>
+        <page-body> ... </page-body>
+      </document-page>
+      <document-page>
+        <page-footer> ... </page-footer>
+        <page-background> ... </page-background>
+        <page-body> ... </page-body>
+      </document-page>
+      <document-page>
+        <page-header> ... </page-header>
+        <page-body> ... </page-body>
+      </document-page>
+      <document-page>
+        <page-footer> ... </page-footer>
+        <page-body> ... </page-body>
+      </document-page>
+      <document-page>
+        <page-background> ... </page-background>
+        <page-body> ... </page-body>
+      </document-page>
+      <document-page>
+        <page-body> ... </page-body>
+      </document-page>
+    `;
+    const result = evalTemplateSettings(templateDefaults);
+
+    expect(result).toEqual([
+      {
+        index: 0,
+        width: 595,
+        height: 842,
+        bodyMarginTop: 0,
+        bodyMarginBottom: 0,
+        hasSections: true,
+      },
+      {
+        index: 1,
+        width: 595,
+        height: 842,
+        bodyMarginTop: 0,
+        bodyMarginBottom: 0,
+        hasSections: true,
+      },
+      {
+        index: 2,
+        width: 595,
+        height: 842,
+        bodyMarginTop: 0,
+        bodyMarginBottom: 0,
+        hasSections: true,
+      },
+      {
+        index: 3,
+        width: 595,
+        height: 842,
+        bodyMarginTop: 0,
+        bodyMarginBottom: 0,
+        hasSections: true,
+      },
+      {
+        index: 4,
+        width: 595,
+        height: 842,
+        bodyMarginTop: 0,
+        bodyMarginBottom: 0,
+        hasSections: true,
+      },
+      {
+        index: 5,
+        width: 595,
+        height: 842,
+        bodyMarginTop: 0,
+        bodyMarginBottom: 0,
+        hasSections: true,
+      },
+      {
+        index: 6,
+        width: 595,
+        height: 842,
+        bodyMarginTop: 0,
+        bodyMarginBottom: 0,
+        hasSections: true,
+      },
+      {
+        index: 7,
+        width: 595,
+        height: 842,
+        bodyMarginTop: 0,
+        bodyMarginBottom: 0,
+        hasSections: false,
       },
     ]);
   });

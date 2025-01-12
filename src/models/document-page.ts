@@ -1,9 +1,14 @@
-import { PDFDocument } from 'pdf-lib';
-import { Layout } from '@app/models/layout';
+import {PDFDocument} from 'pdf-lib';
+import {BodyElement} from '@app/models/element';
+import {createPageLayoutSettings} from '@app/utils/layout/create-page-layout';
 
+import type TimeLogger from '@app/utils/debug/time-logger';
 import type DeclarativePDF from '@app/index';
+import type {SectionSettings} from '@app/evaluators/section-settings';
+import type {SectionElement} from '@app/models/element';
+import type {PageLayout} from '@app/utils/layout/create-page-layout';
 
-type DocumentPageOpts = {
+export type DocumentPageOpts = {
   parent: DeclarativePDF;
   /** index of document-page element in DOM */
   index: number;
@@ -15,19 +20,9 @@ type DocumentPageOpts = {
   bodyMarginTop: number;
   /** bottom margin of the page-body element */
   bodyMarginBottom: number;
+  /** do we have any sections other than page-body */
+  hasSections: boolean;
 };
-
-export type SectionMeta = {
-  sectionHeight: number;
-  sectionType: 'header' | 'footer' | 'background';
-  hasCurrentPageNumber: boolean;
-  hasTotalPagesNumber: boolean;
-};
-
-export type SectionVariantMeta = {
-  physicalPageIndex: number;
-  physicalPageType: 'first' | 'last' | 'even' | 'odd' | 'default';
-} & SectionMeta;
 
 export class DocumentPage {
   declare parent: DeclarativePDF;
@@ -36,9 +31,13 @@ export class DocumentPage {
   declare index: number;
   declare bodyMarginTop: number;
   declare bodyMarginBottom: number;
+  declare hasSections: boolean;
 
-  declare layout?: Layout;
-  declare body?: { buffer: Buffer; pdf: PDFDocument };
+  /** These two will exist after createLayoutAndBody() method */
+  declare layout?: PageLayout;
+  declare body?: BodyElement;
+
+  sectionElements: SectionElement[] = [];
 
   constructor(opts: DocumentPageOpts) {
     this.parent = opts.parent;
@@ -47,6 +46,7 @@ export class DocumentPage {
     this.height = opts.height;
     this.bodyMarginTop = opts.bodyMarginTop;
     this.bodyMarginBottom = opts.bodyMarginBottom;
+    this.hasSections = opts.hasSections;
   }
 
   get viewPort() {
@@ -63,79 +63,53 @@ export class DocumentPage {
   /**
    * Create the layout and body element.
    *
-   * This method creates the body PDF and sets the number
-   * of pages for this document-page.
+   * This method will figure out heights and positions of
+   * all existing elements on this page and create a body
+   * element which will, in turn, give us a total page
+   * count for this document page.
    *
-   * At this point, layout knows only of heights and what
-   * page elements exist. To finish the layouting, we need
-   * number of pages for this doc and total number of pages
-   * across all documentPage models
+   * We need to know the number of pages to be able to
+   * construct other elements that might need to display
+   * current page / total page number.
    */
-  async createLayoutAndBody(meta: (SectionMeta | SectionVariantMeta)[]) {
-    this.layout = new Layout(this, meta);
+  async createLayoutAndBody(sectionSettings?: SectionSettings, logger?: TimeLogger) {
+    this.layout = createPageLayoutSettings(sectionSettings, this.height, this.width);
 
-    await this.html.prepareSection({ documentPageIndex: this.index });
+    await this.html.prepareSection({documentPageIndex: this.index});
+
+    logger?.level3().start('[5.3.1] Print body to pdf buffer');
     const uint8Array = await this.html.pdf({
-      width: this.width,
-      height: this.layout.bodyHeight,
+      width: this.layout.width,
+      height: this.layout.body.height,
       margin: {
         top: this.bodyMarginTop,
         bottom: this.bodyMarginBottom,
       },
-      transparentBg: this.layout.hasBackgroundElement,
+      transparentBg: this.layout.body.transparentBg,
     });
+    logger?.level3().end();
+
     const buffer = Buffer.from(uint8Array);
+
+    logger?.level3().start('[5.3.2] Load body pdf as PDFDocument');
     const pdf = await PDFDocument.load(uint8Array);
+    logger?.level3().end();
+
     await this.html.resetVisibility();
 
-    this.body = { pdf, buffer };
+    this.layout.pageCount = pdf.getPageCount();
+    this.body = new BodyElement({
+      buffer,
+      pdf,
+      layout: this.layout.body,
+    });
   }
 
   get previousDocumentPages() {
     return this.parent.documentPages.slice(0, this.index);
   }
 
-  get pageCount() {
-    const count = this.body!.pdf.getPageCount();
-
-    if (count < 1) {
-      throw new Error(
-        `Body generated for document page ${this.index} has no pages`
-      );
-    }
-
-    return count;
-  }
-
   get pageCountOffset() {
-    const offset = this.previousDocumentPages.reduce(
-      (acc, doc) => acc + doc.pageCount,
-      0
-    );
-
-    if (offset < this.previousDocumentPages.length) {
-      throw new Error(
-        'Page count offset is less than number of document pages'
-      );
-    }
-
-    return offset;
-  }
-
-  get totalPagesNumber() {
-    return this.parent.totalPagesNumber;
-  }
-
-  async process() {
-    if (!this.layout) throw new Error('Layout is not initialized');
-    this.layout.createLayoutPages();
-
-    // there is nothing to process, so bail out
-    if (!this.layout.needsProcessing) return;
-
-    // process every page that needs processing in sequence
-    for (const page of this.layout.pagesForProcessing) {
-      await page.process();
-    }
+    return this.previousDocumentPages.reduce((acc, doc) => acc + doc.layout!.pageCount, 0);
   }
 }
