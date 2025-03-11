@@ -38,6 +38,8 @@ interface DeclarativePDFOpts {
   defaults?: PaperOpts;
   /** Debug options (attaches parts, logs timings) */
   debug?: DebugOptions;
+  /** Title of the document */
+  documentTitle?: string;
 }
 
 export default class DeclarativePDF {
@@ -45,6 +47,7 @@ export default class DeclarativePDF {
   declare defaults: PaperDefaults;
   declare normalize?: NormalizeOptions;
   declare debug: DebugOptions;
+  declare documentTitle: string;
 
   documentPages: DocumentPage[] = [];
 
@@ -58,6 +61,7 @@ export default class DeclarativePDF {
     this.defaults = new PaperDefaults(opts?.defaults);
     this.normalize = opts?.normalize;
     this.debug = opts?.debug ?? {};
+    this.documentTitle = opts?.documentTitle ?? 'document';
   }
 
   get totalPagesNumber() {
@@ -164,6 +168,8 @@ export default class DeclarativePDF {
           modificationDate: new Date(),
         });
       }
+
+      pdf.setTitle(this.documentTitle);
 
       return Buffer.from(await pdf.save());
     } catch (error) {

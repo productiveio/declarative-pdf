@@ -65,6 +65,9 @@ interface DeclarativePDFOpts {
     /** Attach generated PDF segments for debugging (default: false) */
     attachSegments?: boolean;
   };
+
+  /** Title of the document */
+  documentTitle?: string;
 }
 ```
 
