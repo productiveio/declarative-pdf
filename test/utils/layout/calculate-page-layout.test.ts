@@ -58,7 +58,7 @@ describe('calculatePageLayout', () => {
     const pageHeight = 1000;
 
     expect(() => calculatePageLayout(settings, pageHeight)).toThrow(
-      `Header/footer too big. Page height: 1000px, header: 1000px, footer: 1000px, body: -998px.`
+      'The header and footer are too large to fit on the page. Please reduce their size and try again.'
     );
   });
 

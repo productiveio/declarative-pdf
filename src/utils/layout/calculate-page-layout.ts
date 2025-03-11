@@ -19,11 +19,12 @@ export default function calculatePageLayout(
   const footerY = footerHeight ? -1 : 0;
   const bodyY = footerHeight - (pageHeight ? 1 : 0);
   const backgroundY = 0;
+  const BODY_HEIGHT_MIN_FACTOR = 0.25;
 
-  if (bodyHeight < pageHeight / 3) {
-    throw new Error(
-      `Header/footer too big. Page height: ${pageHeight}px, header: ${headerHeight}px, footer: ${footerHeight}px, body: ${bodyHeight}px.`
-    );
+  if (bodyHeight < pageHeight * BODY_HEIGHT_MIN_FACTOR) {
+    throw new Error('The header and footer are too large to fit on the page. Please reduce their size and try again.', {
+      cause: `Page height: ${pageHeight}px, header: ${headerHeight}px, footer: ${footerHeight}px, body: ${bodyHeight}px`,
+    });
   }
 
   return {
