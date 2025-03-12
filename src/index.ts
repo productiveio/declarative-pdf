@@ -199,8 +199,7 @@ export default class DeclarativePDF {
         });
       }
 
-      // Set all metadata fields if provided
-      this.setDocumentMetadata(pdf);
+      if (this.documentMeta) this.setDocumentMetadata(pdf);
 
       return Buffer.from(await pdf.save());
     } catch (error) {
