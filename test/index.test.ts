@@ -6,7 +6,6 @@ import puppeteer, {type Browser, type Page} from 'puppeteer';
 import DeclarativePDF from '@app/index';
 import HTMLAdapter from '@app/utils/adapter-puppeteer';
 import {PaperDefaults} from '@app/utils/paper-defaults';
-import {PDFDocument} from 'pdf-lib';
 
 describe('DeclarativePDF', () => {
   let browser: Browser;
@@ -172,18 +171,5 @@ describe('DeclarativePDF', () => {
     const buffer2 = await pdf.generate(page2);
     await page2.close();
     expect(buffer2).toBeInstanceOf(Buffer);
-  });
-
-  test('initializes with a custom document title', async () => {
-    const customTitle = 'Test Document Title';
-    const pdf = new DeclarativePDF(browser, {
-      documentTitle: customTitle,
-    });
-
-    const buffer = await pdf.generate(testHtml);
-
-    const generatedPdf = await PDFDocument.load(buffer);
-
-    expect(generatedPdf.getTitle()).toBe(customTitle);
   });
 });

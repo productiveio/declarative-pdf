@@ -25,6 +25,29 @@ constructor(browser: MinimumBrowser, opts?: DeclarativePDFOpts)
 - `opts` - optional configuration object
 
 ```typescript
+export interface DocumentMeta {
+  title?: string;
+  author?: string;
+  subject?: string;
+  keywords?: string[];
+  producer?: string;
+  creator?: string;
+  creationDate?: Date;
+  modificationDate?: Date;
+}
+
+export interface DocumentOptions {
+  /** If exists, will be used to set available metadata fields on the pdf document */
+  meta?: DocumentMeta;
+  /**
+   * Controls the minimum space the body section must occupy on each page.
+   * Value is a decimal factor of the total page height (0.0 to 1.0).
+   * - Default: 1/3 (a third of the page)
+   * - Example: 0.25 means body must be at least 25% of page height
+   */
+  bodyHeightMinimumFactor?: number;
+}
+
 interface DeclarativePDFOpts {
   /** Normalize HTML content options */
   normalize?: {
@@ -66,8 +89,8 @@ interface DeclarativePDFOpts {
     attachSegments?: boolean;
   };
 
-  /** Title of the document */
-  documentTitle?: string;
+  /** Override for pdf document metadata and rules */
+  document?: DocumentOptions;
 }
 ```
 
@@ -115,6 +138,7 @@ import DeclarativePDF from 'declarative-pdf';
 const browser = await puppeteer.launch();
 const pdf = new DeclarativePDF(browser, {
   debug: {timeLog: true},
+  document: {meta: {title: 'Document title'}}
 });
 
 // From string

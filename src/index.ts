@@ -31,6 +31,29 @@ export interface NormalizeOptions {
   normalizeDocumentPage?: boolean;
 }
 
+export interface DocumentMeta {
+  title?: string;
+  author?: string;
+  subject?: string;
+  keywords?: string[];
+  producer?: string;
+  creator?: string;
+  creationDate?: Date;
+  modificationDate?: Date;
+}
+
+export interface DocumentOptions {
+  /** If exists, will be used to set available metadata fields on the pdf document */
+  meta?: DocumentMeta;
+  /**
+   * Controls the minimum space the body section must occupy on each page.
+   * Value is a decimal factor of the total page height (0.0 to 1.0).
+   * - Default: 1/3 (a third of the page)
+   * - Example: 0.25 means body must be at least 25% of page height
+   */
+  bodyHeightMinimumFactor?: number;
+}
+
 interface DeclarativePDFOpts {
   /** Should we normalize the content (remove excess elements, set some defaults...) */
   normalize?: NormalizeOptions;
@@ -38,8 +61,8 @@ interface DeclarativePDFOpts {
   defaults?: PaperOpts;
   /** Debug options (attaches parts, logs timings) */
   debug?: DebugOptions;
-  /** Title of the document */
-  documentTitle?: string;
+  /** Override for pdf document metadata and rules */
+  document?: DocumentOptions;
 }
 
 export default class DeclarativePDF {
@@ -47,7 +70,7 @@ export default class DeclarativePDF {
   declare defaults: PaperDefaults;
   declare normalize?: NormalizeOptions;
   declare debug: DebugOptions;
-  declare documentTitle: string;
+  declare documentMeta?: DocumentMeta;
 
   documentPages: DocumentPage[] = [];
 
@@ -61,7 +84,8 @@ export default class DeclarativePDF {
     this.defaults = new PaperDefaults(opts?.defaults);
     this.normalize = opts?.normalize;
     this.debug = opts?.debug ?? {};
-    this.documentTitle = opts?.documentTitle ?? 'document';
+
+    if (opts?.document?.meta) this.documentMeta = opts.document.meta;
   }
 
   get totalPagesNumber() {
@@ -124,6 +148,12 @@ export default class DeclarativePDF {
        * resulting PDF will be the same as the body buffer.
        */
       if (this.documentPages.length === 1 && !this.documentPages[0].hasSections) {
+        if (this.documentMeta) {
+          const pdf = await PDFDocument.load(this.documentPages[0].body!.buffer);
+          this.setDocumentMetadata(pdf);
+          return Buffer.from(await pdf.save());
+        }
+
         return this.documentPages[0].body!.buffer;
       }
 
@@ -169,7 +199,8 @@ export default class DeclarativePDF {
         });
       }
 
-      pdf.setTitle(this.documentTitle);
+      // Set all metadata fields if provided
+      this.setDocumentMetadata(pdf);
 
       return Buffer.from(await pdf.save());
     } catch (error) {
@@ -255,5 +286,25 @@ export default class DeclarativePDF {
     }
 
     return outputPDF;
+  }
+
+  private setDocumentMetadata(pdf: PDFDocument): void {
+    if (!this.documentMeta) return;
+
+    Object.entries(this.documentMeta).forEach(([key, value]) => {
+      this.setMetadataField(pdf, key as keyof DocumentMeta, value);
+    });
+  }
+
+  private setMetadataField<K extends keyof DocumentMeta>(pdf: PDFDocument, key: K, value: DocumentMeta[K]): void {
+    if (value === undefined) return;
+
+    type PDFSetterKey = `set${Capitalize<K>}`;
+
+    const setterKey = `set${key.charAt(0).toUpperCase()}${key.slice(1)}` as PDFSetterKey;
+
+    if (setterKey in pdf && typeof pdf[setterKey as keyof PDFDocument] === 'function') {
+      (pdf[setterKey as keyof PDFDocument] as (arg: DocumentMeta[K]) => void)(value);
+    }
   }
 }
