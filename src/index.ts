@@ -71,7 +71,7 @@ export default class DeclarativePDF {
   declare defaults: PaperDefaults;
   declare normalize?: NormalizeOptions;
   declare debug: DebugOptions;
-  declare documentMeta?: Partial<DocumentMeta>;
+  declare documentOptions?: DocumentOptions;
 
   documentPages: DocumentPage[] = [];
 
@@ -85,8 +85,7 @@ export default class DeclarativePDF {
     this.defaults = new PaperDefaults(opts?.defaults);
     this.normalize = opts?.normalize;
     this.debug = opts?.debug ?? {};
-
-    if (opts?.document?.meta) this.documentMeta = opts.document.meta;
+    this.documentOptions = opts?.document;
   }
 
   get totalPagesNumber() {
@@ -149,9 +148,10 @@ export default class DeclarativePDF {
        * resulting PDF will be the same as the body buffer.
        */
       if (this.documentPages.length === 1 && !this.documentPages[0].hasSections) {
-        if (this.documentMeta) {
+        const meta = this.documentOptions?.meta;
+        if (meta) {
           const pdf = await PDFDocument.load(this.documentPages[0].body!.buffer);
-          setDocumentMetadata(pdf, this.documentMeta);
+          setDocumentMetadata(pdf, meta);
           return Buffer.from(await pdf.save());
         }
 
@@ -199,8 +199,6 @@ export default class DeclarativePDF {
           modificationDate: new Date(),
         });
       }
-
-      if (this.documentMeta) setDocumentMetadata(pdf, this.documentMeta);
 
       return Buffer.from(await pdf.save());
     } catch (error) {
@@ -284,6 +282,9 @@ export default class DeclarativePDF {
         attachSegmentsForDebugging: this.debug.attachSegments,
       });
     }
+
+    const meta = this.documentOptions?.meta;
+    if (meta) setDocumentMetadata(outputPDF, meta);
 
     return outputPDF;
   }

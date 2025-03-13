@@ -3,7 +3,7 @@ import {selectSection} from '@app/utils/select-section';
 import {SectionElement} from '@app/models/element';
 
 import type {PDFPage} from 'pdf-lib';
-import type {PageLayout} from '@app/utils/layout/create-page-layout';
+import type {PageLayout} from '@app/utils/layout/create-page-layout-settings';
 import type {SectionSetting} from '@app/evaluators/section-settings';
 import type {BodyElement} from '@app/models/element';
 import type HTMLAdapter from '@app/utils/adapter-puppeteer';

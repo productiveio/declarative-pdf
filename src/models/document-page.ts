@@ -1,12 +1,12 @@
 import {PDFDocument} from 'pdf-lib';
 import {BodyElement} from '@app/models/element';
-import {createPageLayoutSettings} from '@app/utils/layout/create-page-layout';
+import {createPageLayoutSettings} from '@app/utils/layout/create-page-layout-settings';
 
 import type TimeLogger from '@app/utils/debug/time-logger';
 import type DeclarativePDF from '@app/index';
 import type {SectionSettings} from '@app/evaluators/section-settings';
 import type {SectionElement} from '@app/models/element';
-import type {PageLayout} from '@app/utils/layout/create-page-layout';
+import type {PageLayout} from '@app/utils/layout/create-page-layout-settings';
 
 export type DocumentPageOpts = {
   parent: DeclarativePDF;

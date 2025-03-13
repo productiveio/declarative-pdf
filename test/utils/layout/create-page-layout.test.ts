@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-import {createPageLayoutSettings} from '@app/utils/layout/create-page-layout';
+import {createPageLayoutSettings} from '@app/utils/layout/create-page-layout-settings';
 import type {SectionSetting, SectionSettings} from '@app/evaluators/section-settings';
 
 describe('createPageLayoutSettings', () => {

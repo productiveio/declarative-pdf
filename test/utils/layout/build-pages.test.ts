@@ -4,7 +4,7 @@
 import {PDFDocument} from 'pdf-lib';
 import {BodyElement} from '@app/models/element';
 import {buildPages} from '@app/utils/layout/build-pages';
-import {createPageLayoutSettings} from '@app/utils/layout/create-page-layout';
+import {createPageLayoutSettings} from '@app/utils/layout/create-page-layout-settings';
 
 import type {SectionSetting} from '@app/evaluators/section-settings';
 import type HTMLAdapter from '@app/utils/adapter-puppeteer';
