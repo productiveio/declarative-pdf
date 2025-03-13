@@ -51,6 +51,7 @@ interface MockLayoutOpts {
   };
   height?: number;
   width?: number;
+  bodyHeightMinimumFactor?: number;
   pageCount?: number;
 }
 
@@ -98,8 +99,11 @@ describe('buildPages', () => {
         backgrounds: [],
         ...opts?.settings,
       },
-      opts?.height ?? 200,
-      opts?.width ?? 200
+      {
+        pageHeight: opts?.height ?? 200,
+        pageWidth: opts?.width ?? 200,
+        bodyHeightMinimumFactor: opts?.bodyHeightMinimumFactor ?? 1 / 3,
+      }
     );
     if (opts?.pageCount) layout.pageCount = opts.pageCount;
     return layout;

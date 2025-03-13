@@ -73,7 +73,13 @@ export class DocumentPage {
    * current page / total page number.
    */
   async createLayoutAndBody(sectionSettings?: SectionSettings, logger?: TimeLogger) {
-    this.layout = createPageLayoutSettings(sectionSettings, this.height, this.width);
+    const layoutOpts = {
+      pageHeight: this.height,
+      pageWidth: this.width,
+      bodyHeightMinimumFactor: this.parent.documentOptions?.bodyHeightMinimumFactor ?? 1 / 3,
+    };
+
+    this.layout = createPageLayoutSettings(sectionSettings, layoutOpts);
 
     await this.html.prepareSection({documentPageIndex: this.index});
 
