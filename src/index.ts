@@ -5,6 +5,7 @@ import {PaperDefaults, type PaperOpts} from '@app/utils/paper-defaults';
 import HTMLAdapter, {type MinimumBrowser, type MinimumPage} from '@app/utils/adapter-puppeteer';
 import TimeLogger from '@app/utils/debug/time-logger';
 import {buildPages} from '@app/utils/layout/build-pages';
+import {setDocumentMetadata} from '@app/utils/set-document-metadata';
 import {version} from '../package.json';
 
 interface DebugOptions {
@@ -32,19 +33,19 @@ export interface NormalizeOptions {
 }
 
 export interface DocumentMeta {
-  title?: string;
-  author?: string;
-  subject?: string;
-  keywords?: string[];
-  producer?: string;
-  creator?: string;
-  creationDate?: Date;
-  modificationDate?: Date;
+  title: string;
+  author: string;
+  subject: string;
+  keywords: string[];
+  producer: string;
+  creator: string;
+  creationDate: Date;
+  modificationDate: Date;
 }
 
 export interface DocumentOptions {
   /** If exists, will be used to set available metadata fields on the pdf document */
-  meta?: DocumentMeta;
+  meta?: Partial<DocumentMeta>;
   /**
    * Controls the minimum space the body section must occupy on each page.
    * Value is a decimal factor of the total page height (0.0 to 1.0).
@@ -70,7 +71,7 @@ export default class DeclarativePDF {
   declare defaults: PaperDefaults;
   declare normalize?: NormalizeOptions;
   declare debug: DebugOptions;
-  declare documentMeta?: DocumentMeta;
+  declare documentMeta?: Partial<DocumentMeta>;
 
   documentPages: DocumentPage[] = [];
 
@@ -150,7 +151,7 @@ export default class DeclarativePDF {
       if (this.documentPages.length === 1 && !this.documentPages[0].hasSections) {
         if (this.documentMeta) {
           const pdf = await PDFDocument.load(this.documentPages[0].body!.buffer);
-          this.setDocumentMetadata(pdf);
+          setDocumentMetadata(pdf, this.documentMeta);
           return Buffer.from(await pdf.save());
         }
 
@@ -199,7 +200,7 @@ export default class DeclarativePDF {
         });
       }
 
-      if (this.documentMeta) this.setDocumentMetadata(pdf);
+      if (this.documentMeta) setDocumentMetadata(pdf, this.documentMeta);
 
       return Buffer.from(await pdf.save());
     } catch (error) {
@@ -285,25 +286,5 @@ export default class DeclarativePDF {
     }
 
     return outputPDF;
-  }
-
-  private setDocumentMetadata(pdf: PDFDocument): void {
-    if (!this.documentMeta) return;
-
-    Object.entries(this.documentMeta).forEach(([key, value]) => {
-      this.setMetadataField(pdf, key as keyof DocumentMeta, value);
-    });
-  }
-
-  private setMetadataField<K extends keyof DocumentMeta>(pdf: PDFDocument, key: K, value: DocumentMeta[K]): void {
-    if (value === undefined) return;
-
-    type PDFSetterKey = `set${Capitalize<K>}`;
-
-    const setterKey = `set${key.charAt(0).toUpperCase()}${key.slice(1)}` as PDFSetterKey;
-
-    if (setterKey in pdf && typeof pdf[setterKey as keyof PDFDocument] === 'function') {
-      (pdf[setterKey as keyof PDFDocument] as (arg: DocumentMeta[K]) => void)(value);
-    }
   }
 }
