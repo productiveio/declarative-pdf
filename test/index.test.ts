@@ -6,6 +6,7 @@ import puppeteer, {type Browser, type Page} from 'puppeteer';
 import DeclarativePDF from '@app/index';
 import HTMLAdapter from '@app/utils/adapter-puppeteer';
 import {PaperDefaults} from '@app/utils/paper-defaults';
+import * as setDocumentMetadataModule from '@app/utils/set-document-metadata';
 
 describe('DeclarativePDF', () => {
   let browser: Browser;
@@ -130,6 +131,27 @@ describe('DeclarativePDF', () => {
     expect(buffer).toBeInstanceOf(Buffer);
   });
 
+  test('builds a PDF from body only with metadata', async () => {
+    const testDate = new Date('2025-01-01');
+    const pdf = new DeclarativePDF(browser, {
+      document: {
+        meta: {
+          title: 'Test Title',
+          author: 'Test Author',
+          subject: 'Test Subject',
+          keywords: ['keyword1', 'keyword2'],
+          producer: 'Test Producer',
+          creator: 'Test Creator',
+          creationDate: testDate,
+          modificationDate: testDate,
+        },
+      },
+    });
+
+    const buffer = await pdf.generate('<html><body><h1>Test</h1></body></html>');
+    expect(buffer).toBeInstanceOf(Buffer);
+  });
+
   test('throws an error if the browser is faulty', () => {
     const fakeBrowser = {} as unknown as Browser;
     const pdf = new DeclarativePDF(fakeBrowser);
@@ -171,5 +193,68 @@ describe('DeclarativePDF', () => {
     const buffer2 = await pdf.generate(page2);
     await page2.close();
     expect(buffer2).toBeInstanceOf(Buffer);
+  });
+
+  test('sets document metadata when provided', async () => {
+    const testDate = new Date('2025-01-01');
+    const pdf = new DeclarativePDF(browser, {
+      document: {
+        meta: {
+          title: 'Test Title',
+          author: 'Test Author',
+          subject: 'Test Subject',
+          keywords: ['keyword1', 'keyword2'],
+          producer: 'Test Producer',
+          creator: 'Test Creator',
+          creationDate: testDate,
+          modificationDate: testDate,
+        },
+      },
+    });
+
+    const setMetadataSpy = jest.spyOn(setDocumentMetadataModule, 'setDocumentMetadata');
+
+    const buffer = await pdf.generate(testHtml);
+    expect(buffer).toBeInstanceOf(Buffer);
+    expect(setMetadataSpy).toHaveBeenCalledWith(
+      expect.any(Object), // PDF document
+      expect.objectContaining({
+        title: 'Test Title',
+        author: 'Test Author',
+      })
+    );
+
+    setMetadataSpy.mockRestore();
+  });
+
+  test('throws error when header/footer are too large with small bodyHeightMinimumFactor', async () => {
+    const largeHeaderFooterHtml = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            page-header, page-footer {
+              display: block;
+              height: 600px;
+            }
+          </style>
+        </head>
+        <body>
+          <document-page format="a4">
+            <page-header>Huge Header</page-header>
+            <page-body>Small Body</page-body>
+            <page-footer>Huge Footer</page-footer>
+          </document-page>
+        </body>
+      </html>
+    `;
+
+    const pdf = new DeclarativePDF(browser, {
+      document: {
+        bodyHeightMinimumFactor: 0.5,
+      },
+    });
+
+    await expect(pdf.generate(largeHeaderFooterHtml)).rejects.toThrow(/Header\/footer too big/);
   });
 });
