@@ -5,6 +5,7 @@ import {PaperDefaults, type PaperOpts} from '@app/utils/paper-defaults';
 import HTMLAdapter, {type MinimumBrowser, type MinimumPage} from '@app/utils/adapter-puppeteer';
 import TimeLogger from '@app/utils/debug/time-logger';
 import {buildPages} from '@app/utils/layout/build-pages';
+import {setDocumentMetadata} from '@app/utils/set-document-metadata';
 import {version} from '../package.json';
 
 interface DebugOptions {
@@ -31,6 +32,29 @@ export interface NormalizeOptions {
   normalizeDocumentPage?: boolean;
 }
 
+export interface DocumentMeta {
+  title: string;
+  author: string;
+  subject: string;
+  keywords: string[];
+  producer: string;
+  creator: string;
+  creationDate: Date;
+  modificationDate: Date;
+}
+
+export interface DocumentOptions {
+  /** If exists, will be used to set available metadata fields on the pdf document */
+  meta?: Partial<DocumentMeta>;
+  /**
+   * Controls the minimum space the body section must occupy on each page.
+   * Value is a decimal factor of the total page height (0.0 to 1.0).
+   * - Default: 1/3 (a third of the page)
+   * - Example: 0.25 means body must be at least 25% of page height
+   */
+  bodyHeightMinimumFactor?: number;
+}
+
 interface DeclarativePDFOpts {
   /** Should we normalize the content (remove excess elements, set some defaults...) */
   normalize?: NormalizeOptions;
@@ -38,6 +62,8 @@ interface DeclarativePDFOpts {
   defaults?: PaperOpts;
   /** Debug options (attaches parts, logs timings) */
   debug?: DebugOptions;
+  /** Override for pdf document metadata and rules */
+  document?: DocumentOptions;
 }
 
 export default class DeclarativePDF {
@@ -45,6 +71,7 @@ export default class DeclarativePDF {
   declare defaults: PaperDefaults;
   declare normalize?: NormalizeOptions;
   declare debug: DebugOptions;
+  declare documentOptions?: DocumentOptions;
 
   documentPages: DocumentPage[] = [];
 
@@ -58,6 +85,7 @@ export default class DeclarativePDF {
     this.defaults = new PaperDefaults(opts?.defaults);
     this.normalize = opts?.normalize;
     this.debug = opts?.debug ?? {};
+    this.documentOptions = opts?.document;
   }
 
   get totalPagesNumber() {
@@ -120,6 +148,13 @@ export default class DeclarativePDF {
        * resulting PDF will be the same as the body buffer.
        */
       if (this.documentPages.length === 1 && !this.documentPages[0].hasSections) {
+        const meta = this.documentOptions?.meta;
+        if (meta) {
+          const pdf = await PDFDocument.load(this.documentPages[0].body!.buffer);
+          setDocumentMetadata(pdf, meta);
+          return Buffer.from(await pdf.save());
+        }
+
         return this.documentPages[0].body!.buffer;
       }
 
@@ -247,6 +282,9 @@ export default class DeclarativePDF {
         attachSegmentsForDebugging: this.debug.attachSegments,
       });
     }
+
+    const meta = this.documentOptions?.meta;
+    if (meta) setDocumentMetadata(outputPDF, meta);
 
     return outputPDF;
   }

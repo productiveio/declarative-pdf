@@ -28,12 +28,17 @@ export interface PageLayout {
   background?: SectionLayout;
 }
 
+interface CreatePageLayoutSettingsOpts {
+  pageHeight: number;
+  pageWidth: number;
+  bodyHeightMinimumFactor: number;
+}
+
 export function createPageLayoutSettings(
-  sectionSettings?: SectionSettings,
-  pageHeight: number = 0,
-  pageWidth: number = 0
+  sectionSettings: SectionSettings | undefined,
+  opts: CreatePageLayoutSettingsOpts
 ): PageLayout {
-  const pageLayout = calculatePageLayout(sectionSettings, pageHeight, pageWidth);
+  const pageLayout = calculatePageLayout(sectionSettings, opts);
   const transparentBg = !!sectionSettings?.backgrounds.length;
 
   const {headers = [], footers = [], backgrounds = []} = sectionSettings ?? {};
@@ -41,8 +46,8 @@ export function createPageLayoutSettings(
   const hasAnySection = !!(headers.length || footers.length || backgrounds.length);
 
   return {
-    height: pageHeight,
-    width: pageWidth,
+    height: opts.pageHeight,
+    width: opts.pageWidth,
     hasPageNumbers: hasPageNumbers(sectionSettings),
     hasAnySection,
     pageCount: 0,

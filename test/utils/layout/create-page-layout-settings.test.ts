@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-import {createPageLayoutSettings} from '@app/utils/layout/create-page-layout';
+import {createPageLayoutSettings} from '@app/utils/layout/create-page-layout-settings';
 import type {SectionSetting, SectionSettings} from '@app/evaluators/section-settings';
 
 describe('createPageLayoutSettings', () => {
@@ -9,6 +9,16 @@ describe('createPageLayoutSettings', () => {
     headers: [],
     footers: [],
     backgrounds: [],
+  });
+
+  const makeLayoutOpts = (opts?: {
+    height?: number;
+    width?: number;
+    factor?: number;
+  }): {pageHeight: number; pageWidth: number; bodyHeightMinimumFactor: number} => ({
+    pageHeight: opts?.height ?? 1000,
+    pageWidth: opts?.width ?? 500,
+    bodyHeightMinimumFactor: opts?.factor ?? 1 / 3,
   });
 
   const makeSectionSetting = (props: Partial<SectionSetting> = {}): SectionSetting => ({
@@ -20,7 +30,7 @@ describe('createPageLayoutSettings', () => {
 
   test('creates basic layout with empty sections', () => {
     const settings = makeBasicSettings();
-    const result = createPageLayoutSettings(settings, 1000, 500);
+    const result = createPageLayoutSettings(settings, makeLayoutOpts());
 
     expect(result).toEqual({
       height: 1000,
@@ -48,7 +58,7 @@ describe('createPageLayoutSettings', () => {
       backgrounds: [makeSectionSetting()],
     };
 
-    const result = createPageLayoutSettings(settings, 1000, 500);
+    const result = createPageLayoutSettings(settings, makeLayoutOpts());
 
     expect(result).toEqual({
       height: 1000,
@@ -90,7 +100,7 @@ describe('createPageLayoutSettings', () => {
       backgrounds: [],
     };
 
-    const result = createPageLayoutSettings(settings, 1000, 500);
+    const result = createPageLayoutSettings(settings, makeLayoutOpts());
 
     expect(result.hasPageNumbers).toBe(true);
     expect(result.hasAnySection).toBe(true);
@@ -106,7 +116,7 @@ describe('createPageLayoutSettings', () => {
       backgrounds: [makeSectionSetting()],
     };
 
-    const result = createPageLayoutSettings(settings, 1000, 500);
+    const result = createPageLayoutSettings(settings, makeLayoutOpts());
 
     expect(result.header?.transparentBg).toBe(true);
     expect(result.footer?.transparentBg).toBe(true);
@@ -120,7 +130,7 @@ describe('createPageLayoutSettings', () => {
       backgrounds: [makeSectionSetting({height: 1000})],
     };
 
-    const result = createPageLayoutSettings(settings, 1000, 500);
+    const result = createPageLayoutSettings(settings, makeLayoutOpts());
 
     expect(result.header?.height).toBe(200);
     expect(result.header?.y).toBe(800); // 1000 - 200
@@ -141,7 +151,7 @@ describe('createPageLayoutSettings', () => {
       backgrounds: [backgroundSetting],
     };
 
-    const result = createPageLayoutSettings(settings, 1000, 500);
+    const result = createPageLayoutSettings(settings, makeLayoutOpts());
 
     expect(result.header?.settings).toEqual([headerSetting]);
     expect(result.footer?.settings).toEqual([footerSetting]);
@@ -149,7 +159,7 @@ describe('createPageLayoutSettings', () => {
   });
 
   test('creates zero layout when no settings are provided', () => {
-    const result = createPageLayoutSettings();
+    const result = createPageLayoutSettings(undefined, makeLayoutOpts({height: 0, width: 0}));
 
     expect(result).toEqual({
       height: 0,

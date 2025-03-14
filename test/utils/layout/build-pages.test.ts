@@ -4,7 +4,7 @@
 import {PDFDocument} from 'pdf-lib';
 import {BodyElement} from '@app/models/element';
 import {buildPages} from '@app/utils/layout/build-pages';
-import {createPageLayoutSettings} from '@app/utils/layout/create-page-layout';
+import {createPageLayoutSettings} from '@app/utils/layout/create-page-layout-settings';
 
 import type {SectionSetting} from '@app/evaluators/section-settings';
 import type HTMLAdapter from '@app/utils/adapter-puppeteer';
@@ -51,6 +51,7 @@ interface MockLayoutOpts {
   };
   height?: number;
   width?: number;
+  bodyHeightMinimumFactor?: number;
   pageCount?: number;
 }
 
@@ -98,8 +99,11 @@ describe('buildPages', () => {
         backgrounds: [],
         ...opts?.settings,
       },
-      opts?.height ?? 200,
-      opts?.width ?? 200
+      {
+        pageHeight: opts?.height ?? 200,
+        pageWidth: opts?.width ?? 200,
+        bodyHeightMinimumFactor: opts?.bodyHeightMinimumFactor ?? 1 / 3,
+      }
     );
     if (opts?.pageCount) layout.pageCount = opts.pageCount;
     return layout;
