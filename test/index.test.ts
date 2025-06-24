@@ -8,6 +8,8 @@ import HTMLAdapter from '@app/utils/adapter-puppeteer';
 import {PaperDefaults} from '@app/utils/paper-defaults';
 import * as setDocumentMetadataModule from '@app/utils/set-document-metadata';
 
+const MINUTE = 60 * 1000;
+
 describe('DeclarativePDF', () => {
   let browser: Browser;
   let testHtml: string;
@@ -19,7 +21,7 @@ describe('DeclarativePDF', () => {
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security', '--font-render-hinting=none'],
     });
     testHtml = fs.readFileSync('./test/examples/standard.html', {encoding: 'utf8'});
-  });
+  }, MINUTE);
 
   afterAll(async () => {
     await browser.close();
