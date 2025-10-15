@@ -69,7 +69,7 @@ const pageTestRunner = async (htmlPath: string, pdfName: string) => {
 
   expect(result?.status).toBe('passed');
   await page.close();
-}
+};
 
 let browser: Browser;
 
