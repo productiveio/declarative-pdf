@@ -19,7 +19,6 @@ afterAll(async () => {
   await browser.close();
 });
 
-
 describe('HTMLAdapter', () => {
   let mockPage: jest.Mocked<MinimumPage>;
   let mockBrowser: jest.Mocked<MinimumBrowser>;
