@@ -5,7 +5,7 @@ import evalTemplateNormalize from '@app/evaluators/template-normalize';
 import evalTemplateSettings from '@app/evaluators/template-settings';
 import evalResetVisibility from '@app/evaluators/reset-visibility';
 
-import type {Browser, Page} from 'puppeteer';
+import type {Browser, Page, HTTPRequest, HTTPResponse} from 'puppeteer';
 import type {PrepareSection} from '@app/evaluators/prepare-section';
 import type {NormalizeOptions} from '@app/index';
 
@@ -22,7 +22,63 @@ export type MinimumPage = {
   pdf: AnyFunction;
   close: AnyFunction;
   isClosed: AnyFunction;
+  on?: AnyFunction;
+  off?: AnyFunction;
 };
+
+interface TrackedRequest {
+  url: string;
+  method: string;
+  startTime: number;
+  endTime?: number;
+  status?: 'pending' | 'completed' | 'failed';
+  statusCode?: number;
+  failureReason?: string;
+}
+
+function formatNetworkReport(requests: Map<string, TrackedRequest>): string {
+  const pending: TrackedRequest[] = [];
+  const completed: TrackedRequest[] = [];
+  const failed: TrackedRequest[] = [];
+  const now = Date.now();
+
+  for (const req of requests.values()) {
+    if (req.status === 'pending') pending.push(req);
+    else if (req.status === 'completed') completed.push(req);
+    else if (req.status === 'failed') failed.push(req);
+  }
+
+  const lines: string[] = ['', '=== Network Request Report ===', ''];
+
+  if (pending.length > 0) {
+    lines.push(`PENDING REQUESTS (${pending.length}):`);
+    for (const req of pending) {
+      const elapsed = now - req.startTime;
+      lines.push(`  - [${req.method}] ${req.url} (waiting ${elapsed}ms)`);
+    }
+    lines.push('');
+  }
+
+  if (failed.length > 0) {
+    lines.push(`FAILED REQUESTS (${failed.length}):`);
+    for (const req of failed) {
+      lines.push(`  - [${req.method}] ${req.url} - ${req.failureReason || 'unknown error'}`);
+    }
+    lines.push('');
+  }
+
+  if (completed.length > 0) {
+    lines.push(`COMPLETED REQUESTS (${completed.length}):`);
+    for (const req of completed) {
+      const duration = (req.endTime || now) - req.startTime;
+      lines.push(`  - [${req.method}] ${req.url} (${duration}ms, status: ${req.statusCode})`);
+    }
+    lines.push('');
+  }
+
+  lines.push('=== End Report ===', '');
+  return lines.join('\n');
+}
 
 export default class HTMLAdapter {
   declare private _browser?: MinimumBrowser;
@@ -66,10 +122,84 @@ export default class HTMLAdapter {
     this._page = undefined;
   }
 
-  setContent(content: string) {
-    return this.page.setContent(content, {
-      waitUntil: ['load', 'networkidle0'],
-    });
+  async setContent(content: string) {
+    const page = this.page;
+
+    // Only track requests if the page supports event listeners
+    if (!page.on || !page.off) {
+      return page.setContent(content, {
+        waitUntil: ['load', 'networkidle0'],
+      });
+    }
+
+    const requests = new Map<string, TrackedRequest>();
+
+    const onRequest = (request: HTTPRequest) => {
+      const id = `${request.method()}-${request.url()}`;
+      requests.set(id, {
+        url: request.url(),
+        method: request.method(),
+        startTime: Date.now(),
+        status: 'pending',
+      });
+    };
+
+    const onResponse = (response: HTTPResponse) => {
+      const request = response.request();
+      const id = `${request.method()}-${request.url()}`;
+      const tracked = requests.get(id);
+      if (tracked) {
+        tracked.status = 'completed';
+        tracked.endTime = Date.now();
+        tracked.statusCode = response.status();
+      }
+    };
+
+    const onRequestFailed = (request: HTTPRequest) => {
+      const id = `${request.method()}-${request.url()}`;
+      const tracked = requests.get(id);
+      if (tracked) {
+        tracked.status = 'failed';
+        tracked.endTime = Date.now();
+        tracked.failureReason = request.failure()?.errorText || 'unknown';
+      }
+    };
+
+    page.on('request', onRequest);
+    page.on('response', onResponse);
+    page.on('requestfailed', onRequestFailed);
+
+    try {
+      await page.setContent(content, {
+        waitUntil: ['load', 'networkidle0'],
+      });
+    } catch (error) {
+      const report = formatNetworkReport(requests);
+      console.error('setContent failed with error:', (error as Error).message);
+      console.error(report);
+
+      // Enhance error message with summary
+      const pending = [...requests.values()].filter((r) => r.status === 'pending');
+      const failed = [...requests.values()].filter((r) => r.status === 'failed');
+
+      const enhancedMessage = [
+        (error as Error).message,
+        `Network: ${pending.length} pending, ${failed.length} failed`,
+        pending.length > 0 ? `Pending: ${pending.map((r) => r.url).join(', ')}` : '',
+        failed.length > 0 ? `Failed: ${failed.map((r) => `${r.url} (${r.failureReason})`).join(', ')}` : '',
+      ]
+        .filter(Boolean)
+        .join(' | ');
+
+      const enhancedError = new Error(enhancedMessage);
+      enhancedError.name = (error as Error).name;
+      enhancedError.stack = (error as Error).stack;
+      throw enhancedError;
+    } finally {
+      page.off('request', onRequest);
+      page.off('response', onResponse);
+      page.off('requestfailed', onRequestFailed);
+    }
   }
 
   setViewport(opts: {width: number; height: number}) {
