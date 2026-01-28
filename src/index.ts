@@ -133,7 +133,27 @@ export default class DeclarativePDF {
        * If the template is malformed or doesn't contain any document-page
        * elements, we throw an error.
        */
-      if (!this.documentPages.length) throw new Error('No document pages found');
+      if (!this.documentPages.length) {
+        const diagnostic = await this.html.page.evaluate(() => {
+          const body = document.body;
+          const childTags = Array.from(body.children)
+            .slice(0, 10)
+            .map((el) => el.tagName.toLowerCase());
+          return {
+            bodyChildCount: body.children.length,
+            firstChildTags: childTags,
+            hasDocumentPage: !!document.querySelector('document-page'),
+            hasPageBody: !!document.querySelector('page-body'),
+            bodyInnerHTMLPreview: body.innerHTML.slice(0, 500),
+          };
+        });
+        throw new Error(
+          `No document pages found. Template diagnostic: ` +
+            `body has ${diagnostic.bodyChildCount} children [${diagnostic.firstChildTags.join(', ')}], ` +
+            `hasDocumentPage: ${diagnostic.hasDocumentPage}, hasPageBody: ${diagnostic.hasPageBody}. ` +
+            `Preview: ${diagnostic.bodyInnerHTMLPreview}...`
+        );
+      }
 
       /** for every document page model, get from DOM what that document-page contains */
       logger?.level1().start('[5] Build page layout and body');

@@ -40,7 +40,15 @@ export class BodyElement {
   }
 
   async embedPageIdx(targetPage: PDFPage, idx: number) {
-    return await targetPage.doc.embedPdf(this.pdf, [idx]);
+    try {
+      return await targetPage.doc.embedPdf(this.pdf, [idx]);
+    } catch (error) {
+      const err = error as Error;
+      throw new Error(
+        `Failed to embed body page ${idx}: ${err.message}. ` +
+          `Layout: ${this.width}x${this.height}px at (${this.x}, ${this.y})`
+      );
+    }
   }
 }
 
@@ -105,8 +113,16 @@ export class SectionElement {
   async embedPage(targetPage: PDFPage) {
     if (this.embeddedPage) return this.embeddedPage;
 
-    const pages = await targetPage.doc.embedPdf(this.pdf);
-    this.embeddedPage = pages[0];
-    return pages[0];
+    try {
+      const pages = await targetPage.doc.embedPdf(this.pdf);
+      this.embeddedPage = pages[0];
+      return pages[0];
+    } catch (error) {
+      const err = error as Error;
+      throw new Error(
+        `Failed to embed ${this.debug.type} section for page ${this.debug.pageNumber}: ${err.message}. ` +
+          `Layout: ${this.width}x${this.height}px at (${this.x}, ${this.y})`
+      );
+    }
   }
 }

@@ -219,4 +219,141 @@ describe('HTMLAdapter', () => {
       expect(mockPage.close).not.toHaveBeenCalled();
     });
   });
+
+  describe('setContent with network tracking', () => {
+    test('falls back to simple setContent when page lacks event methods', async () => {
+      const adapter = new HTMLAdapter(mockBrowser);
+      await adapter.newPage();
+      // mockPage doesn't have on/off methods by default
+
+      await adapter.setContent('<html></html>');
+
+      expect(mockPage.setContent).toHaveBeenCalledWith('<html></html>', {
+        waitUntil: ['load', 'networkidle0'],
+      });
+    });
+
+    test('enriches timeout error with pending request info', async () => {
+      const listeners: Record<string, ((...args: unknown[]) => void)[]> = {};
+      const pageWithEvents = {
+        ...mockPage,
+        on: jest.fn((event: string, handler: (...args: unknown[]) => void) => {
+          listeners[event] = listeners[event] || [];
+          listeners[event].push(handler);
+        }),
+        off: jest.fn((event: string, handler: (...args: unknown[]) => void) => {
+          if (listeners[event]) {
+            listeners[event] = listeners[event].filter((h) => h !== handler);
+          }
+        }),
+        setContent: jest.fn(async () => {
+          // Simulate a request that starts but never completes
+          const mockRequest = {
+            method: () => 'GET',
+            url: () => 'https://example.com/slow-resource.js',
+            failure: () => null,
+          };
+          listeners['request']?.forEach((h) => h(mockRequest));
+
+          // Then throw timeout error
+          throw new Error('Timed out after waiting 30000ms');
+        }),
+      };
+
+      mockBrowser.newPage = jest.fn().mockResolvedValue(pageWithEvents);
+      const adapter = new HTMLAdapter(mockBrowser);
+      await adapter.newPage();
+
+      await expect(adapter.setContent('<html></html>')).rejects.toThrow(/Network: 1 pending, 0 failed/);
+      await expect(adapter.setContent('<html></html>')).rejects.toThrow(/Pending:.*slow-resource\.js/);
+    });
+
+    test('enriches timeout error with failed request info', async () => {
+      const listeners: Record<string, ((...args: unknown[]) => void)[]> = {};
+      const pageWithEvents = {
+        ...mockPage,
+        on: jest.fn((event: string, handler: (...args: unknown[]) => void) => {
+          listeners[event] = listeners[event] || [];
+          listeners[event].push(handler);
+        }),
+        off: jest.fn((event: string, handler: (...args: unknown[]) => void) => {
+          if (listeners[event]) {
+            listeners[event] = listeners[event].filter((h) => h !== handler);
+          }
+        }),
+        setContent: jest.fn(async () => {
+          // Simulate a request that fails
+          const mockRequest = {
+            method: () => 'GET',
+            url: () => 'https://example.com/broken.css',
+            failure: () => ({errorText: 'net::ERR_CONNECTION_REFUSED'}),
+          };
+          listeners['request']?.forEach((h) => h(mockRequest));
+          listeners['requestfailed']?.forEach((h) => h(mockRequest));
+
+          throw new Error('Timed out after waiting 30000ms');
+        }),
+      };
+
+      mockBrowser.newPage = jest.fn().mockResolvedValue(pageWithEvents);
+      const adapter = new HTMLAdapter(mockBrowser);
+      await adapter.newPage();
+
+      await expect(adapter.setContent('<html></html>')).rejects.toThrow(/Network: 0 pending, 1 failed/);
+      await expect(adapter.setContent('<html></html>')).rejects.toThrow(/net::ERR_CONNECTION_REFUSED/);
+    });
+
+    test('cleans up event listeners after success', async () => {
+      const listeners: Record<string, ((...args: unknown[]) => void)[]> = {};
+      const pageWithEvents = {
+        ...mockPage,
+        on: jest.fn((event: string, handler: (...args: unknown[]) => void) => {
+          listeners[event] = listeners[event] || [];
+          listeners[event].push(handler);
+        }),
+        off: jest.fn((event: string, handler: (...args: unknown[]) => void) => {
+          if (listeners[event]) {
+            listeners[event] = listeners[event].filter((h) => h !== handler);
+          }
+        }),
+        setContent: jest.fn().mockResolvedValue(undefined),
+      };
+
+      mockBrowser.newPage = jest.fn().mockResolvedValue(pageWithEvents);
+      const adapter = new HTMLAdapter(mockBrowser);
+      await adapter.newPage();
+
+      await adapter.setContent('<html></html>');
+
+      expect(pageWithEvents.off).toHaveBeenCalledTimes(3);
+      expect(pageWithEvents.off).toHaveBeenCalledWith('request', expect.any(Function));
+      expect(pageWithEvents.off).toHaveBeenCalledWith('response', expect.any(Function));
+      expect(pageWithEvents.off).toHaveBeenCalledWith('requestfailed', expect.any(Function));
+    });
+
+    test('cleans up event listeners after error', async () => {
+      const listeners: Record<string, ((...args: unknown[]) => void)[]> = {};
+      const pageWithEvents = {
+        ...mockPage,
+        on: jest.fn((event: string, handler: (...args: unknown[]) => void) => {
+          listeners[event] = listeners[event] || [];
+          listeners[event].push(handler);
+        }),
+        off: jest.fn((event: string, handler: (...args: unknown[]) => void) => {
+          if (listeners[event]) {
+            listeners[event] = listeners[event].filter((h) => h !== handler);
+          }
+        }),
+        setContent: jest.fn().mockRejectedValue(new Error('timeout')),
+      };
+
+      mockBrowser.newPage = jest.fn().mockResolvedValue(pageWithEvents);
+      const adapter = new HTMLAdapter(mockBrowser);
+      await adapter.newPage();
+
+      await expect(adapter.setContent('<html></html>')).rejects.toThrow();
+
+      expect(pageWithEvents.off).toHaveBeenCalledTimes(3);
+    });
+  });
 });

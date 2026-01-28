@@ -98,7 +98,16 @@ export class DocumentPage {
     const buffer = Buffer.from(uint8Array);
 
     logger?.level3().start('[5.3.2] Load body pdf as PDFDocument');
-    const pdf = await PDFDocument.load(uint8Array);
+    let pdf;
+    try {
+      pdf = await PDFDocument.load(uint8Array);
+    } catch (error) {
+      const err = error as Error;
+      throw new Error(
+        `Failed to load body PDF for document-page[${this.index}]: ${err.message}. ` +
+          `Layout: ${this.layout.width}x${this.layout.body.height}px, buffer size: ${buffer.length} bytes`
+      );
+    }
     logger?.level3().end();
 
     await this.html.resetVisibility();

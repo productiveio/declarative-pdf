@@ -45,7 +45,16 @@ async function createSectionElement(sectionType: SectionType, setting: SectionSe
 
   const buffer = Buffer.from(uint8Array);
 
-  const pdf = await PDFDocument.load(buffer);
+  let pdf;
+  try {
+    pdf = await PDFDocument.load(buffer);
+  } catch (error) {
+    const err = error as Error;
+    throw new Error(
+      `Failed to load ${sectionType} PDF for page ${currentPageNumber}: ${err.message}. ` +
+        `Dimensions: ${layout.width}x${setting.height}px, buffer size: ${buffer.length} bytes`
+    );
+  }
 
   return new SectionElement({
     buffer,
