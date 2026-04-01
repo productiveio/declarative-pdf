@@ -1,4 +1,4 @@
-import calculatePageLayout from '@app/utils/layout/calculate-page-layout';
+import calculatePageLayout, {getMaxHeight} from '@app/utils/layout/calculate-page-layout';
 import {hasPageNumbers, hasSectionPageNumbers} from '@app/utils/layout/has-page-numbers';
 
 import type {SectionSettings, SectionSetting} from '@app/evaluators/section-settings';
@@ -34,14 +34,47 @@ interface CreatePageLayoutSettingsOpts {
   bodyHeightMinimumFactor: number;
 }
 
+/**
+ * When the combined header + footer height exceeds the available page space
+ * (leaving less than bodyHeightMinimumFactor of the page for the body),
+ * proportionally reduce all section setting heights so they fit.
+ *
+ * Returns the original settings unchanged if no capping is needed,
+ * or cloned settings with reduced heights if capping is required.
+ */
+function capOversizedSections(sectionSettings: SectionSettings, opts: CreatePageLayoutSettingsOpts): SectionSettings {
+  const {pageHeight, bodyHeightMinimumFactor} = opts;
+  if (!pageHeight) return sectionSettings;
+
+  const headerHeight = getMaxHeight(sectionSettings.headers);
+  const footerHeight = getMaxHeight(sectionSettings.footers);
+  const totalSectionsHeight = headerHeight + footerHeight;
+  if (!totalSectionsHeight) return sectionSettings;
+
+  // +2 accounts for the overlap pixel added in calculatePageLayout
+  const maxSectionsHeight = Math.floor(pageHeight * (1 - bodyHeightMinimumFactor)) + 2;
+  if (totalSectionsHeight <= maxSectionsHeight) return sectionSettings;
+
+  const scaleFactor = maxSectionsHeight / totalSectionsHeight;
+  const capHeight = (s: SectionSetting): SectionSetting => ({...s, height: Math.floor(s.height * scaleFactor)});
+
+  return {
+    headers: sectionSettings.headers.map(capHeight),
+    footers: sectionSettings.footers.map(capHeight),
+    backgrounds: sectionSettings.backgrounds,
+  };
+}
+
 export function createPageLayoutSettings(
   sectionSettings: SectionSettings | undefined,
   opts: CreatePageLayoutSettingsOpts
 ): PageLayout {
-  const pageLayout = calculatePageLayout(sectionSettings, opts);
+  const cappedSettings = sectionSettings ? capOversizedSections(sectionSettings, opts) : undefined;
+
+  const pageLayout = calculatePageLayout(cappedSettings, opts);
   const transparentBg = !!sectionSettings?.backgrounds.length;
 
-  const {headers = [], footers = [], backgrounds = []} = sectionSettings ?? {};
+  const {headers = [], footers = [], backgrounds = []} = cappedSettings ?? {};
 
   const hasAnySection = !!(headers.length || footers.length || backgrounds.length);
 

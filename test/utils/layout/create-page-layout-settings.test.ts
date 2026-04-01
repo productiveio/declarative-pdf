@@ -179,4 +179,93 @@ describe('createPageLayoutSettings', () => {
       background: undefined,
     });
   });
+
+  describe('oversized header/footer capping', () => {
+    test('caps header and footer proportionally when they exceed available page space', () => {
+      // Reproduces the real-world bug: A4 page (842px), header 274px, footer 701px
+      // Without capping: body = 842 - 274 - 701 + 2 = -131px → would throw
+      const settings: SectionSettings = {
+        headers: [makeSectionSetting({height: 274})],
+        footers: [makeSectionSetting({height: 701})],
+        backgrounds: [],
+      };
+
+      const result = createPageLayoutSettings(settings, makeLayoutOpts({height: 842, width: 595, factor: 0.3}));
+
+      // Should not throw — sections are capped to fit
+      expect(result.body.height).toBeGreaterThan(0);
+      expect(result.body.height).toBeGreaterThanOrEqual(Math.floor(842 * 0.3));
+
+      // Capped settings should have reduced heights
+      const cappedHeaderHeight = result.header!.settings[0].height;
+      const cappedFooterHeight = result.footer!.settings[0].height;
+      expect(cappedHeaderHeight).toBeLessThan(274);
+      expect(cappedFooterHeight).toBeLessThan(701);
+
+      // Proportions should be preserved
+      const originalRatio = 274 / 701;
+      const cappedRatio = cappedHeaderHeight / cappedFooterHeight;
+      expect(cappedRatio).toBeCloseTo(originalRatio, 1);
+    });
+
+    test('does not cap sections when they fit within the page', () => {
+      const settings: SectionSettings = {
+        headers: [makeSectionSetting({height: 200})],
+        footers: [makeSectionSetting({height: 150})],
+        backgrounds: [],
+      };
+
+      const result = createPageLayoutSettings(settings, makeLayoutOpts());
+
+      expect(result.header!.settings[0].height).toBe(200);
+      expect(result.footer!.settings[0].height).toBe(150);
+    });
+
+    test('caps all variants when multiple physical-page variants exist', () => {
+      const settings: SectionSettings = {
+        headers: [
+          makeSectionSetting({height: 500, physicalPageType: 'first'}),
+          makeSectionSetting({height: 400, physicalPageType: 'default'}),
+        ],
+        footers: [makeSectionSetting({height: 500})],
+        backgrounds: [],
+      };
+
+      // max header = 500, footer = 500, total = 1000 > 1000 * (1 - 1/3) + 2 = 668
+      const result = createPageLayoutSettings(settings, makeLayoutOpts());
+
+      expect(result.header!.settings[0].height).toBeLessThan(500);
+      expect(result.header!.settings[1].height).toBeLessThan(400);
+      expect(result.footer!.settings[0].height).toBeLessThan(500);
+      expect(result.body.height).toBeGreaterThan(0);
+    });
+
+    test('preserves page number flags on capped settings', () => {
+      const settings: SectionSettings = {
+        headers: [makeSectionSetting({height: 600, hasCurrentPageNumber: true})],
+        footers: [makeSectionSetting({height: 600, hasTotalPagesNumber: true})],
+        backgrounds: [],
+      };
+
+      const result = createPageLayoutSettings(settings, makeLayoutOpts());
+
+      expect(result.hasPageNumbers).toBe(true);
+      expect(result.header!.hasPageNumbers).toBe(true);
+      expect(result.footer!.hasPageNumbers).toBe(true);
+      expect(result.header!.settings[0].hasCurrentPageNumber).toBe(true);
+      expect(result.footer!.settings[0].hasTotalPagesNumber).toBe(true);
+    });
+
+    test('does not modify background heights when capping', () => {
+      const settings: SectionSettings = {
+        headers: [makeSectionSetting({height: 600})],
+        footers: [makeSectionSetting({height: 600})],
+        backgrounds: [makeSectionSetting({height: 1000})],
+      };
+
+      const result = createPageLayoutSettings(settings, makeLayoutOpts());
+
+      expect(result.background!.settings[0].height).toBe(1000);
+    });
+  });
 });
