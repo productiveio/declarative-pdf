@@ -4,6 +4,7 @@ import evalPrepareSection from '@app/evaluators/prepare-section';
 import evalTemplateNormalize from '@app/evaluators/template-normalize';
 import evalTemplateSettings from '@app/evaluators/template-settings';
 import evalResetVisibility from '@app/evaluators/reset-visibility';
+import {evalInsertBodySpacer, evalRemoveBodySpacer} from '@app/evaluators/body-spacer';
 
 import type {Browser, Page, HTTPRequest, HTTPResponse} from 'puppeteer';
 import type {PrepareSection} from '@app/evaluators/prepare-section';
@@ -227,6 +228,14 @@ export default class HTMLAdapter {
 
   resetVisibility() {
     return this.page.evaluate(evalResetVisibility);
+  }
+
+  insertBodySpacer(opts: {documentPageIndex: number; height: number}) {
+    return this.page.evaluate(evalInsertBodySpacer, opts);
+  }
+
+  removeBodySpacer(documentPageIndex: number) {
+    return this.page.evaluate(evalRemoveBodySpacer, documentPageIndex);
   }
 
   /**

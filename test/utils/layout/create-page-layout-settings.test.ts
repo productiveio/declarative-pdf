@@ -38,6 +38,8 @@ describe('createPageLayoutSettings', () => {
       hasPageNumbers: false,
       hasAnySection: false,
       pageCount: 0,
+      dynamicHeader: false,
+      headerDelta: 0,
       body: {
         width: 500,
         height: 1002,
@@ -66,6 +68,8 @@ describe('createPageLayoutSettings', () => {
       hasPageNumbers: false,
       hasAnySection: true,
       pageCount: 0,
+      dynamicHeader: false,
+      headerDelta: 0,
       body: {
         width: 500,
         height: 1002,
@@ -158,6 +162,23 @@ describe('createPageLayoutSettings', () => {
     expect(result.background?.settings).toEqual([backgroundSetting]);
   });
 
+  test('propagates dynamicHeader and headerDelta', () => {
+    const settings: SectionSettings = {
+      headers: [
+        makeSectionSetting({height: 250, physicalPageType: 'first'}),
+        makeSectionSetting({height: 100, physicalPageType: 'default'}),
+      ],
+      footers: [],
+      backgrounds: [],
+    };
+
+    const result = createPageLayoutSettings(settings, {...makeLayoutOpts(), dynamicHeader: true});
+
+    expect(result.dynamicHeader).toBe(true);
+    expect(result.headerDelta).toBe(150);
+    expect(result.header?.height).toBe(100); // band sized for the default header
+  });
+
   test('creates zero layout when no settings are provided', () => {
     const result = createPageLayoutSettings(undefined, makeLayoutOpts({height: 0, width: 0}));
 
@@ -167,6 +188,8 @@ describe('createPageLayoutSettings', () => {
       hasPageNumbers: false,
       hasAnySection: false,
       pageCount: 0,
+      dynamicHeader: false,
+      headerDelta: 0,
       body: {
         width: 0,
         height: 0,

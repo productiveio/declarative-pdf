@@ -7,6 +7,7 @@ type TemplateSetting = {
   bodyMarginTop?: number;
   bodyMarginBottom?: number;
   hasSections?: boolean;
+  dynamicHeader?: boolean;
 };
 
 const capNumber = (num: unknown, min: number, max: number, base: number) => {
@@ -22,5 +23,6 @@ export function normalizeSetting(setting: TemplateSetting) {
     bodyMarginTop: capNumber(setting.bodyMarginTop, 0, 420_000, DEFAULT_BODY_MARGIN_TOP),
     bodyMarginBottom: capNumber(setting.bodyMarginBottom, 0, 420_000, DEFAULT_BODY_MARGIN_BOTTOM),
     hasSections: setting.hasSections || false,
+    dynamicHeader: setting.dynamicHeader || false,
   };
 }

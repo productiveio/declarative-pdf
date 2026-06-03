@@ -50,6 +50,7 @@ describe('calculatePageLayout', () => {
 
     const result = calculatePageLayout(settings, makeLayoutOpts());
     expect(result).toEqual({
+      headerDelta: 0,
       header: {width: 800, height: 200, x: 0, y: 800},
       footer: {width: 800, height: 150, x: 0, y: -1},
       body: {width: 800, height: 652, x: 0, y: 149},
@@ -72,6 +73,7 @@ describe('calculatePageLayout', () => {
   test('throws error when page height is zero', () => {
     const result = calculatePageLayout(undefined, makeLayoutOpts({height: 0, width: 0}));
     expect(result).toEqual({
+      headerDelta: 0,
       header: {width: 0, height: 0, x: 0, y: 0},
       footer: {width: 0, height: 0, x: 0, y: 0},
       body: {width: 0, height: 0, x: 0, y: 0},
@@ -88,10 +90,69 @@ describe('calculatePageLayout', () => {
 
     const result = calculatePageLayout(settings, makeLayoutOpts());
     expect(result).toEqual({
+      headerDelta: 0,
       header: {width: 800, height: 0, x: 0, y: 1000},
       footer: {width: 800, height: 0, x: 0, y: 0},
       body: {width: 800, height: 1002, x: 0, y: -1},
       background: {width: 800, height: 1000, x: 0, y: 0},
+    });
+  });
+
+  describe('dynamicHeader', () => {
+    const dynamicOpts = {...makeLayoutOpts(), dynamicHeader: true};
+
+    test('sizes the body for the default header (not max) and reserves the first-page delta', () => {
+      const settings = {
+        headers: [
+          {height: 250, physicalPageType: 'first'},
+          {height: 100, physicalPageType: 'default'},
+        ] as SectionSetting[],
+        footers: [{height: 50, physicalPageType: 'default'}] as SectionSetting[],
+        backgrounds: [] as SectionSetting[],
+      };
+
+      const result = calculatePageLayout(settings, dynamicOpts);
+      // header band + body use the default header (100), not the max (250)
+      expect(result.header).toEqual({width: 800, height: 100, x: 0, y: 900});
+      expect(result.body).toEqual({width: 800, height: 852, x: 0, y: 49});
+      // first page reserves the extra 150px
+      expect(result.headerDelta).toBe(150);
+    });
+
+    test('headerDelta is 0 when only a default header variant exists', () => {
+      const settings = {
+        headers: [{height: 100, physicalPageType: 'default'}] as SectionSetting[],
+        footers: [] as SectionSetting[],
+        backgrounds: [] as SectionSetting[],
+      };
+
+      const result = calculatePageLayout(settings, dynamicOpts);
+      expect(result.header.height).toBe(100);
+      expect(result.headerDelta).toBe(0);
+    });
+
+    test('treats a single non-variant header as both default and first (delta 0)', () => {
+      const settings = {
+        headers: [{height: 120}] as SectionSetting[],
+        footers: [] as SectionSetting[],
+        backgrounds: [] as SectionSetting[],
+      };
+
+      const result = calculatePageLayout(settings, dynamicOpts);
+      expect(result.header.height).toBe(120);
+      expect(result.headerDelta).toBe(0);
+    });
+
+    test('uses 0 as default height when only a first variant exists (blank header elsewhere)', () => {
+      const settings = {
+        headers: [{height: 250, physicalPageType: 'first'}] as SectionSetting[],
+        footers: [] as SectionSetting[],
+        backgrounds: [] as SectionSetting[],
+      };
+
+      const result = calculatePageLayout(settings, dynamicOpts);
+      expect(result.header.height).toBe(0);
+      expect(result.headerDelta).toBe(250);
     });
   });
 });
