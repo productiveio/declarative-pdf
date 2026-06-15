@@ -21,14 +21,11 @@ export default function calculatePageLayout(
 
   // In dynamic-header mode the body is sized for the default (other-pages) header,
   // and the taller first-page header is reserved separately via `headerDelta`. A lone
-  // header with no physical-page variant is used for every page.
-  const single = headers.length === 1 && headers[0].physicalPageType === undefined;
-  const defaultHeaderHeight = single
-    ? (headers[0].height ?? 0)
-    : (headers.find((s) => s.physicalPageType === 'default')?.height ?? 0);
-  const firstPageHeaderHeight = single
-    ? defaultHeaderHeight
-    : (headers.find((s) => s.physicalPageType === 'first')?.height ?? defaultHeaderHeight);
+  // header with no physical-page variant acts as the default (and first) for every page.
+  const lone = headers.length === 1 && headers[0].physicalPageType === undefined ? headers[0] : undefined;
+  const byType = (type: 'default' | 'first') => headers.find((s) => s.physicalPageType === type) ?? lone;
+  const defaultHeaderHeight = byType('default')?.height ?? 0;
+  const firstPageHeaderHeight = byType('first')?.height ?? defaultHeaderHeight;
   const headerDelta = dynamicHeader ? Math.max(0, firstPageHeaderHeight - defaultHeaderHeight) : 0;
 
   const headerHeight = dynamicHeader ? defaultHeaderHeight : getMaxHeight(headers);
