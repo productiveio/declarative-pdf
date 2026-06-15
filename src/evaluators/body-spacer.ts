@@ -18,7 +18,6 @@ export function evalInsertBodySpacer(opts: {documentPageIndex: number; height: n
   const spacer = document.createElement('div');
   spacer.setAttribute('data-declarative-pdf-body-spacer', '');
   spacer.style.height = `${opts.height}px`;
-  spacer.style.width = '100%';
   // Don't let a flex page-body shrink the spacer away.
   spacer.style.flexShrink = '0';
   body.insertBefore(spacer, body.firstChild);
