@@ -35,6 +35,7 @@ You can include any valid HTML content within these elements.
   - [Repeating section elements](#repeating-section-elements)
     - [Background](#background)
     - [Header](#header)
+    - [Dynamic header](#dynamic-header)
     - [Footer](#footer)
   - [Repeating section special elements](#repeating-section-special-elements)
     - [Physical page](#physical-page)
@@ -274,6 +275,32 @@ Usage:
 
 The `<page-header>` element can contain any valid HTML content, including text, images, tables, lists and more, as well as custom tags `<physical-page>`, `<current-page-number>` and `<total-pages-number>`. The content of the `<page-header>` element will be displayed at the top of each page of the PDF document.
 
+#### Dynamic header
+
+Attribute: `dynamic-header` (on `<document-page>`)
+
+By default the header reserves the same height on every page — the tallest of its `<physical-page>` variants. Add the `dynamic-header` attribute and each page's header is drawn at its own height instead, so a taller first-page header doesn't leave a gap on later pages.
+
+The typical use is a first page with extra content above an otherwise repeating header (e.g. a tax QR code):
+
+```html
+<document-page dynamic-header>
+  <page-header>
+    <physical-page select="first">
+      <!-- taller: QR block + the repeating header below it -->
+    </physical-page>
+    <physical-page>
+      <!-- the normal, shorter repeating header -->
+    </physical-page>
+  </page-header>
+  <page-body>
+    <!-- body content goes here -->
+  </page-body>
+</document-page>
+```
+
+How it works: the body is laid out for the shorter (`default`) header height, the extra first-page height is reserved at the top of the body for the first page only, and the first-page header is drawn on top of it. Pages without a taller variant are unaffected. See `docs/examples/dynamic-header.html` for a runnable example.
+
 #### Footer
 
 Custom tag: `<page-footer>`
@@ -344,7 +371,7 @@ If multiple `<physical-page>` elements are present, the content of the element, 
 5. `default`
 6. blank
 
-For `<page-header>` and `<page-footer>` it is important to note that their height will be uniform (max height) across all pages within `<document-page>` set. Putting too much content in one specific physical page selector may lead to too much white space on all other pages.
+For `<page-header>` and `<page-footer>` it is important to note that their height will be uniform (max height) across all pages within `<document-page>` set. Putting too much content in one specific physical page selector may lead to too much white space on all other pages. For headers, the [`dynamic-header`](#dynamic-header) attribute opts out of this uniform height.
 
 #### Current and total page number
 

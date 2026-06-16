@@ -41,6 +41,7 @@
 
 - `repeating sections` - customizable headers, footers, and backgrounds for each page
 - `section variants` - define variants for headers, footers, and backgrounds for different pages
+- `dynamic header` - opt in to per-page header heights so a taller first-page header leaves no gap on later pages
 - `page size and orientation` - define page size by name or by width, height and ppi
 - `multi-page content` - content that spans across multiple pages
 - `page numbering` - display page numbers within headers, footers or backgrounds
