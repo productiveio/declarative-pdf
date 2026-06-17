@@ -54,13 +54,15 @@ The project uses Jest for testing. There are several test commands:
 
 ### Visual tests
 
-Visual tests are dependant a lib that depends on GraphicsMagick/Imagemagick. You can install those with homebrew:
+Visual tests are dependant a lib that depends on GraphicsMagick/Imagemagick, which in turn needs Ghostscript to rasterize PDFs to PNG. You can install those with homebrew:
 
 ```bash
-brew install imagemagick graphicsmagick
+brew install imagemagick graphicsmagick ghostscript
 ```
 
-They also might fail due to the differences in the rendering of the PDFs on different systems. Luckily, the diffs are generated and you can inspect them.
+> Without `ghostscript` every comparison errors with `sh: gs: command not found` and the tests report as failed.
+
+They also might fail due to the differences in the rendering of the PDFs on different systems. Luckily, the diffs are generated and you can inspect them. If the differences are just rendering noise on your machine, regenerate the baselines by copying the generated PDFs from `test/data/actualPdfs/` over `test/data/baselinePdfs/`.
 
 ### Linking the library locally
 

@@ -102,6 +102,10 @@ describe('PDF visual regression test', () => {
     await testRunner('./test/examples/a4-72-multipage.html', `a4-72-multipage.pdf`);
   });
 
+  test('dynamic header template', async () => {
+    await testRunner('./test/examples/dynamic-header.html', `dynamic-header.pdf`);
+  });
+
   test.skip('a4 297 standard template', async () => {
     await testRunner('./test/examples/a4-297-standard.html', `a4-297-standard.pdf`);
   });

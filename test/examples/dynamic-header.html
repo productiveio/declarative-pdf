@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dynamic header example</title>
+    <style>
+      * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      body { margin: 0; padding: 0; font-family: Arial, sans-serif; font-size: 11px; color: #333; }
+
+      document-page, page-background, page-header, page-body, page-footer { display: block; }
+
+      /* Opaque body background — reproduces the real template where the body's own
+         fill was painting over the overlapping first-page header. */
+      page-body { background: #fff; }
+
+      /* The repeating company header (present on every page). */
+      .company { font-weight: bold; border-bottom: 1px solid #ccc; padding: 0 24px 8px; }
+
+      /* First-page-only block that sits ABOVE the company header. */
+      .fiscal { padding: 16px 24px 8px; }
+      .fiscal-caption { font-size: 9px; color: #666; }
+      .fiscal-qr {
+        width: 85px; height: 85px; margin: 2px 0;
+        border: 1px solid #999; background: #eee;
+        display: flex; align-items: center; justify-content: center; font-size: 9px; color: #999;
+      }
+
+      /* Info lines that live in the header BELOW the QR — i.e. inside the
+         first-page header's overlap region (this is what regressed). */
+      .info { padding: 8px 24px; }
+      .info div { margin-bottom: 4px; }
+
+      .row { padding: 6px 24px; border-bottom: 1px dotted #ddd; }
+      page-footer { padding: 6px 24px; font-size: 9px; color: #888; border-top: 1px solid #ccc; }
+    </style>
+  </head>
+  <body>
+    <!-- `dynamic-header`: the first page's header may be taller (QR block) without
+         reserving that height on later pages. Remove the attribute to see the old
+         uniform-height behavior (gap above the company header on pages 2+). -->
+    <document-page format="a4" ppi="72" dynamic-header>
+      <page-header>
+        <physical-page select="first">
+          <div class="fiscal">
+            <div class="fiscal-caption">QR tributario:</div>
+            <div class="fiscal-qr">QR</div>
+            <div class="fiscal-caption">VERI*FACTU</div>
+          </div>
+          <div class="company">Nether Realm Records — Invoice 123456</div>
+          <div class="info">
+            <div><b>Subject</b> Mock invoice</div>
+            <div><b>Client</b> Alestorm</div>
+            <div><b>IRN</b> &#123;&#123;IRN&#125;&#125;</div>
+          </div>
+        </physical-page>
+        <physical-page>
+          <div class="company">Nether Realm Records — Invoice 123456</div>
+          <div class="info">
+            <div><b>Subject</b> Mock invoice</div>
+            <div><b>Client</b> Alestorm</div>
+            <div><b>IRN</b> &#123;&#123;IRN&#125;&#125;</div>
+          </div>
+        </physical-page>
+      </page-header>
+
+      <page-body>
+        <!-- Enough rows to span several pages. -->
+        <div class="row">Line 1 — Administrative work</div>
+        <div class="row">Line 2 — Administrative work</div>
+        <div class="row">Line 3 — Administrative work</div>
+        <div class="row">Line 4 — Administrative work</div>
+        <div class="row">Line 5 — Administrative work</div>
+        <div class="row">Line 6 — Administrative work</div>
+        <div class="row">Line 7 — Administrative work</div>
+        <div class="row">Line 8 — Administrative work</div>
+        <div class="row">Line 9 — Administrative work</div>
+        <div class="row">Line 10 — Administrative work</div>
+        <div class="row">Line 11 — Administrative work</div>
+        <div class="row">Line 12 — Administrative work</div>
+        <div class="row">Line 13 — Administrative work</div>
+        <div class="row">Line 14 — Administrative work</div>
+        <div class="row">Line 15 — Administrative work</div>
+        <div class="row">Line 16 — Administrative work</div>
+        <div class="row">Line 17 — Administrative work</div>
+        <div class="row">Line 18 — Administrative work</div>
+        <div class="row">Line 19 — Administrative work</div>
+        <div class="row">Line 20 — Administrative work</div>
+        <div class="row">Line 21 — Administrative work</div>
+        <div class="row">Line 22 — Administrative work</div>
+        <div class="row">Line 23 — Administrative work</div>
+        <div class="row">Line 24 — Administrative work</div>
+        <div class="row">Line 25 — Administrative work</div>
+        <div class="row">Line 26 — Administrative work</div>
+        <div class="row">Line 27 — Administrative work</div>
+        <div class="row">Line 28 — Administrative work</div>
+        <div class="row">Line 29 — Administrative work</div>
+        <div class="row">Line 30 — Administrative work</div>
+        <div class="row">Line 31 — Administrative work</div>
+        <div class="row">Line 32 — Administrative work</div>
+        <div class="row">Line 33 — Administrative work</div>
+        <div class="row">Line 34 — Administrative work</div>
+        <div class="row">Line 35 — Administrative work</div>
+        <div class="row">Line 36 — Administrative work</div>
+        <div class="row">Line 37 — Administrative work</div>
+        <div class="row">Line 38 — Administrative work</div>
+        <div class="row">Line 39 — Administrative work</div>
+        <div class="row">Line 40 — Administrative work</div>
+      </page-body>
+
+      <page-footer>
+        Page <current-page-number>0</current-page-number> of <total-pages-number>0</total-pages-number>
+      </page-footer>
+    </document-page>
+  </body>
+</html>
