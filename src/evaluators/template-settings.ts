@@ -53,6 +53,10 @@ export default function evalTemplateSettings(opts: TemplateSettingOpts) {
 
     const hasSections = !!docPageEl.querySelector('page-header, page-footer, page-background');
 
+    // Opt-in: render each physical page's header at its own height instead of a
+    // uniform max height (e.g. a taller first-page header above a repeating header).
+    const dynamicHeader = docPageEl.hasAttribute('dynamic-header');
+
     let bodyMarginBottom = 0;
     let bodyMarginTop = 0;
 
@@ -87,6 +91,7 @@ export default function evalTemplateSettings(opts: TemplateSettingOpts) {
       bodyMarginTop,
       bodyMarginBottom,
       hasSections,
+      dynamicHeader,
     };
   };
 

@@ -206,4 +206,19 @@ describe('selectSection', () => {
 
     expect(selectSection(settings1, 1, 2, 6)).toBeUndefined();
   });
+
+  test('single page (first and last) prefers FIRST, then LAST, then DEFAULT', () => {
+    const first = makeSetting({physicalPageIndex: 1, physicalPageType: Variant.FIRST});
+    const last = makeSetting({physicalPageIndex: 2, physicalPageType: Variant.LAST});
+    const def = makeSetting({physicalPageIndex: 3, physicalPageType: Variant.DEFAULT});
+
+    // first-only variant must still apply on a single page (the bug: it fell through to default)
+    expect(selectSection([first, def], 0, 0, 1)?.physicalPageIndex).toBe(1);
+    // first takes precedence when both are present (documented priority: first > last)
+    expect(selectSection([first, last, def], 0, 0, 1)?.physicalPageIndex).toBe(1);
+    // last-only still works
+    expect(selectSection([last, def], 0, 0, 1)?.physicalPageIndex).toBe(2);
+    // neither defined falls back to default
+    expect(selectSection([def], 0, 0, 1)?.physicalPageIndex).toBe(3);
+  });
 });

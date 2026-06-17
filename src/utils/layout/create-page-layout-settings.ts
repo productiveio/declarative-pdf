@@ -22,6 +22,10 @@ export interface PageLayout {
   hasPageNumbers: boolean;
   hasAnySection: boolean;
   pageCount: number;
+  /** when true, headers are drawn at their own per-page height (see calculate-page-layout) */
+  dynamicHeader: boolean;
+  /** extra first-page header height to reserve at the top of the body (0 unless dynamicHeader) */
+  headerDelta: number;
   body: BodyLayout;
   header?: SectionLayout;
   footer?: SectionLayout;
@@ -32,6 +36,7 @@ interface CreatePageLayoutSettingsOpts {
   pageHeight: number;
   pageWidth: number;
   bodyHeightMinimumFactor: number;
+  dynamicHeader?: boolean;
 }
 
 export function createPageLayoutSettings(
@@ -51,6 +56,8 @@ export function createPageLayoutSettings(
     hasPageNumbers: hasPageNumbers(sectionSettings),
     hasAnySection,
     pageCount: 0,
+    dynamicHeader: !!opts.dynamicHeader,
+    headerDelta: pageLayout.headerDelta,
     body: {
       ...pageLayout.body,
       transparentBg,

@@ -56,6 +56,13 @@ async function createSectionElement(sectionType: SectionType, setting: SectionSe
     );
   }
 
+  // In dynamic-header mode each page's header is drawn at its own variant height,
+  // top-aligned, instead of the uniform max-height band — so a taller first-page
+  // header sits over the reserved body spacer and later pages stay flush to the body.
+  const isDynamicHeader = sectionType === 'header' && layout.dynamicHeader;
+  const sectionHeight = isDynamicHeader ? setting.height : layout[sectionType]!.height;
+  const sectionY = isDynamicHeader ? layout.height - setting.height : layout[sectionType]!.y;
+
   return new SectionElement({
     buffer,
     pdf,
@@ -66,9 +73,9 @@ async function createSectionElement(sectionType: SectionType, setting: SectionSe
     },
     layout: {
       width: layout.width,
-      height: layout[sectionType]!.height,
+      height: sectionHeight,
       x: 0,
-      y: layout[sectionType]!.y,
+      y: sectionY,
     },
   });
 }
@@ -168,9 +175,13 @@ export async function buildPages(opts: BuildPagesOpts) {
     logger?.level2().start(`[6.2] Embed and place page ${pageIndex} sections`);
     const targetPage = target.addPage([layout.width, layout.height]);
     await embedAndPlaceSection(targetPage, background);
-    await embedAndPlaceSection(targetPage, header);
+    // Normally the header is drawn before the body. In dynamic-header mode the taller
+    // first-page header overlaps the body's reserved (empty) area, so it must be drawn
+    // last — otherwise the body's background paints over the overlapping header content.
+    if (!layout.dynamicHeader) await embedAndPlaceSection(targetPage, header);
     await embedAndPlaceSection(targetPage, footer);
     await embedAndPlaceBody(targetPage, body, pageIndex);
+    if (layout.dynamicHeader) await embedAndPlaceSection(targetPage, header);
     logger?.level2().end();
 
     pages.push({

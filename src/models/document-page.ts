@@ -22,6 +22,8 @@ export type DocumentPageOpts = {
   bodyMarginBottom: number;
   /** do we have any sections other than page-body */
   hasSections: boolean;
+  /** opt-in: render each page's header at its own height (e.g. taller first-page header) */
+  dynamicHeader: boolean;
 };
 
 export class DocumentPage {
@@ -32,6 +34,7 @@ export class DocumentPage {
   declare bodyMarginTop: number;
   declare bodyMarginBottom: number;
   declare hasSections: boolean;
+  declare dynamicHeader: boolean;
 
   /** These two will exist after createLayoutAndBody() method */
   declare layout?: PageLayout;
@@ -47,6 +50,7 @@ export class DocumentPage {
     this.bodyMarginTop = opts.bodyMarginTop;
     this.bodyMarginBottom = opts.bodyMarginBottom;
     this.hasSections = opts.hasSections;
+    this.dynamicHeader = opts.dynamicHeader;
   }
 
   get viewPort() {
@@ -77,9 +81,17 @@ export class DocumentPage {
       pageHeight: this.height,
       pageWidth: this.width,
       bodyHeightMinimumFactor: this.parent.documentOptions?.bodyHeightMinimumFactor ?? 1 / 3,
+      dynamicHeader: this.dynamicHeader,
     };
 
     this.layout = createPageLayoutSettings(sectionSettings, layoutOpts);
+
+    // Reserve the taller first-page header's extra height at the top of the body so
+    // page-1 content flows below it (the spacer is the first body element → page 1 only).
+    const reserveFirstPageHeader = this.dynamicHeader && this.layout.headerDelta > 0;
+    if (reserveFirstPageHeader) {
+      await this.html.insertBodySpacer({documentPageIndex: this.index, height: this.layout.headerDelta});
+    }
 
     await this.html.prepareSection({documentPageIndex: this.index});
 
@@ -94,6 +106,10 @@ export class DocumentPage {
       transparentBg: this.layout.body.transparentBg,
     });
     logger?.level3().end();
+
+    if (reserveFirstPageHeader) {
+      await this.html.removeBodySpacer(this.index);
+    }
 
     const buffer = Buffer.from(uint8Array);
 

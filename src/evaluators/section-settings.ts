@@ -97,6 +97,13 @@ export default function evalSectionSettings(documentPageIndex: number): SectionS
       return [getSettings(sectionEl)];
     }
 
+    // Physical pages are rendered as block during isolation (see prepare-section);
+    // force block here too so their measured height is correct even if the consumer
+    // didn't style the custom element (otherwise an inline default mis-measures it).
+    physicalPageEl.forEach((el) => {
+      el.style.display = 'block';
+    });
+
     return physicalPageEl.map((el, index) => getSettings(el, index));
   };
 

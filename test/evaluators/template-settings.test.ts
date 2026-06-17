@@ -42,6 +42,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
         hasSections: false,
+        dynamicHeader: false,
       },
       {
         index: 1,
@@ -50,6 +51,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
         hasSections: false,
+        dynamicHeader: false,
       },
       {
         index: 2,
@@ -58,6 +60,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
         hasSections: false,
+        dynamicHeader: false,
       },
       {
         index: 3,
@@ -66,6 +69,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
         hasSections: false,
+        dynamicHeader: false,
       },
     ]);
   });
@@ -90,6 +94,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
         hasSections: false,
+        dynamicHeader: false,
       },
       {
         index: 1,
@@ -98,6 +103,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
         hasSections: false,
+        dynamicHeader: false,
       },
       {
         index: 2,
@@ -106,6 +112,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
         hasSections: false,
+        dynamicHeader: false,
       },
       {
         index: 3,
@@ -114,6 +121,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
         hasSections: false,
+        dynamicHeader: false,
       },
       {
         index: 4,
@@ -122,6 +130,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
         hasSections: false,
+        dynamicHeader: false,
       },
       {
         index: 5,
@@ -130,6 +139,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
         hasSections: false,
+        dynamicHeader: false,
       },
       {
         index: 6,
@@ -138,6 +148,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
         hasSections: false,
+        dynamicHeader: false,
       },
     ]);
   });
@@ -156,6 +167,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
         hasSections: false,
+        dynamicHeader: false,
       },
     ]);
   });
@@ -174,6 +186,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
         hasSections: false,
+        dynamicHeader: false,
       },
     ]);
   });
@@ -192,6 +205,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
         hasSections: false,
+        dynamicHeader: false,
       },
     ]);
   });
@@ -210,6 +224,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
         hasSections: false,
+        dynamicHeader: false,
       },
     ]);
   });
@@ -233,6 +248,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 10,
         bodyMarginBottom: 20,
         hasSections: false,
+        dynamicHeader: false,
       },
       {
         index: 1,
@@ -241,6 +257,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 30,
         bodyMarginBottom: 40,
         hasSections: false,
+        dynamicHeader: false,
       },
     ]);
   });
@@ -294,6 +311,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
         hasSections: true,
+        dynamicHeader: false,
       },
       {
         index: 1,
@@ -302,6 +320,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
         hasSections: true,
+        dynamicHeader: false,
       },
       {
         index: 2,
@@ -310,6 +329,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
         hasSections: true,
+        dynamicHeader: false,
       },
       {
         index: 3,
@@ -318,6 +338,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
         hasSections: true,
+        dynamicHeader: false,
       },
       {
         index: 4,
@@ -326,6 +347,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
         hasSections: true,
+        dynamicHeader: false,
       },
       {
         index: 5,
@@ -334,6 +356,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
         hasSections: true,
+        dynamicHeader: false,
       },
       {
         index: 6,
@@ -342,6 +365,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
         hasSections: true,
+        dynamicHeader: false,
       },
       {
         index: 7,
@@ -350,6 +374,7 @@ describe('evalTemplateSettings', () => {
         bodyMarginTop: 0,
         bodyMarginBottom: 0,
         hasSections: false,
+        dynamicHeader: false,
       },
     ]);
   });

@@ -11,6 +11,7 @@ describe('normalizeSetting', () => {
       bodyMarginTop: 0,
       bodyMarginBottom: 0,
       hasSections: false,
+      dynamicHeader: false,
     });
   });
 
@@ -31,6 +32,7 @@ describe('normalizeSetting', () => {
       bodyMarginTop: 0,
       bodyMarginBottom: 0,
       hasSections: false,
+      dynamicHeader: false,
     });
   });
 
@@ -51,6 +53,7 @@ describe('normalizeSetting', () => {
       bodyMarginTop: 0,
       bodyMarginBottom: 420_000,
       hasSections: false,
+      dynamicHeader: false,
     });
   });
 
@@ -64,6 +67,7 @@ describe('normalizeSetting', () => {
       bodyMarginTop: 0,
       bodyMarginBottom: 0,
       hasSections: true,
+      dynamicHeader: false,
     });
   });
 
@@ -77,6 +81,7 @@ describe('normalizeSetting', () => {
       bodyMarginTop: 0,
       bodyMarginBottom: 0,
       hasSections: false,
+      dynamicHeader: false,
     });
   });
 });

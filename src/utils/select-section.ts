@@ -30,8 +30,12 @@ export function selectSection(sectionSettings: SectionSetting[], pageIndex: numb
   const isLast = pageIndex === count - 1;
   const isOdd = (pageIndex + 1 + offset) % 2 === 1;
 
+  // FIRST then LAST (matches the documented priority order). A single page is both first
+  // and last, so checking each independently means a `first`-only variant (e.g. a
+  // first-page header) still applies instead of falling through to default.
   return (
-    (isLast || isFirst ? findVariant(sectionSettings, isLast ? Variant.LAST : Variant.FIRST) : undefined) ||
+    (isFirst ? findVariant(sectionSettings, Variant.FIRST) : undefined) ||
+    (isLast ? findVariant(sectionSettings, Variant.LAST) : undefined) ||
     findVariant(sectionSettings, isOdd ? Variant.ODD : Variant.EVEN) ||
     findVariant(sectionSettings, Variant.DEFAULT)
   );

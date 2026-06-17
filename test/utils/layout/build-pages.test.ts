@@ -52,6 +52,7 @@ interface MockLayoutOpts {
   height?: number;
   width?: number;
   bodyHeightMinimumFactor?: number;
+  dynamicHeader?: boolean;
   pageCount?: number;
 }
 
@@ -103,6 +104,7 @@ describe('buildPages', () => {
         pageHeight: opts?.height ?? 200,
         pageWidth: opts?.width ?? 200,
         bodyHeightMinimumFactor: opts?.bodyHeightMinimumFactor ?? 1 / 3,
+        dynamicHeader: opts?.dynamicHeader,
       }
     );
     if (opts?.pageCount) layout.pageCount = opts.pageCount;
@@ -209,5 +211,31 @@ describe('buildPages', () => {
     expect(PDFDocument.load).toHaveBeenCalledTimes(4);
     expect(opts.html.prepareSection).toHaveBeenCalledTimes(4);
     expect(opts.html.pdf).toHaveBeenCalledTimes(4);
+  });
+
+  test('top-aligns each page header at its own height when dynamicHeader', async () => {
+    const opts = await mockBuildPagesOpts({
+      totalPagesNumber: 2,
+      layout: {
+        height: 1000,
+        dynamicHeader: true,
+        settings: {
+          headers: [
+            mockSectionSetting({height: 100, physicalPageType: 'first', physicalPageIndex: 0}),
+            mockSectionSetting({height: 50, physicalPageType: 'default', physicalPageIndex: 1}),
+          ],
+        },
+        pageCount: 2,
+      },
+    });
+
+    const {pages} = await buildPages(opts);
+
+    // page 1 → tall first-page header, top-aligned
+    expect(pages[0].header?.height).toBe(100);
+    expect(pages[0].header?.y).toBe(900); // 1000 - 100
+    // page 2 → default header at its own height, also top-aligned (flush to body, no gap)
+    expect(pages[1].header?.height).toBe(50);
+    expect(pages[1].header?.y).toBe(950); // 1000 - 50
   });
 });
