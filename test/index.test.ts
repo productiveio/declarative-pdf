@@ -154,6 +154,31 @@ describe('DeclarativePDF', () => {
     expect(buffer).toBeInstanceOf(Buffer);
   });
 
+  test('closes its tab after the single-page early return', async () => {
+    const singlePageHtml = '<html><body><document-page><page-body>leak check</page-body></document-page></body></html>';
+
+    // string input: the internally opened tab must be closed again
+    const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+    const pagesBefore = (await browser.pages()).length;
+    const pdf = new DeclarativePDF(browser, {debug: {timeLog: true}});
+    const buffer = await pdf.generate(singlePageHtml);
+
+    expect(buffer).toBeInstanceOf(Buffer);
+    expect((await browser.pages()).length).toBe(pagesBefore);
+    expect(consoleLogSpy).toHaveBeenCalled();
+    consoleLogSpy.mockRestore();
+
+    // page input: the provided page is released (reusable) but stays open — the caller owns it
+    const page = await browser.newPage();
+    await page.setContent(singlePageHtml);
+    const buffer2 = await pdf.generate(page);
+
+    expect(buffer2).toBeInstanceOf(Buffer);
+    expect(page.isClosed()).toBe(false);
+    await expect(pdf.generate(page)).resolves.toBeInstanceOf(Buffer);
+    await page.close();
+  });
+
   test('throws an error if the browser is faulty', () => {
     const fakeBrowser = {} as unknown as Browser;
     const pdf = new DeclarativePDF(fakeBrowser);

@@ -169,13 +169,28 @@ export default class DeclarativePDF {
        */
       if (this.documentPages.length === 1 && !this.documentPages[0].hasSections) {
         const meta = this.documentOptions?.meta;
+        let buffer = this.documentPages[0].body!.buffer;
         if (meta) {
-          const pdf = await PDFDocument.load(this.documentPages[0].body!.buffer);
+          const pdf = await PDFDocument.load(buffer);
           setDocumentMetadata(pdf, meta);
-          return Buffer.from(await pdf.save());
+          buffer = Buffer.from(await pdf.save());
         }
 
-        return this.documentPages[0].body!.buffer;
+        if (isPageHandledInternally) {
+          /** cleanup - close the tab in browser */
+          logger?.level1().start('[6] Closing tab');
+          await this.html.close();
+        } else {
+          /** cleanup - release the page */
+          this.html.releasePage();
+        }
+
+        /** cleanup - close the logger session */
+        logger?.session().end();
+        const report = logger?.report;
+        if (report) console.log(report);
+
+        return buffer;
       }
 
       /**
