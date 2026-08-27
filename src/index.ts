@@ -180,8 +180,17 @@ export default class DeclarativePDF {
          * Unlike the normal path below, the time-log report is only printed
          * here, not attached — attaching would need a pdf-lib load of the
          * body buffer, which this fast path avoids unless meta is set.
+         *
+         * The buffer is already rendered at this point, so a cleanup
+         * failure must not replace it — log the failure and drop the page
+         * reference so this instance stays usable.
          */
-        await this.cleanup(isPageHandledInternally, logger, '[6] Closing tab');
+        try {
+          await this.cleanup(isPageHandledInternally, logger, '[6] Closing tab');
+        } catch (cleanupError) {
+          console.error('Failed to close tab after PDF generation:', cleanupError);
+          this.html.releasePage();
+        }
 
         return buffer;
       }
