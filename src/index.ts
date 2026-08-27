@@ -179,7 +179,7 @@ export default class DeclarativePDF {
         /**
          * Unlike the normal path below, the time-log report is only printed
          * here, not attached — attaching would need a pdf-lib load of the
-         * body buffer, defeating the point of this fast path.
+         * body buffer, which this fast path avoids unless meta is set.
          */
         await this.cleanup(isPageHandledInternally, logger, '[6] Closing tab');
 
