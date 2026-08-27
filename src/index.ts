@@ -176,19 +176,12 @@ export default class DeclarativePDF {
           buffer = Buffer.from(await pdf.save());
         }
 
-        if (isPageHandledInternally) {
-          /** cleanup - close the tab in browser */
-          logger?.level1().start('[6] Closing tab');
-          await this.html.close();
-        } else {
-          /** cleanup - release the page */
-          this.html.releasePage();
-        }
-
-        /** cleanup - close the logger session */
-        logger?.session().end();
-        const report = logger?.report;
-        if (report) console.log(report);
+        /**
+         * Unlike the normal path below, the time-log report is only printed
+         * here, not attached — attaching would need a pdf-lib load of the
+         * body buffer, defeating the point of this fast path.
+         */
+        await this.cleanup(isPageHandledInternally, logger, '[6] Closing tab');
 
         return buffer;
       }
@@ -201,20 +194,8 @@ export default class DeclarativePDF {
       const pdf = await this.buildPDF(logger);
       logger?.level1().end();
 
-      if (isPageHandledInternally) {
-        /** cleanup - close the tab in browser */
-        logger?.level1().start('[7] Closing tab');
-        await this.html.close();
-      } else {
-        /** cleanup - release the page */
-        this.html.releasePage();
-      }
-
-      /** cleanup - close the logger session */
-      logger?.session().end();
-      const report = logger?.report;
+      const report = await this.cleanup(isPageHandledInternally, logger, '[7] Closing tab');
       if (report) {
-        console.log(report);
         const reportPdf = await PDFDocument.create();
         const font = await reportPdf.embedFont(StandardFonts.Courier);
         const page = reportPdf.addPage(PageSizes.A4);
@@ -237,22 +218,33 @@ export default class DeclarativePDF {
 
       return Buffer.from(await pdf.save());
     } catch (error) {
-      if (isPageHandledInternally) {
-        /** cleanup - always close opened tab in the browser to avoid memory leaks */
-        logger?.level1().start('[x] Closing tab after error');
-        await this.html.close();
-      } else {
-        /** cleanup - release the page */
-        this.html.releasePage();
-      }
-
-      /** cleanup - always close the logger session */
-      logger?.session().end();
-      const report = logger?.report;
-      if (report) console.log(report);
+      await this.cleanup(isPageHandledInternally, logger, '[x] Closing tab after error');
 
       throw error;
     }
+  }
+
+  /**
+   * Closes the internally opened tab (or releases an externally provided
+   * page), ends the logger session and prints the time-log report.
+   * Returns the report so the caller can attach it to the PDF.
+   */
+  private async cleanup(isPageHandledInternally: boolean, logger: TimeLogger | undefined, label: string) {
+    if (isPageHandledInternally) {
+      /** cleanup - close the tab in browser */
+      logger?.level1().start(label);
+      await this.html.close();
+    } else {
+      /** cleanup - release the page */
+      this.html.releasePage();
+    }
+
+    /** cleanup - close the logger session */
+    logger?.session().end();
+    const report = logger?.report;
+    if (report) console.log(report);
+
+    return report;
   }
 
   /**

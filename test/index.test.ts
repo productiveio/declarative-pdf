@@ -166,7 +166,6 @@ describe('DeclarativePDF', () => {
     expect(buffer).toBeInstanceOf(Buffer);
     expect((await browser.pages()).length).toBe(pagesBefore);
     expect(consoleLogSpy).toHaveBeenCalled();
-    consoleLogSpy.mockRestore();
 
     // page input: the provided page is released (reusable) but stays open — the caller owns it
     const page = await browser.newPage();
@@ -177,6 +176,7 @@ describe('DeclarativePDF', () => {
     expect(page.isClosed()).toBe(false);
     await expect(pdf.generate(page)).resolves.toBeInstanceOf(Buffer);
     await page.close();
+    consoleLogSpy.mockRestore();
   });
 
   test('throws an error if the browser is faulty', () => {
