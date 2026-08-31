@@ -154,6 +154,63 @@ describe('DeclarativePDF', () => {
     expect(buffer).toBeInstanceOf(Buffer);
   });
 
+  test('closes its tab after the single-page early return', async () => {
+    const singlePageHtml = '<html><body><document-page><page-body>leak check</page-body></document-page></body></html>';
+
+    const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+    let page: Page | undefined;
+    try {
+      // string input: the internally opened tab must be closed again
+      const pagesBefore = (await browser.pages()).length;
+      const pdf = new DeclarativePDF(browser, {debug: {timeLog: true}});
+      const buffer = await pdf.generate(singlePageHtml);
+
+      expect(buffer).toBeInstanceOf(Buffer);
+      expect((await browser.pages()).length).toBe(pagesBefore);
+      expect(consoleLogSpy).toHaveBeenCalled();
+
+      // page input: the provided page is released (reusable) but stays open — the caller owns it
+      page = await browser.newPage();
+      await page.setContent(singlePageHtml);
+      const buffer2 = await pdf.generate(page);
+
+      expect(buffer2).toBeInstanceOf(Buffer);
+      expect(page.isClosed()).toBe(false);
+      await expect(pdf.generate(page)).resolves.toBeInstanceOf(Buffer);
+    } finally {
+      consoleLogSpy.mockRestore();
+      if (page && !page.isClosed()) await page.close();
+    }
+  });
+
+  test('returns the buffer from the fast path even when closing the tab fails', async () => {
+    const singlePageHtml =
+      '<html><body><document-page><page-body>close failure</page-body></document-page></body></html>';
+
+    const pdf = new DeclarativePDF(browser);
+    const pagesBefore = (await browser.pages()).length;
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+    const closeSpy = jest.spyOn(pdf.html, 'close').mockRejectedValueOnce(new Error('close failed'));
+
+    try {
+      const buffer = await pdf.generate(singlePageHtml);
+
+      expect(buffer).toBeInstanceOf(Buffer);
+      expect(closeSpy).toHaveBeenCalledTimes(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to close tab after PDF generation:', expect.any(Error));
+
+      // the failed close must not wedge the instance for further generates
+      const buffer2 = await pdf.generate(singlePageHtml);
+      expect(buffer2).toBeInstanceOf(Buffer);
+    } finally {
+      closeSpy.mockRestore();
+      consoleErrorSpy.mockRestore();
+      // the stubbed close left the first internal tab open — close it
+      const leaked = (await browser.pages()).slice(pagesBefore);
+      for (const page of leaked) await page.close();
+    }
+  });
+
   test('throws an error if the browser is faulty', () => {
     const fakeBrowser = {} as unknown as Browser;
     const pdf = new DeclarativePDF(fakeBrowser);
