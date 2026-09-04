@@ -31,7 +31,7 @@ overrides:
   js-yaml@>=4.0.0 <4.3.1: '>=4.3.1 <5.0.0'
   ip-address@<10.3.1: '>=10.3.1 <11.0.0'
   ws@>=8.0.0 <8.21.0: '>=8.21.0 <9.0.0'
-  postcss@<8.5.18: '>=8.5.18 <9.0.0'
+  postcss@<8.5.27: '>=8.5.27 <9.0.0'
 
 importers:
 
@@ -79,10 +79,10 @@ importers:
         version: 1.0.1(jest-resolve@30.2.0)
       jsdom:
         specifier: 27.0.0
-        version: 27.0.0(postcss@8.5.26)
+        version: 27.0.0(postcss@8.5.27)
       postcss:
-        specifier: '>=8.5.18 <9.0.0'
-        version: 8.5.26
+        specifier: 8.5.27
+        version: 8.5.27
       prettier:
         specifier: 3.6.2
         version: 3.6.2
@@ -100,7 +100,7 @@ importers:
         version: 4.2.0
       tsup:
         specifier: 8.5.0
-        version: 8.5.0(postcss@8.5.26)(typescript@5.9.3)
+        version: 8.5.0(postcss@8.5.27)(typescript@5.9.3)
       typescript:
         specifier: 5.9.3
         version: 5.9.3
@@ -341,7 +341,7 @@ packages:
     resolution: {integrity: sha512-zSlIxa20WvMojjpCSy8WrNpcZ61RqfTfX3XTaOeVlGJrt/8HF3YbzgFZa01yTbT4GWQLwfTcC3EB8i3XnB647Q==}
     engines: {node: '>=18'}
     peerDependencies:
-      postcss: '>=8.5.18 <9.0.0'
+      postcss: '>=8.5.27 <9.0.0'
 
   '@csstools/css-tokenizer@3.0.4':
     resolution: {integrity: sha512-Vd/9EVDiu6PPJt9yAh6roZP6El1xHrdvIVGjyBsHR0RYwNHgL7FJPyIIW4fANJNG6FtyZfvlRPpFI4ZM/lubvw==}
@@ -3029,7 +3029,7 @@ packages:
     engines: {node: '>= 18'}
     peerDependencies:
       jiti: '>=1.21.0'
-      postcss: '>=8.5.18 <9.0.0'
+      postcss: '>=8.5.27 <9.0.0'
       tsx: ^4.8.1
       yaml: ^2.4.2
     peerDependenciesMeta:
@@ -3042,8 +3042,8 @@ packages:
       yaml:
         optional: true
 
-  postcss@8.5.26:
-    resolution: {integrity: sha512-u82N74LFzG8ca+dD8puPnplTXoGH4fTPpVGuIbt36G3qvNlkvfD0lEAZSxaly3KX8TS/L1A1gsCEmvKmBcVbkQ==}
+  postcss@8.5.27:
+    resolution: {integrity: sha512-79Iho8QeYyooJ8e9lCRyTVlyTAkS/kXBYKff6TMzS3kEWGQ8Ds5UEtXpGrSUDLUWok6QTvxeYy0GO8fopHnaSA==}
     engines: {node: ^10 || ^12 || >=14}
 
   prelude-ls@1.2.1:
@@ -3544,7 +3544,7 @@ packages:
     peerDependencies:
       '@microsoft/api-extractor': ^7.36.0
       '@swc/core': ^1
-      postcss: '>=8.5.18 <9.0.0'
+      postcss: '>=8.5.27 <9.0.0'
       typescript: '>=4.5.0'
     peerDependenciesMeta:
       '@microsoft/api-extractor':
@@ -4074,9 +4074,9 @@ snapshots:
     dependencies:
       '@csstools/css-tokenizer': 3.0.4
 
-  '@csstools/css-syntax-patches-for-csstree@1.0.14(postcss@8.5.26)':
+  '@csstools/css-syntax-patches-for-csstree@1.0.14(postcss@8.5.27)':
     dependencies:
-      postcss: 8.5.26
+      postcss: 8.5.27
 
   '@csstools/css-tokenizer@3.0.4': {}
 
@@ -5361,10 +5361,10 @@ snapshots:
       '@asamuzakjp/css-color': 3.2.0
       rrweb-cssom: 0.8.0
 
-  cssstyle@5.3.1(postcss@8.5.26):
+  cssstyle@5.3.1(postcss@8.5.27):
     dependencies:
       '@asamuzakjp/css-color': 4.0.5
-      '@csstools/css-syntax-patches-for-csstree': 1.0.14(postcss@8.5.26)
+      '@csstools/css-syntax-patches-for-csstree': 1.0.14(postcss@8.5.27)
       css-tree: 3.1.0
     transitivePeerDependencies:
       - postcss
@@ -6836,10 +6836,10 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  jsdom@27.0.0(postcss@8.5.26):
+  jsdom@27.0.0(postcss@8.5.27):
     dependencies:
       '@asamuzakjp/dom-selector': 6.6.2
-      cssstyle: 5.3.1(postcss@8.5.26)
+      cssstyle: 5.3.1(postcss@8.5.27)
       data-urls: 6.0.0
       decimal.js: 10.6.0
       html-encoding-sniffer: 4.0.0
@@ -7214,13 +7214,13 @@ snapshots:
 
   possible-typed-array-names@1.0.0: {}
 
-  postcss-load-config@6.0.1(postcss@8.5.26):
+  postcss-load-config@6.0.1(postcss@8.5.27):
     dependencies:
       lilconfig: 3.1.2
     optionalDependencies:
-      postcss: 8.5.26
+      postcss: 8.5.27
 
-  postcss@8.5.26:
+  postcss@8.5.27:
     dependencies:
       nanoid: 3.3.18
       picocolors: 1.1.1
@@ -7841,7 +7841,7 @@ snapshots:
 
   tslib@2.8.1: {}
 
-  tsup@8.5.0(postcss@8.5.26)(typescript@5.9.3):
+  tsup@8.5.0(postcss@8.5.27)(typescript@5.9.3):
     dependencies:
       bundle-require: 5.1.0(esbuild@0.28.1)
       cac: 6.7.14
@@ -7852,7 +7852,7 @@ snapshots:
       fix-dts-default-cjs-exports: 1.0.1
       joycon: 3.1.1
       picocolors: 1.1.1
-      postcss-load-config: 6.0.1(postcss@8.5.26)
+      postcss-load-config: 6.0.1(postcss@8.5.27)
       resolve-from: 5.0.0
       rollup: 4.60.1
       source-map: 0.8.0-beta.0
@@ -7861,7 +7861,7 @@ snapshots:
       tinyglobby: 0.2.12
       tree-kill: 1.2.2
     optionalDependencies:
-      postcss: 8.5.26
+      postcss: 8.5.27
       typescript: 5.9.3
     transitivePeerDependencies:
       - jiti
