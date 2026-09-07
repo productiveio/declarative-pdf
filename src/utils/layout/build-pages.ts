@@ -218,26 +218,24 @@ async function embedAndPlaceSection(page: PDFPage, section?: SectionElement) {
   if (!section) return;
 
   const embeddedPage = await section.embedPage(page);
-  const placement = {
+
+  page.drawPage(embeddedPage, {
     x: section.x,
     y: section.y,
     width: section.width,
     height: section.height,
-  };
-
-  page.drawPage(embeddedPage, placement);
-  transferLinkAnnotations(page, section.sourcePage, placement);
+  });
+  transferLinkAnnotations(page, section.sourcePage, section);
 }
 
 async function embedAndPlaceBody(page: PDFPage, body: BodyElement, idx: number) {
   const [embeddedPage] = await body.embedPageIdx(page, idx);
-  const placement = {
+
+  page.drawPage(embeddedPage, {
     x: body.x,
     y: body.y,
     width: body.width,
     height: body.height,
-  };
-
-  page.drawPage(embeddedPage, placement);
-  transferLinkAnnotations(page, body.sourcePage(idx), placement);
+  });
+  transferLinkAnnotations(page, body.sourcePage(idx), body);
 }
