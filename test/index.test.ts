@@ -2,6 +2,7 @@
  * @jest-environment node
  */
 import fs from 'fs';
+import {PDFDict, PDFDocument, PDFName, PDFString} from 'pdf-lib';
 import puppeteer, {type Browser, type Page} from 'puppeteer';
 import DeclarativePDF from '@app/index';
 import HTMLAdapter from '@app/utils/adapter-puppeteer';
@@ -284,6 +285,46 @@ describe('DeclarativePDF', () => {
     );
 
     setMetadataSpy.mockRestore();
+  });
+
+  test('keeps links clickable in the assembled PDF', async () => {
+    const linkedHtml = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            page-footer { display: block; height: 40px; }
+            .spacer { height: 900px; }
+          </style>
+        </head>
+        <body>
+          <document-page format="a4">
+            <page-footer><a href="https://productive.io">productive.io</a></page-footer>
+            <page-body>
+              <p><a href="https://productive.io/terms">Payment terms</a></p>
+              <div class="spacer"></div>
+              <p><a href="mailto:hello@productive.io">hello@productive.io</a></p>
+            </page-body>
+          </document-page>
+        </body>
+      </html>
+    `;
+
+    const pdf = new DeclarativePDF(browser);
+    const buffer = await pdf.generate(linkedHtml);
+    const document = await PDFDocument.load(buffer);
+
+    const uris = document.getPages().map((page) => {
+      const annots = page.node.Annots();
+
+      return Array.from({length: annots?.size() ?? 0}, (_, index) =>
+        annots!.lookup(index, PDFDict).lookup(PDFName.of('A'), PDFDict).lookup(PDFName.of('URI'), PDFString).asString()
+      );
+    });
+
+    expect(document.getPageCount()).toBe(2);
+    expect(uris[0].sort()).toEqual(['https://productive.io/', 'https://productive.io/terms']);
+    expect(uris[1].sort()).toEqual(['https://productive.io/', 'mailto:hello@productive.io']);
   });
 
   test('throws error when header/footer are too large with small bodyHeightMinimumFactor', async () => {
