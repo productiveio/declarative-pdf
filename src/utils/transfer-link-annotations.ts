@@ -2,7 +2,6 @@ import {PDFArray, PDFDict, PDFName, PDFNumber, PDFObjectCopier} from 'pdf-lib';
 
 import type {PDFPage} from 'pdf-lib';
 
-const ANNOTS = PDFName.of('Annots');
 const SUBTYPE = PDFName.of('Subtype');
 const LINK = PDFName.of('Link');
 const RECT = PDFName.of('Rect');
@@ -40,14 +39,6 @@ function transformRect(rect: PDFArray, placement: Placement, scaleX: number, sca
   ];
 }
 
-function annotationsOf(page: PDFPage) {
-  const existing = page.node.Annots();
-  if (existing) return existing;
-
-  page.node.set(ANNOTS, page.doc.context.obj([]));
-  return page.node.Annots()!;
-}
-
 /**
  * Carries link annotations from an embedded source page onto the page it was drawn on.
  *
@@ -72,6 +63,8 @@ export function transferLinkAnnotations(targetPage: PDFPage, sourcePage: PDFPage
   const scaleY = placement.height / sourceHeight;
 
   const context = targetPage.doc.context;
+  // Per call: the copier memoizes clones, so a section drawn on several pages would
+  // otherwise share one annotation dict and every page would get the last rect.
   const copier = PDFObjectCopier.for(sourcePage.doc.context, context);
 
   let transferred = 0;
@@ -85,12 +78,12 @@ export function transferLinkAnnotations(targetPage: PDFPage, sourcePage: PDFPage
 
     const copy = copier.copy(annotation);
     copy.set(RECT, context.obj(transformRect(rect, placement, scaleX, scaleY)));
-    // Both index into the source document — its structure tree is not copied, and the
-    // owning page is the target one now.
+    // Both index into the source document: its structure tree is not copied, and /P is
+    // optional, so the copy needs no owning-page reference at all.
     copy.delete(STRUCT_PARENT);
     copy.delete(PAGE);
 
-    annotationsOf(targetPage).push(context.register(copy));
+    targetPage.node.addAnnot(context.register(copy));
     transferred++;
   }
 

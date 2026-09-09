@@ -86,6 +86,19 @@ describe('transferLinkAnnotations', () => {
     expect(rectOf(annotationsOf(target)[1])).toEqual([10, 20, 50, 40]);
   });
 
+  test('keeps one source page placed on several target pages independent', async () => {
+    const source = await sourcePage([EXTERNAL_LINK]);
+    const doc = await PDFDocument.create();
+    const first = doc.addPage([200, 500]);
+    const second = doc.addPage([200, 500]);
+
+    transferLinkAnnotations(first, source, {x: 0, y: 0, width: 200, height: 400});
+    transferLinkAnnotations(second, source, {x: 0, y: 100, width: 200, height: 400});
+
+    expect(rectOf(annotationsOf(first)[0])).toEqual([10, 20, 50, 40]);
+    expect(rectOf(annotationsOf(second)[0])).toEqual([10, 120, 50, 140]);
+  });
+
   test('skips annotations that cannot be carried over on their own', async () => {
     const source = await sourcePage([
       {Type: 'Annot', Subtype: 'Link', Rect: [10, 20, 50, 40], Dest: 'footnote'},
