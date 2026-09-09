@@ -39,6 +39,10 @@ export class BodyElement {
     return this.layout.height;
   }
 
+  sourcePage(idx: number) {
+    return this.pdf.getPage(idx);
+  }
+
   async embedPageIdx(targetPage: PDFPage, idx: number) {
     try {
       return await targetPage.doc.embedPdf(this.pdf, [idx]);
@@ -108,6 +112,10 @@ export class SectionElement {
 
   get name() {
     return this._name;
+  }
+
+  get sourcePage() {
+    return this.pdf.getPage(0);
   }
 
   async embedPage(targetPage: PDFPage) {

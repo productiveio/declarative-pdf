@@ -19,7 +19,10 @@ jest.mock('pdf-lib', () => {
     embedPdf: jest.fn().mockResolvedValue([{}]),
     getPageCount: () => 1,
     getPageIndices: () => [0],
-    getPage: () => ({}),
+    getPage: () => ({
+      node: {Annots: () => undefined},
+      getSize: () => ({width: 200, height: 200}),
+    }),
     copyPages: () => [],
   };
 
@@ -31,6 +34,7 @@ jest.mock('pdf-lib', () => {
   };
 
   return {
+    ...jest.requireActual('pdf-lib'),
     PDFDocument: {
       load: jest.fn().mockResolvedValue(mockDocument),
       create: jest.fn().mockResolvedValue({

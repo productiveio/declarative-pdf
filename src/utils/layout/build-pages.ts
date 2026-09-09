@@ -1,5 +1,6 @@
 import {PDFDocument} from 'pdf-lib';
 import {selectSection} from '@app/utils/select-section';
+import {transferLinkAnnotations} from '@app/utils/transfer-link-annotations';
 import {SectionElement} from '@app/models/element';
 
 import type {PDFPage} from 'pdf-lib';
@@ -224,6 +225,7 @@ async function embedAndPlaceSection(page: PDFPage, section?: SectionElement) {
     width: section.width,
     height: section.height,
   });
+  transferLinkAnnotations(page, section.sourcePage, section);
 }
 
 async function embedAndPlaceBody(page: PDFPage, body: BodyElement, idx: number) {
@@ -235,4 +237,5 @@ async function embedAndPlaceBody(page: PDFPage, body: BodyElement, idx: number) 
     width: body.width,
     height: body.height,
   });
+  transferLinkAnnotations(page, body.sourcePage(idx), body);
 }

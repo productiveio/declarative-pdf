@@ -45,6 +45,7 @@
 - `page size and orientation` - define page size by name or by width, height and ppi
 - `multi-page content` - content that spans across multiple pages
 - `page numbering` - display page numbers within headers, footers or backgrounds
+- `links` - anchors stay clickable in the generated PDF, in the body and in repeating sections
 
 # Motivation
 

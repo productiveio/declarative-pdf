@@ -40,6 +40,7 @@ You can include any valid HTML content within these elements.
   - [Repeating section special elements](#repeating-section-special-elements)
     - [Physical page](#physical-page)
     - [Current and total page number](#current-and-total-page-number)
+- [Links](#links)
 
 ## Template structure
 
@@ -421,3 +422,15 @@ So, on 4th page of 5 page document, page numbers would be:
   Page <current-page-number>4</current-page-number> of <total-pages-number>5</total-pages-number>
 </page-footer>
 ```
+
+## Links
+
+Anchors keep working in the generated PDF, in the body as well as in repeating sections — a link in a footer is placed on every page that footer renders on.
+
+```html
+<page-footer>
+  Questions? <a href="mailto:hello@example.com">hello@example.com</a>
+</page-footer>
+```
+
+Only links with an external target (`https:`, `mailto:`, ...) are carried over. Chrome renders in-document anchors (`<a href="#section">`) as named destinations, which resolve through the name tree of the page they were rendered from — that page is not part of the assembled document, so such links arrive as plain styled text.
