@@ -10,7 +10,6 @@ overrides:
   pdfjs-dist@<=4.1.392: '>=4.2.67'
   cross-spawn@<6.0.6: '>=6.0.6'
   tar-fs@>=3.0.0 <3.0.9: '>=3.0.9'
-  basic-ftp@<=5.2.1: 5.2.2
   flatted@<=3.4.1: 3.4.2
   handlebars@>=4.0.0 <=4.7.9: '>=4.7.10 <5.0.0'
   rollup@>=4.0.0 <4.59.0: 4.60.1
@@ -36,6 +35,7 @@ overrides:
   browserslist@>=4.0.0 <4.28.7: '>=4.28.7 <5.0.0'
   baseline-browser-mapping@>=2.0.0 <2.11.0: '>=2.11.0 <3.0.0'
   '@humanfs/node@<0.16.8': '>=0.16.8 <0.17.0'
+  basic-ftp@<=6.2.3: '>=6.2.4 <7.0.0'
 
 importers:
 
@@ -1420,8 +1420,8 @@ packages:
     engines: {node: '>=6.0.0'}
     hasBin: true
 
-  basic-ftp@5.2.2:
-    resolution: {integrity: sha512-1tDrzKsdCg70WGvbFss/ulVAxupNauGnOlgpyjKzeQxzyllBLS0CGLV7tjIXTK3ZQA9/FBEm9qyFFN1bciA6pw==}
+  basic-ftp@6.2.6:
+    resolution: {integrity: sha512-0EjZCaodOz6yiokv2JA1VyKGNdGxULZ+GGlPgG9tm4d+T/bHtX1hUch8CumDneBfpIbiSdn7TaCGwpM+gwsOlw==}
     engines: {node: '>=10.0.0'}
 
   bidi-js@1.0.3:
@@ -5193,7 +5193,7 @@ snapshots:
 
   baseline-browser-mapping@2.11.23: {}
 
-  basic-ftp@5.2.2: {}
+  basic-ftp@6.2.6: {}
 
   bidi-js@1.0.3:
     dependencies:
@@ -6064,7 +6064,7 @@ snapshots:
 
   get-uri@6.0.5:
     dependencies:
-      basic-ftp: 5.2.2
+      basic-ftp: 6.2.6
       data-uri-to-buffer: 6.0.2
       debug: 4.4.3
     transitivePeerDependencies:
